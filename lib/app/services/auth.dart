@@ -109,8 +109,8 @@ class Auth implements AuthBase {
       switch (result.status) {
         case AuthorizationStatus.authorized:
 //          try {
-            print("Apple successfull sign in");
             final appleIdCredential = result.credential;
+            print("Apple successfull sign in for ${appleIdCredential.fullName.givenName} ${appleIdCredential.fullName.familyName}");
             final oAuthProvider = OAuthProvider(providerId: "apple.com");
             final credential = oAuthProvider.getCredential(
               idToken: String.fromCharCodes(appleIdCredential.identityToken),
