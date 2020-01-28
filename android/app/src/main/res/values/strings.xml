@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">[prod] Nearby Menus</string>
+    <string name="facebook_app_id">1523962131096308</string>
+    <string name="fb_login_protocol_scheme">fb1523962131096308</string>
+</resources>
