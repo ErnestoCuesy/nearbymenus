@@ -1,10 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:nearbymenus/app/common_widgets/avatar.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/services/auth.dart';
-import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
 class AccountPage extends StatelessWidget {
@@ -33,27 +31,22 @@ class AccountPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final db = Provider.of<Database>(context);
     final user = Provider.of<User>(context);
-    final environment = db.environment?? '...';
     var accountText = 'Account';
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          environment == 'Production'
+          FlavourConfig.isProduction()
               ? accountText
-              : accountText + ' [$environment]',
-          style: TextStyle(color: Theme.of(context).accentColor),
+              : accountText + ' [DEV]',
+          style: Theme.of(context).primaryTextTheme.title,
         ),
         actions: <Widget>[
           FlatButton(
             child: Text(
               'Logout',
-              style: TextStyle(
-                fontSize: 18.0,
-                color: Theme.of(context).accentColor,
+              style: Theme.of(context).primaryTextTheme.button,
               ),
-            ),
             onPressed: () => _confirmSignOut(context),
           ),
         ],
@@ -63,13 +56,16 @@ class AccountPage extends StatelessWidget {
         ),
       ),
       body: _buildContents(context),
-      backgroundColor: Theme.of(context).backgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     );
   }
 
   Widget _buildUserInfo(BuildContext context, User user) {
     return Column(
       children: <Widget>[
+        if (FlavourConfig.instance.signInWithApple ||
+            FlavourConfig.instance.signInWithFacebook ||
+            FlavourConfig.instance.signInWithGoogle)
         Avatar(
           photoUrl: user.photoUrl,
           radius: 50,
@@ -78,7 +74,7 @@ class AccountPage extends StatelessWidget {
         if (user.displayName != null)
           Text(
             user.displayName,
-            style: TextStyle(color: Theme.of(context).accentColor),
+            style: Theme.of(context).primaryTextTheme.body1,
           ),
         SizedBox(
           height: 8.0,
@@ -87,3 +83,6 @@ class AccountPage extends StatelessWidget {
     );
   }
 }
+// TODO only display avatar if social media sign-in was configured
+// TODO store user name and address in Firebase.
+// TODO Display here along with subscription status

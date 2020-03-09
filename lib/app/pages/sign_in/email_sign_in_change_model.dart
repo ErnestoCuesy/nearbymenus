@@ -1,9 +1,10 @@
 import 'package:nearbymenus/app/pages/sign_in/validators.dart';
 import 'package:nearbymenus/app/services/auth.dart';
-import 'email_sign_in_model.dart';
 import 'package:flutter/foundation.dart';
 
-class EmailSignInChangeModel with EmailAndPasswordValidators, ChangeNotifier {
+enum EmailSignInFormType { signIn, register, resetPassword }
+
+class EmailSignInChangeModel with UserCredentialsValidators, ChangeNotifier {
   EmailSignInChangeModel({
     @required this.auth,
     this.email,
@@ -24,10 +25,19 @@ class EmailSignInChangeModel with EmailAndPasswordValidators, ChangeNotifier {
     updateWith(submitted: true, isLoading: true);
     try {
       // await Future.delayed(Duration(seconds: 3)); // Simulate slow network
-      if (formType == EmailSignInFormType.signIn) {
-        await auth.signInWithEmailAndPassword(email, password);
-      } else {
-        await auth.createUserWithEmailAndPassword(email, password);
+      switch (formType) {
+        case EmailSignInFormType.signIn: {
+          await auth.signInWithEmailAndPassword(email, password);
+        }
+        break;
+        case EmailSignInFormType.register: {
+          await auth.createUserWithEmailAndPassword(email, password);
+        }
+        break;
+        case EmailSignInFormType.resetPassword: {
+          await auth.resetPassword(email);
+        }
+        break;
       }
     } catch (e) {
       updateWith(isLoading: false);
@@ -36,41 +46,82 @@ class EmailSignInChangeModel with EmailAndPasswordValidators, ChangeNotifier {
   }
 
   String get primaryButtonText {
-    return formType == EmailSignInFormType.signIn
-        ? 'Sign In'
-        : 'Create an account';
+    String buttonText;
+    switch (formType) {
+      case EmailSignInFormType.signIn: {
+        buttonText = 'Sign In';
+      }
+      break;
+      case EmailSignInFormType.register: {
+        buttonText = 'Create an account';
+      }
+      break;
+      case EmailSignInFormType.resetPassword: {
+        buttonText = 'Reset password';
+      }
+      break;
+    }
+    return buttonText;
   }
 
   String get secondaryButtonText {
-    return formType == EmailSignInFormType.signIn
-        ? 'Need an account? Register'
-        : 'Have an account? Sign In';
+    String buttonText = '';
+    switch (formType) {
+      case EmailSignInFormType.signIn: {
+        buttonText = 'Don\'t have an account? Register';
+      }
+      break;
+      case EmailSignInFormType.register: {
+        buttonText = 'Have an account? Sign In';
+      }
+      break;
+      case EmailSignInFormType.resetPassword:
+        buttonText = 'Sign In';
+      break;
+    }
+    return buttonText;
   }
 
+  String get tertiaryButtonText => 'Forgot your password?';
+
   bool get canSubmit {
-      return emailValidator.isValid(email) &&
-        passwordValidator.isValid(password) &&
-        !isLoading;
+    bool canSubmitFlag = false;
+    switch (formType) {
+      case EmailSignInFormType.register:
+      case EmailSignInFormType.signIn: {
+        if (emailValidator.isValid(email) &&
+            passwordValidator.isValid(password) &&
+            !isLoading) {
+          canSubmitFlag = true;
+        }
+      }
+      break;
+      case EmailSignInFormType.resetPassword: {
+        if (emailValidator.isValid(email) &&
+            !isLoading) {
+          canSubmitFlag = true;
+        }
+      }
+      break;
+    }
+    return canSubmitFlag;
   }
 
   String get passwordErrorText {
-    bool showErrorText = submitted && !passwordValidator.isValid(password);
+    bool showErrorText = !passwordValidator.isValid(password);
     return showErrorText ? invalidPasswordErrorText : null;
   }
 
   String get emailErrorText {
-    bool showErrorText = submitted && !emailValidator.isValid(email);
+    bool showErrorText = !emailValidator.isValid(email);
     return showErrorText ? invalidEmailErrorText : null;
   }
 
-  void toggleFormType() {
-    final formType = this.formType == EmailSignInFormType.signIn
-        ? EmailSignInFormType.register
-        : EmailSignInFormType.signIn;
+  void toggleFormType(EmailSignInFormType toggleForm) {
     updateWith(
       email: '',
       password: '',
-      formType: formType,
+      formType: toggleForm,
       isLoading: false,
       submitted: false,
     );

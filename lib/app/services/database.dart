@@ -15,25 +15,19 @@ abstract class Database {
   Future<void> setEntry(Entry entry);
   Future<void> deleteEntry(Entry entry);
   Stream<List<Entry>> entriesStream({Job job});
-  String environment;
+  Future<void> setUserDetails();
 }
 
 String documentIdFromCurrentDate() => DateTime.now().toIso8601String();
 
 class FirestoreDatabase implements Database {
 
-  FirestoreDatabase({@required this.uid}) {
+    FirestoreDatabase({@required this.uid}) {
       assert(uid != null);
-      getEnvironment().then((QuerySnapshot snapshot) {
-        environment = snapshot.documents[0].data['name'];
-      });
     }
 
     final String uid;
     final _service = FirestoreService.instance;
-
-    Future<QuerySnapshot> getEnvironment() async => await
-      Firestore.instance.collection(APIPath.environment()).getDocuments();
 
     @override
     Future<void> setJob(Job job) async => await _service.setData(
@@ -84,5 +78,7 @@ class FirestoreDatabase implements Database {
     );
 
     @override
-    String environment;
+    Future<void> setUserDetails() async => await _service.setData(path: APIPath.userDetails(uid), data: {'username': 'userName', 'useraddress': 'userAddress'});
+
 }
+// TODO fix implementation of username, address and location

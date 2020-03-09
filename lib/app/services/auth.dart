@@ -4,12 +4,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 
 class User {
-  User({@required this.uid, @required this.photoUrl, @required this.displayName});
+  User({@required this.uid, @required this.photoUrl, @required this.displayName, @required this.isEmailVerified});
   final String uid;
   final String photoUrl;
   final String displayName;
+  final bool isEmailVerified;
 }
 
 abstract class AuthBase {
@@ -20,7 +22,8 @@ abstract class AuthBase {
   Future<User> signInWithFacebook();
   Future<User> signInWithApple();
   Future<User> signInWithEmailAndPassword(String email, String password);
-  Future<User> createUserWithEmailAndPassword(String email, String password);
+  Future<void> createUserWithEmailAndPassword(String email, String password);
+  Future<void> resetPassword(String email);
   Future<void> signOut();
 }
 
@@ -28,7 +31,8 @@ class Auth implements AuthBase {
   final _fireBaseAuth = FirebaseAuth.instance;
 
   User _userFromFirebase(FirebaseUser user) {
-    return user == null ? null : User(uid: user.uid, displayName: user.displayName, photoUrl: user.photoUrl);
+    print('FirebaseUser => ${user.displayName}');
+    return user == null ? null : User(uid: user.uid, displayName: user.displayName, photoUrl: user.photoUrl, isEmailVerified: user.isEmailVerified);
   }
 
   @override
@@ -54,7 +58,7 @@ class Auth implements AuthBase {
     var googleAccount;
     try {
       googleAccount = await googleSignIn.signIn();
-//      print('Google account => ${googleAccount.toString()}');
+      print('Google account => ${googleAccount.toString()}');
     } catch (e) {
       print(e.toString());
     }
@@ -102,13 +106,13 @@ class Auth implements AuthBase {
 
   @override
   Future<User> signInWithApple() async {
-//    try {
+    try {
       final AuthorizationResult result = await AppleSignIn.performRequests([
         AppleIdRequest(requestedScopes: [Scope.email, Scope.fullName])
       ]);
       switch (result.status) {
         case AuthorizationStatus.authorized:
-//          try {
+          try {
             final appleIdCredential = result.credential;
             print("Apple successfull sign in for ${appleIdCredential.fullName.givenName} ${appleIdCredential.fullName.familyName}");
             final oAuthProvider = OAuthProvider(providerId: "apple.com");
@@ -122,11 +126,11 @@ class Auth implements AuthBase {
             updateUser.displayName = '${appleIdCredential.fullName.givenName} ${appleIdCredential.fullName.familyName}';
             await firebaseUser.updateProfile(updateUser);
             return _userFromFirebase(authResult.user);
-//          } catch (e) {
-//            print('Apple Sign-in ERROR during Firebase auth');
-//            throw PlatformException(
-//                code: 'ERROR_', message: 'Apple Firebase Sign-in error');
-//          }
+          } catch (e) {
+            print('Apple Sign-in ERROR during Firebase auth');
+            throw PlatformException(
+                code: 'ERROR_', message: 'Apple Firebase Sign-in error');
+          }
           break;
         case AuthorizationStatus.error:
         // do something
@@ -142,32 +146,57 @@ class Auth implements AuthBase {
               message: 'Apple Sign In Cancelled by User');
           break;
       }
- //   } catch (error) {
-//      print('ERROR during Apple Sign-in');
-//      throw PlatformException(
-//          code: 'ERROR_',
-//          message: 'Apple Sign-in error');
- //   }
+    } catch (error) {
+      print('ERROR during Apple Sign-in');
+      throw PlatformException(
+          code: 'ERROR_',
+          message: 'Apple Sign-in error');
+    }
   }
 
   @override
   Future<User> signInWithEmailAndPassword(String email, String password) async {
     final authResult = await _fireBaseAuth.signInWithEmailAndPassword(email: email, password: password);
-    return _userFromFirebase(authResult.user);
+    if (!authResult.user.isEmailVerified) {
+      throw PlatformException(
+        code: 'ERROR_EMAIL_NOT_VERIFIED',
+        message: 'Please verify your email address by clicking on the link emailed to you.'
+      );
+    } else {
+      return _userFromFirebase(authResult.user);
+    }
   }
 
   @override
-  Future<User> createUserWithEmailAndPassword(String email, String password) async {
+  Future<void> createUserWithEmailAndPassword(String email, String password) async {
     final authResult = await _fireBaseAuth.createUserWithEmailAndPassword(email: email, password: password);
-    return _userFromFirebase(authResult.user);
+    // TODO Hotmail filters verification email sent by Firebase
+    authResult.user.sendEmailVerification();
+    throw PlatformException(
+        code: 'EMAIL_NOT_VERIFIED',
+        message: 'Please verify your email address by clicking on the link emailed to you.'
+    );
+  }
+
+  @override
+  Future<void> resetPassword(String email) async {
+    await _fireBaseAuth.sendPasswordResetEmail(email: email);
+    throw PlatformException(
+      code: 'PASSWORD_RESET',
+      message: 'A password reset link has been emailed to you. Please click on it to enter your new password and try to sign in again.'
+    );
   }
 
   @override
   Future<void> signOut() async {
-    final googleSignIn = GoogleSignIn();
-    await googleSignIn.signOut();
-    final facebookLogin = FacebookLogin();
-    await facebookLogin.logOut();
+    if (FlavourConfig.instance.signInWithGoogle) {
+      final googleSignIn = GoogleSignIn();
+      await googleSignIn.signOut();
+    }
+    if (FlavourConfig.instance.signInWithFacebook) {
+      final facebookLogin = FacebookLogin();
+      await facebookLogin.logOut();
+    }
     await _fireBaseAuth.signOut();
   }
 }

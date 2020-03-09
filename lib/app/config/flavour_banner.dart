@@ -26,7 +26,7 @@ class FlavourBanner extends StatelessWidget {
   BannerConfig _getDefaultBanner() {
     return BannerConfig(
       bannerName: FlavourConfig.instance.name,
-      bannerColor: FlavourConfig.instance.color
+      bannerColor: FlavourConfig.instance.bannerColor
     );
   }
 

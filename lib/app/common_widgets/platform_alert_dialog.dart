@@ -43,8 +43,7 @@ class PlatformAlertDialog extends PlatformWidget {
   @override
   Widget buildMaterialWidget(BuildContext context) {
     return AlertDialog(
-      //backgroundColor: Theme.of(context).backgroundColor,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).backgroundColor,
       title: Text(title),
       content: Text(content),
       actions: _buildActions(context),
@@ -54,20 +53,21 @@ class PlatformAlertDialog extends PlatformWidget {
   List<Widget> _buildActions(BuildContext context) {
     final actions = <Widget>[];
     if (cancelActionText != null) {
-      actions.add(
-          PlatformAlertDialogAction(
-            child: Text(cancelActionText, style: TextStyle(color: Theme.of(context).accentColor),),
-            onPressed: () => Navigator.of(context).pop(false),
-          )
-
-      );
+      actions.add(PlatformAlertDialogAction(
+        child: Text(
+          cancelActionText,
+          style: Theme.of(context).primaryTextTheme.button,
+        ),
+        onPressed: () => Navigator.of(context).pop(false),
+      ));
     }
-    actions.add(
-      PlatformAlertDialogAction(
-        child: Text(defaultActionText, style: TextStyle(color: Theme.of(context).accentColor),),
-        onPressed: () => Navigator.of(context).pop(true),
-      )
-    );
+    actions.add(PlatformAlertDialogAction(
+      child: Text(
+        defaultActionText,
+        style: Theme.of(context).primaryTextTheme.button,
+      ),
+      onPressed: () => Navigator.of(context).pop(true),
+    ));
     return actions;
   }
 }

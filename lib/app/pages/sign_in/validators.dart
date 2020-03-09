@@ -25,9 +25,13 @@ class NumericFieldValidator implements NumberValidator{
 
 }
 
-class EmailAndPasswordValidators {
+class UserCredentialsValidators {
+  final StringValidator userNameValidator = NonEmptyStringValidator();
+  final StringValidator userAddressValidator = NonEmptyStringValidator();
   final StringValidator emailValidator = NonEmptyStringValidator();
   final StringValidator passwordValidator = NonEmptyStringValidator();
+  final String invalidUsernameErrorText = 'Name can\'t be empty';
+  final String invalidAddressErrorText = 'Address can\'t be empty';
   final String invalidEmailErrorText = 'Email can\'t be empty';
   final String invalidPasswordErrorText = 'Password can\'t be empty';
 }

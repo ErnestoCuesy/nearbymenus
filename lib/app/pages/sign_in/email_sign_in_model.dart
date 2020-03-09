@@ -1,8 +1,8 @@
 import 'package:nearbymenus/app/pages/sign_in/validators.dart';
 
-enum EmailSignInFormType { signIn, register }
+enum EmailSignInFormType { signIn, register, forgotPassword }
 
-class EmailSignInModel with EmailAndPasswordValidators {
+class EmailSignInModel with UserCredentialsValidators {
   EmailSignInModel({
     this.email,
     this.password,
