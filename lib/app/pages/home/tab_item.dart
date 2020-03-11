@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-enum TabItem { restaurants, orders, account}
+enum TabItem { orders, restaurants, account}
 
 class TabItemData {
   const TabItemData({@required this.title, @required this.icon});
@@ -10,8 +10,8 @@ class TabItemData {
   final IconData icon;
 
   static const Map<TabItem, TabItemData> allTabs = {
-    TabItem.restaurants: TabItemData(title: 'Restaurants', icon: Icons.local_dining),
     TabItem.orders: TabItemData(title: 'My Orders', icon: Icons.shopping_cart),
+    TabItem.restaurants: TabItemData(title: 'Restaurants', icon: Icons.local_dining),
     TabItem.account: TabItemData(title: 'Account', icon: Icons.person),
   };
 }

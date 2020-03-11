@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:nearbymenus/app/pages/account/account_page.dart';
 import 'package:nearbymenus/app/pages/home/tab_item.dart';
+import 'package:nearbymenus/app/pages/welcome/user_details_page.dart';
 import 'cupertino_home_scaffold.dart';
 
 class HomePage extends StatefulWidget {

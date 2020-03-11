@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
-import 'package:nearbymenus/app/pages/sign_in/email_sign_in_change_model.dart';
+import 'package:nearbymenus/app/pages/sign_in/email_sign_in_model.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
@@ -10,13 +10,13 @@ class EmailSignInForm extends StatefulWidget {
 
   EmailSignInForm({@required this.model});
 
-  final EmailSignInChangeModel model;
+  final EmailSignInModel model;
 
   static Widget create(BuildContext context) {
     final AuthBase auth = Provider.of<AuthBase>(context);
-    return ChangeNotifierProvider<EmailSignInChangeModel>(
-      builder: (context) => EmailSignInChangeModel(auth: auth),
-      child: Consumer<EmailSignInChangeModel>(
+    return ChangeNotifierProvider<EmailSignInModel>(
+      builder: (context) => EmailSignInModel(auth: auth),
+      child: Consumer<EmailSignInModel>(
         builder: (context, model, _) => EmailSignInForm(model: model),
       ),
     );
@@ -32,7 +32,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
 
-  EmailSignInChangeModel get model => widget.model;
+  EmailSignInModel get model => widget.model;
 
   @override
   void dispose() {

@@ -28,10 +28,12 @@ class NumericFieldValidator implements NumberValidator{
 class UserCredentialsValidators {
   final StringValidator userNameValidator = NonEmptyStringValidator();
   final StringValidator userAddressValidator = NonEmptyStringValidator();
+  final StringValidator userLocationValidator = NonEmptyStringValidator();
   final StringValidator emailValidator = NonEmptyStringValidator();
   final StringValidator passwordValidator = NonEmptyStringValidator();
   final String invalidUsernameErrorText = 'Name can\'t be empty';
   final String invalidAddressErrorText = 'Address can\'t be empty';
+  final String invalidLocationErrorText = 'Location can\'t be empty';
   final String invalidEmailErrorText = 'Email can\'t be empty';
   final String invalidPasswordErrorText = 'Password can\'t be empty';
 }
@@ -42,3 +44,5 @@ class JobNameAndRatePerHourValidators {
   final String invalidJobNameText = 'Job name can\'t be empty';
   final String invalidRatePerHourText = 'Rate per hour must be a number';
 }
+
+// TODO use geo stuff to get user location i.e. estate/complex name

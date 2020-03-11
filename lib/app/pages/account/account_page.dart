@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:nearbymenus/app/common_widgets/avatar.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/services/auth.dart';
@@ -63,13 +62,6 @@ class AccountPage extends StatelessWidget {
   Widget _buildUserInfo(BuildContext context, User user) {
     return Column(
       children: <Widget>[
-        if (FlavourConfig.instance.signInWithApple ||
-            FlavourConfig.instance.signInWithFacebook ||
-            FlavourConfig.instance.signInWithGoogle)
-        Avatar(
-          photoUrl: user.photoUrl,
-          radius: 50,
-        ),
         SizedBox(height: 8.0),
         if (user.displayName != null)
           Text(
@@ -83,6 +75,5 @@ class AccountPage extends StatelessWidget {
     );
   }
 }
-// TODO only display avatar if social media sign-in was configured
 // TODO store user name and address in Firebase.
 // TODO Display here along with subscription status

@@ -11,40 +11,22 @@ class StringUtils {
   }
 }
 
-class FlavourValues {
-  final String dbRootCollection;
-
-  FlavourValues({@required this.dbRootCollection});
-}
-
 class FlavourConfig {
   final Flavour flavour;
   final ColorTheme colorTheme;
   final String name;
   final Color bannerColor;
-  final bool signInWithGoogle;
-  final bool signInWithApple;
-  final bool signInWithFacebook;
-  final FlavourValues values;
   static FlavourConfig _instance;
 
   factory FlavourConfig(
       {@required Flavour flavour,
       @required ColorTheme colorTheme,
-      Color bannerColor: Colors.blue,
-      bool signInWithGoogle: false,
-      bool signInWithApple: false,
-      bool signInWithFacebook: false,
-      @required FlavourValues values}) {
+      Color bannerColor: Colors.blue,}) {
     _instance ??= FlavourConfig._internal(
       flavour,
       colorTheme,
       StringUtils.enumName(flavour.toString()),
       bannerColor,
-      signInWithGoogle,
-      signInWithApple,
-      signInWithFacebook,
-      values,
     );
     return _instance;
   }
@@ -54,10 +36,6 @@ class FlavourConfig {
     this.colorTheme,
     this.name,
     this.bannerColor,
-    this.signInWithGoogle,
-    this.signInWithApple,
-    this.signInWithFacebook,
-    this.values,
   );
   static FlavourConfig get instance => _instance;
   static bool isProduction() => _instance.flavour == Flavour.PROD;

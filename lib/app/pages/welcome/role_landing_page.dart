@@ -1,32 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/config/flavour_banner.dart';
+import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/home/home_page.dart';
 import 'package:nearbymenus/app/pages/sign_in/sign_in_page.dart';
-import 'package:nearbymenus/app/pages/welcome/role_landing_page.dart';
 import 'package:nearbymenus/app/pages/welcome/role_selection_page.dart';
+import 'package:nearbymenus/app/pages/welcome/user_details_page.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
-class LandingPage extends StatelessWidget {
+class RoleLandingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final auth = Provider.of<AuthBase>(context, listen: true);
+    final database = Provider.of<Database>(context, listen: true);
     return FlavourBanner(
-      child: StreamBuilder<User>(
-        stream: auth.onAuthStateChanged,
+      child: StreamBuilder<UserDetails>(
+        stream: database.userDetailsStream(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.active) {
-            User user = snapshot.data;
-            if (user == null || user.isEmailVerified == false) {
-              return SignInPage();
+            UserDetails userDetails = snapshot.data;
+            if (userDetails == null) {
+                return UserDetailsPage();
+            } else {
+              if (userDetails.userRole == 'none' || userDetails.userRole == '') {
+                return RoleSelectionPage(database: database, userDetails: userDetails,);
+              }
             }
-            return Provider<User>.value(
-              value: user,
-              child: Provider<Database>(
-                  builder: (_) => FirestoreDatabase(uid: user.uid),
-                  child: RoleLandingPage()),
-            );
+            return HomePage();
           } else {
             return Scaffold(
               body: Center(
