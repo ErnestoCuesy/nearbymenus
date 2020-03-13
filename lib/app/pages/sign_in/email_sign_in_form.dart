@@ -15,7 +15,7 @@ class EmailSignInForm extends StatefulWidget {
   static Widget create(BuildContext context) {
     final AuthBase auth = Provider.of<AuthBase>(context);
     return ChangeNotifierProvider<EmailSignInModel>(
-      builder: (context) => EmailSignInModel(auth: auth),
+      create: (context) => EmailSignInModel(auth: auth),
       child: Consumer<EmailSignInModel>(
         builder: (context, model, _) => EmailSignInForm(model: model),
       ),
@@ -128,6 +128,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
       style: Theme.of(context).inputDecorationTheme.labelStyle,
       controller: _passwordController,
       focusNode: _passwordFocusNode,
+      cursorColor: Colors.black,
       decoration: InputDecoration(
         labelText: 'Password',
         errorText: model.passwordErrorText,
@@ -146,6 +147,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
       style: Theme.of(context).inputDecorationTheme.labelStyle,
       controller: _emailController,
       focusNode: _emailFocusNode,
+      cursorColor: Colors.black,
       decoration: InputDecoration(
         labelText: 'Email',
         hintText: 'i.e.: test@test.com',

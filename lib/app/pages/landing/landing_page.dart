@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/config/flavour_banner.dart';
-import 'package:nearbymenus/app/pages/home/home_page.dart';
 import 'package:nearbymenus/app/pages/sign_in/sign_in_page.dart';
 import 'package:nearbymenus/app/pages/welcome/role_landing_page.dart';
-import 'package:nearbymenus/app/pages/welcome/role_selection_page.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +22,7 @@ class LandingPage extends StatelessWidget {
             return Provider<User>.value(
               value: user,
               child: Provider<Database>(
-                  builder: (_) => FirestoreDatabase(uid: user.uid),
+                  create: (_) => FirestoreDatabase(uid: user.uid),
                   child: RoleLandingPage()),
             );
           } else {

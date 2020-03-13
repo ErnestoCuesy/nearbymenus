@@ -3,6 +3,7 @@ import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/pages/welcome/user_details_model.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/services/database.dart';
+import 'package:nearbymenus/app/services/device_info.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
@@ -15,7 +16,7 @@ class UserDetailsForm extends StatefulWidget {
   static Widget create(BuildContext context) {
     final Database database = Provider.of<Database>(context);
     return ChangeNotifierProvider<UserDetailsModel>(
-      builder: (context) => UserDetailsModel(database: database),
+      create: (context) => UserDetailsModel(database: database),
       child: Consumer<UserDetailsModel>(
         builder: (context, model, _) => UserDetailsForm(model: model,),
       ),
@@ -47,6 +48,8 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
   }
 
   Future<void> _save() async {
+    final deviceInfo = Provider.of<DeviceInfo>(context, listen: false);
+    model.deviceName = deviceInfo.deviceName;
     try {
       // await Future.delayed(Duration(seconds: 3)); // Simulate slow network
       await model.save();
@@ -111,6 +114,8 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
       style: Theme.of(context).inputDecorationTheme.labelStyle,
       controller: _userNameController,
       focusNode: _userNameFocusNode,
+      textCapitalization: TextCapitalization.words,
+      cursorColor: Colors.black,
       decoration: InputDecoration(
         labelText: 'Name',
         hintText: 'i.e.: Pat',
@@ -132,6 +137,8 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
       style: Theme.of(context).inputDecorationTheme.labelStyle,
       controller: _userAddressController,
       focusNode: _userAddressFocusNode,
+      textCapitalization: TextCapitalization.words,
+      cursorColor: Colors.black,
       decoration: InputDecoration(
         labelText: 'Address or unit number',
         hintText: 'i.e.: Unit 123',
@@ -153,6 +160,8 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
       style: Theme.of(context).inputDecorationTheme.labelStyle,
       controller: _userLocationController,
       focusNode: _userLocationFocusNode,
+      textCapitalization: TextCapitalization.words,
+      cursorColor: Colors.black,
       decoration: InputDecoration(
         labelText: 'Your Location',
         hintText: 'i.e.: Riverswamp Estate',

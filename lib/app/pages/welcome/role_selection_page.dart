@@ -23,7 +23,8 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
           userName: userDetails.userName,
           userAddress: userDetails.userAddress,
           userLocation: userDetails.userLocation,
-          userRole: role),
+          userRole: role,
+          userDeviceName: userDetails.userDeviceName),
     );
   }
 

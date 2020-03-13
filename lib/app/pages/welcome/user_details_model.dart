@@ -9,6 +9,7 @@ class UserDetailsModel with UserCredentialsValidators, ChangeNotifier {
   String userAddress;
   String userLocation;
   String userRole;
+  String deviceName;
   bool isLoading;
   bool submitted;
 
@@ -30,7 +31,8 @@ class UserDetailsModel with UserCredentialsValidators, ChangeNotifier {
           userName: userName,
           userAddress: userAddress,
           userLocation: userLocation,
-          userRole: 'none'
+          userRole: 'none',
+          userDeviceName: deviceName
         ),
       );
     } catch (e) {

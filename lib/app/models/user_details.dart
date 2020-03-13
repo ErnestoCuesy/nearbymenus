@@ -3,12 +3,14 @@ class UserDetails {
   final String userAddress;
   final String userLocation;
   final String userRole;
+  final String userDeviceName;
 
   UserDetails({
     this.userName,
     this.userAddress,
     this.userLocation,
     this.userRole = 'none',
+    this.userDeviceName = ''
   });
 
   factory UserDetails.fromMap(Map<String, dynamic> data) {
@@ -23,7 +25,8 @@ class UserDetails {
         userName: data['userName'],
         userAddress: data['userAddress'],
         userLocation: data['userLocation'],
-        userRole: data['userRole']);
+        userRole: data['userRole'],
+        userDeviceName: data['userDeviceName']);
   }
 
   Map<String, dynamic> toMap() {
@@ -31,7 +34,8 @@ class UserDetails {
       'userName': userName,
       'userAddress': userAddress,
       'userLocation': userLocation,
-      'userRole': userRole
+      'userRole': userRole,
+      'userDeviceName': userDeviceName
     };
   }
 }

@@ -38,7 +38,7 @@ class SignInPage extends StatelessWidget {
           SizedBox(height: 36.0),
           // EMAIL
           SignInButton(
-            text: 'Sign in with Email',
+            text: 'Sign in',
             textColor: Theme.of(context).accentColor,
             color: Theme.of(context).buttonColor,
             onPressed: () => _signInWithEmail(context),
@@ -51,7 +51,7 @@ class SignInPage extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context) {
     return Text(
-      'Sign in',
+      'Welcome',
       textAlign: TextAlign.center,
       style: Theme.of(context).primaryTextTheme.display1,
     );
