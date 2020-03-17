@@ -1,28 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
-import 'package:nearbymenus/app/services/auth.dart';
+import 'package:nearbymenus/app/pages/welcome/role_selection_page.dart';
 import 'package:nearbymenus/app/services/database.dart';
+import 'package:nearbymenus/app/services/session_manager.dart';
 import 'package:provider/provider.dart';
 
 class AccountPage extends StatelessWidget {
-  final UserDetails userDetails;
-
-  const AccountPage({Key key, this.userDetails}) : super(key: key);
-
   Future<void> _signOut(BuildContext context) async {
+    final sessionManager = Provider.of<SessionManager>(context);
+    final database = Provider.of<Database>(context);
     try {
-      final database = Provider.of<Database>(context);
-      database.setUserDetails(UserDetails(
-        userName: userDetails.userName,
-        userAddress: userDetails.userAddress,
-        userLocation: userDetails.userLocation,
-        userRole: userDetails.userRole,
-        userDeviceName: '',
-      ));
-      final auth = Provider.of<AuthBase>(context);
-      await auth.signOut();
+      sessionManager.signOut();
+      database.setUserDetails(sessionManager.userDetails);
+      // final auth = Provider.of<AuthBase>(context);
+      await sessionManager.auth.signOut();
     } catch (e) {
       print(e.toString());
     }
@@ -40,51 +34,74 @@ class AccountPage extends StatelessWidget {
     }
   }
 
-  List<Widget> _buildContents(BuildContext context) {
+  List<Widget> _buildContents(BuildContext context, UserDetails userDetails) {
     return [
-        SizedBox(height: 8.0),
-        Text(
-          userDetails.userName,
-          style: Theme
-              .of(context)
-              .primaryTextTheme
-              .headline,
+      SizedBox(height: 8.0),
+      Text(
+        userDetails.userName,
+        style: Theme.of(context).primaryTextTheme.headline,
+      ),
+      SizedBox(
+        height: 8.0,
+      ),
+      Text(
+        userDetails.userAddress,
+        style: Theme.of(context).primaryTextTheme.body1,
+      ),
+      SizedBox(
+        height: 8.0,
+      ),
+      Text(
+        userDetails.userLocation,
+        style: Theme.of(context).primaryTextTheme.body1,
+      ),
+      SizedBox(
+        height: 8.0,
+      ),
+      Text(
+        userDetails.userRole,
+        style: Theme.of(context).primaryTextTheme.body1,
+      ),
+      SizedBox(
+        height: 8.0,
+      ),
+      Text(
+        userDetails.userDeviceName,
+        style: Theme.of(context).primaryTextTheme.body1,
+      ),
+      SizedBox(
+        height: 8.0,
+      ),
+      FormSubmitButton(
+        context: context,
+        text: 'Change Role',
+        color: Theme.of(context).primaryColor,
+        onPressed: () => Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              final sessionManager = Provider.of<SessionManager>(context);
+              UserDetails userDetails = sessionManager.userDetails;
+              final database = Provider.of<Database>(context);
+              return RoleSelectionPage(
+                userDetails: userDetails,
+                database: database,
+              );
+            }
+          ),
         ),
-        SizedBox(
-          height: 8.0,
-        ),
-        Text(
-          userDetails.userAddress,
-          style: Theme
-              .of(context)
-              .primaryTextTheme
-              .body1,
-        ),
-        SizedBox(
-          height: 8.0,
-        ),
-        Text(
-          userDetails.userDeviceName,
-          style: Theme
-              .of(context)
-              .primaryTextTheme
-              .body1,
-        ),
-        SizedBox(
-          height: 8.0,
-        )
-      ];
+      ),
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
+    final sessionManager = Provider.of<SessionManager>(context);
+    UserDetails userDetails = sessionManager.userDetails;
     var accountText = 'Account Details';
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          FlavourConfig.isProduction()
-              ? accountText
-              : accountText + ' [DEV]',
+          FlavourConfig.isProduction() ? accountText : accountText + ' [DEV]',
           style: Theme.of(context).primaryTextTheme.title,
         ),
         actions: <Widget>[
@@ -92,7 +109,7 @@ class AccountPage extends StatelessWidget {
             child: Text(
               'Logout',
               style: Theme.of(context).primaryTextTheme.button,
-              ),
+            ),
             onPressed: () => _confirmSignOut(context),
           ),
         ],
@@ -103,14 +120,13 @@ class AccountPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
-            children: _buildContents(context),
+            children: _buildContents(context, userDetails),
           ),
         ),
       ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     );
   }
-
 }
 // TODO store user name and address in Firebase.
 // TODO Display here along with subscription status

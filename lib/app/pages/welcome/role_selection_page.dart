@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/services/database.dart';
 
@@ -18,14 +19,8 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
   UserDetails get userDetails => widget.userDetails;
 
   void _changeRole(String role) {
-    database.setUserDetails(
-      UserDetails(
-          userName: userDetails.userName,
-          userAddress: userDetails.userAddress,
-          userLocation: userDetails.userLocation,
-          userRole: role,
-          userDeviceName: userDetails.userDeviceName),
-    );
+    userDetails.userRole = role;
+    database.setUserDetails(userDetails);
   }
 
   List<Widget> _buildChildren(BuildContext context) {
@@ -47,10 +42,19 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
       ),
       SizedBox(height: 16.0,),
       IconButton(
-        icon: Icon(Icons.adb),
+        icon: Icon(Icons.account_circle),
         iconSize: 36,
         color: Colors.black,
         onPressed: () => _changeRole('staff'),
+      ),
+      if (FlavourConfig.isDevelopment())
+      SizedBox(height: 16.0,),
+      if (FlavourConfig.isDevelopment())
+      IconButton(
+        icon: Icon(Icons.adb),
+        iconSize: 36,
+        color: Colors.black,
+        onPressed: () => _changeRole('dev'),
       ),
     ];
   }

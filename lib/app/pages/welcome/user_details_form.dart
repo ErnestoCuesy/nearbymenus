@@ -3,7 +3,7 @@ import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/pages/welcome/user_details_model.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/services/database.dart';
-import 'package:nearbymenus/app/services/device_info.dart';
+import 'package:nearbymenus/app/services/session_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
@@ -14,7 +14,7 @@ class UserDetailsForm extends StatefulWidget {
   const UserDetailsForm({Key key, this.model}) : super(key: key);
 
   static Widget create(BuildContext context) {
-    final Database database = Provider.of<Database>(context);
+    final database = Provider.of<Database>(context);
     return ChangeNotifierProvider<UserDetailsModel>(
       create: (context) => UserDetailsModel(database: database),
       child: Consumer<UserDetailsModel>(
@@ -48,12 +48,11 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
   }
 
   Future<void> _save() async {
-    final deviceInfo = Provider.of<DeviceInfo>(context, listen: false);
-    model.deviceName = deviceInfo.deviceName;
+    final sessionManager = Provider.of<SessionManager>(context);
+    model.deviceName = sessionManager.deviceInfo.deviceName;
     try {
       // await Future.delayed(Duration(seconds: 3)); // Simulate slow network
       await model.save();
-      // Navigator.of(context).pop();
     } on PlatformException catch (e) {
       PlatformExceptionAlertDialog(
         title: 'Save User Details',

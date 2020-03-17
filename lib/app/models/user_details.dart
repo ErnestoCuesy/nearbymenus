@@ -1,9 +1,9 @@
 class UserDetails {
-  final String userName;
-  final String userAddress;
-  final String userLocation;
-  final String userRole;
-  final String userDeviceName;
+  String userName;
+  String userAddress;
+  String userLocation;
+  String userRole;
+  String userDeviceName;
 
   UserDetails({
     this.userName,

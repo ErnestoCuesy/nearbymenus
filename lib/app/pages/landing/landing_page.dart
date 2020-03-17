@@ -4,15 +4,16 @@ import 'package:nearbymenus/app/pages/sign_in/sign_in_page.dart';
 import 'package:nearbymenus/app/pages/welcome/role_landing_page.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
+import 'package:nearbymenus/app/services/session_manager.dart';
 import 'package:provider/provider.dart';
 
 class LandingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final auth = Provider.of<AuthBase>(context, listen: true);
+    final sessionManager = Provider.of<SessionManager>(context, listen: true);
     return FlavourBanner(
       child: StreamBuilder<User>(
-        stream: auth.onAuthStateChanged,
+        stream: sessionManager.auth.onAuthStateChanged,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.active) {
             User user = snapshot.data;
