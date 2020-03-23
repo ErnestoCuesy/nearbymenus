@@ -1,34 +1,92 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:nearbymenus/app/pages/landing/landing_page.dart';
-import 'package:nearbymenus/app/services/session_manager.dart';
+import 'package:nearbymenus/app/pages/landing/loading_view.dart';
+import 'package:nearbymenus/app/services/auth.dart';
+import 'package:nearbymenus/app/services/database.dart';
+import 'package:nearbymenus/app/services/device_info.dart';
+import 'package:nearbymenus/app/services/session.dart';
 import 'package:nearbymenus/app/utilities/app_theme.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Geolocator _geolocator;
+  Position _currentLocation;
+  PermissionStatus _permissionStatus;
+
+  @override
+  void initState() {
+    super.initState();
+    _determinePermissions();
+  }
+
+  _determinePermissions(){
+    PermissionHandler().checkPermissionStatus(PermissionGroup.location)
+        .then((status) => _updatePermissions(status));
+  }
+
+  _updatePermissions(PermissionStatus status){
+    if (_permissionStatus != status) {
+      setState(() {
+        _permissionStatus = status;
+        if (_permissionStatus == PermissionStatus.granted){
+          // print('Permission had already been granted... determining location...');
+          _determineCurrentLocation();
+        } else {
+          // print('Permission not granted yet... asking...');
+          PermissionHandler().requestPermissions([PermissionGroup.location])
+              .then((permission){
+            if (permission[PermissionGroup.location] == PermissionStatus.granted){
+              // print('Permission granted... determining location...');
+              _determineCurrentLocation();
+            } else {
+              // print('Permission not granted by user... exiting...');
+              exit (0);
+            }
+          });
+        }
+      });
+    }
+  }
+
+  _determineCurrentLocation() {
+    _geolocator = Geolocator();
+    _geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best).then((position) {
+      _currentLocation = position;
+      print('Current location: ${_currentLocation.latitude} : ${_currentLocation.longitude}');
+      setState(() {
+        _currentLocation = position;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // Below line disabled since the bottom android nav bar behaves funny
     // SystemChrome.setEnabledSystemUIOverlays([]);
-
-//    return MultiProvider(
-//      providers: [
-//        Provider<AuthBase>(create: (context) => Auth(),),
-//        Provider<DeviceInfo>(create: (context) => DeviceInfo()),
-//      ],
-//      child: MaterialApp(
-//        title: 'Nearby Menus',
-//        theme: AppTheme.createTheme(context),
-//        home: LandingPage(),
-//      )
-//    );
-
-    return Provider<SessionManager>(
-      create: (context) => SessionManager(),
-      child: MaterialApp(
-        title: 'Nearby Menus',
-        theme: AppTheme.createTheme(context),
-        home: LandingPage(),
-      ),
-    );
+    if (_currentLocation != null) {
+      return MultiProvider(
+          providers: [
+            Provider<DeviceInfo>(create: (context) => DeviceInfo()),
+            Provider<AuthBase>(create: (context) => Auth(),),
+            Provider<Database>(create: (context) => FirestoreDatabase()),
+            Provider<Session>(create: (context) => Session(position: _currentLocation)),
+          ],
+          child: MaterialApp(
+            title: 'Nearby Menus',
+            theme: AppTheme.createTheme(context),
+            home: LandingPage(),
+          )
+      );
+    } else {
+      return LoadingView();
+    }
   }
 }

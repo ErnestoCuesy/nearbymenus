@@ -9,21 +9,14 @@ class CupertinoHomeScaffoldAdmin extends StatelessWidget {
     @required this.onSelectTab,
     @required this.widgetBuilders,
     @required this.navigatorKeys,
+    @required this.roleTabItems,
   }) : super(key: key);
 
-  final TabItemAdmin currentTab;
-  final ValueChanged<TabItemAdmin> onSelectTab;
-  final Map<TabItemAdmin, WidgetBuilder> widgetBuilders;
-  final Map<TabItemAdmin, GlobalKey<NavigatorState>> navigatorKeys;
-
-  List<BottomNavigationBarItem> _itemsForRole(BuildContext context) {
-    List<BottomNavigationBarItem> items = List<BottomNavigationBarItem>();
-          items.add(_buildItem(context, TabItemAdmin.maintainRestaurants));
-          items.add(_buildItem(context, TabItemAdmin.maintainMenu));
-          items.add(_buildItem(context, TabItemAdmin.manageOrders));
-          items.add(_buildItem(context, TabItemAdmin.userAccount));
-    return items;
-  }
+  final TabItem currentTab;
+  final ValueChanged<TabItem> onSelectTab;
+  final Map<TabItem, WidgetBuilder> widgetBuilders;
+  final Map<TabItem, GlobalKey<NavigatorState>> navigatorKeys;
+  final RoleEnumBase roleTabItems;
 
   @override
   Widget build(BuildContext context) {
@@ -31,12 +24,12 @@ class CupertinoHomeScaffoldAdmin extends StatelessWidget {
       tabBar: CupertinoTabBar(
         backgroundColor: Theme.of(context).backgroundColor,
         activeColor: Theme.of(context).accentColor,
-        items: _itemsForRole(context),
-        onTap: (index) => onSelectTab(TabItemAdmin.values[index]),
+        items: RoleEnumBase.itemsForRole(context, currentTab, roleTabItems),
+        onTap: (index) => onSelectTab(roleTabItems.roleEnumList[index]),
       ),
       resizeToAvoidBottomInset: false,
       tabBuilder: (context, index) {
-        final item = TabItemAdmin.values[index];
+        final item = roleTabItems.roleEnumList[index];
         return CupertinoTabView(
           builder: (context) => widgetBuilders[item](context),
           navigatorKey: navigatorKeys[item],
@@ -45,17 +38,4 @@ class CupertinoHomeScaffoldAdmin extends StatelessWidget {
     );
   }
 
-  BottomNavigationBarItem _buildItem(BuildContext context, TabItemAdmin tabItem) {
-    final itemData = TabItemData.allTabsAdmin[tabItem];
-    final color = currentTab == tabItem
-        ? Theme.of(context).tabBarTheme.labelColor
-        : Theme.of(context).tabBarTheme.unselectedLabelColor;
-    return BottomNavigationBarItem(
-      icon: Icon(itemData.icon),
-      title: Text(
-        itemData.title,
-        style: TextStyle(color: color),
-      ),
-    );
-  }
 }

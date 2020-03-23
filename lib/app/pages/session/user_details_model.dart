@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/sign_in/validators.dart';
@@ -8,6 +10,7 @@ class UserDetailsModel with UserCredentialsValidators, ChangeNotifier {
   String userName;
   String userAddress;
   String userLocation;
+  String userNearestRestaurant;
   String userRole;
   String deviceName;
   bool isLoading;
@@ -18,6 +21,7 @@ class UserDetailsModel with UserCredentialsValidators, ChangeNotifier {
     this.userName,
     this.userAddress,
     this.userLocation,
+    this.userNearestRestaurant,
     this.userRole,
     this.isLoading = false,
     this.submitted = false,
@@ -28,11 +32,12 @@ class UserDetailsModel with UserCredentialsValidators, ChangeNotifier {
     try {
       await database.setUserDetails(
         UserDetails(
-          userName: userName,
-          userAddress: userAddress,
-          userLocation: userLocation,
-          userRole: 'none',
-          userDeviceName: deviceName
+          name: userName,
+          address: userAddress,
+          complexName: userLocation,
+          nearestRestaurant: userNearestRestaurant,
+          role: userRole,
+          deviceName: deviceName
         ),
       );
     } catch (e) {
@@ -48,7 +53,6 @@ class UserDetailsModel with UserCredentialsValidators, ChangeNotifier {
     bool canSubmitFlag = false;
     if (userNameValidator.isValid(userName) &&
         userAddressValidator.isValid(userAddress) &&
-        userLocationValidator.isValid(userLocation) &&
         !isLoading) {
       canSubmitFlag = true;
     }
@@ -65,12 +69,6 @@ class UserDetailsModel with UserCredentialsValidators, ChangeNotifier {
     return showErrorText ? invalidAddressErrorText : null;
   }
 
-  String get userLocationErrorText {
-    // TODO implement a validator for location
-    bool showErrorText = !userLocationValidator.isValid(userLocation);
-    return showErrorText ? invalidLocationErrorText : null;
-  }
-
   void updateUserName(String userName) => updateWith(userName: userName);
 
   void updateUserAddress(String userAddress) =>
@@ -79,6 +77,9 @@ class UserDetailsModel with UserCredentialsValidators, ChangeNotifier {
   void updateUserLocation(String userLocation) =>
       updateWith(userLocation: userLocation);
 
+  void updateUserNearestRestaurant(String userNearestRestaurant) =>
+      updateWith(userNearestRestaurant: userNearestRestaurant);
+
   void updateUserRole(String userRole) =>
       updateWith(userRole: userRole);
 
@@ -86,6 +87,7 @@ class UserDetailsModel with UserCredentialsValidators, ChangeNotifier {
     String userName,
     String userAddress,
     String userLocation,
+    String userNearestRestaurant,
     String userRole,
     bool isLoading,
     bool submitted,
@@ -93,6 +95,7 @@ class UserDetailsModel with UserCredentialsValidators, ChangeNotifier {
     this.userName = userName ?? this.userName;
     this.userAddress = userAddress ?? this.userAddress;
     this.userLocation = userLocation ?? this.userLocation;
+    this.userNearestRestaurant = userNearestRestaurant ?? this.userNearestRestaurant;
     this.userRole = userRole ?? this.userRole;
     this.isLoading = isLoading ?? this.isLoading;
     this.submitted = this.submitted;

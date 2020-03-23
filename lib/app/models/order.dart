@@ -5,7 +5,7 @@ import 'address.dart';
 
 class Order {
   final int orderNumber;
-  final User user;
+  final UserAuth user;
   final Address deliveryAddress;
   final List<MenuItem> orderItems;
 

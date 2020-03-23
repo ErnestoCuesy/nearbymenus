@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:meta/meta.dart';
 
 class FirestoreService {
@@ -50,5 +51,13 @@ class FirestoreService {
     final DocumentReference reference = Firestore.instance.document(path);
     final Stream<DocumentSnapshot> snapshots = reference.snapshots();
     return snapshots.map((snapshot) => builder(snapshot.data, snapshot.documentID));
+  }
+
+  Future<List<T>> collectionSnapshot<T>({
+    @required String path,
+    @required T builder(Map<String, dynamic> data, String documentID),
+  }) async {
+    final QuerySnapshot snapshot = await Firestore.instance.collection(path).getDocuments();
+    return snapshot.documents.map((snaps) => builder(snaps.data, snaps.documentID)).toList();
   }
 }

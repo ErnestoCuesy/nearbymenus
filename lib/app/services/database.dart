@@ -1,13 +1,14 @@
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meta/meta.dart';
 import 'package:nearbymenus/app/models/job.dart';
 import 'package:nearbymenus/app/models/entry.dart';
+import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'api_path.dart';
 import 'firestore_service.dart';
 
 abstract class Database {
+  void setUserId(String uid);
   Future<void> setJob(Job job);
   Future<void> deleteJob(Job job);
   Stream<List<Job>> jobsStream();
@@ -18,17 +19,21 @@ abstract class Database {
   Stream<List<Entry>> entriesStream({Job job});
   Future<void> setUserDetails(UserDetails userDetails);
   Stream<UserDetails> userDetailsStream();
+  Future<List<Restaurant>> restaurants();
+  Stream<List<Restaurant>> restaurantStream();
 }
 
 String documentIdFromCurrentDate() => DateTime.now().toIso8601String();
 
 class FirestoreDatabase implements Database {
-  FirestoreDatabase({@required this.uid}) {
-    assert(uid != null);
-  }
 
-  final String uid;
+  String uid;
   final _service = FirestoreService.instance;
+
+  @override
+  void setUserId(String uid) {
+    this.uid = uid;
+  }
 
   @override
   Future<void> setJob(Job job) async => await _service.setData(
@@ -91,4 +96,17 @@ class FirestoreDatabase implements Database {
         path: APIPath.userDetails(uid),
         builder: (data, documentId) => UserDetails.fromMap(data),
       );
+
+  @override
+  Future<List<Restaurant>> restaurants() => _service.collectionSnapshot(
+    path: APIPath.restaurants(),
+    builder: (data, documentId) => Restaurant.fromMap(data, documentId),
+  );
+
+  @override
+  Stream<List<Restaurant>> restaurantStream() => _service.collectionStream(
+    path: APIPath.restaurants(),
+    builder: (data, documentId) => Restaurant.fromMap(data, documentId),
+  );
+
 }

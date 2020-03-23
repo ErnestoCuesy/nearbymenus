@@ -10,31 +10,88 @@ enum TabItem {
   userAccount,
 }
 
-enum TabItemDev {
-  maintainRestaurants,
-  maintainMenu,
-  manageOrders,
-  browseMenu,
-  myOrders,
-  userAccount,
+abstract class RoleEnumBase {
+  List<TabItem> roleEnumList;
+  
+  static RoleEnumBase getRoleTabItems(String role) {
+    RoleEnumBase items;
+    switch (role) {
+      case 'patron': {
+        items = PatronRoleEnum();
+      }
+      break;
+      case 'admin': {
+        items = AdminRoleEnum();
+      }
+      break;
+      case 'staff': {
+        items = StaffRoleEnum();
+      }
+      break;
+      case 'dev': {
+        items = DevRoleEnum();
+      }
+      break;
+    }
+    return items;
+  }
+
+  static List<BottomNavigationBarItem> itemsForRole(BuildContext context, TabItem currentTab, RoleEnumBase roleTabItems) {
+    List<BottomNavigationBarItem> items = List<BottomNavigationBarItem>();
+    roleTabItems.roleEnumList.forEach((roleItem) {
+      items.add(_buildItem(context, roleItem, currentTab));
+    });
+    return items;
+  }
+
+  static BottomNavigationBarItem _buildItem(BuildContext context, TabItem tabItem, TabItem currentTab) {
+    final itemData = TabItemData.allTabs[tabItem];
+    final color = currentTab == tabItem
+        ? Theme.of(context).tabBarTheme.labelColor
+        : Theme.of(context).tabBarTheme.unselectedLabelColor;
+    return BottomNavigationBarItem(
+      icon: Icon(itemData.icon),
+      title: Text(
+        itemData.title,
+        style: TextStyle(color: color),
+      ),
+    );
+  }
+
 }
 
-enum TabItemAdmin {
-  maintainRestaurants,
-  maintainMenu,
-  manageOrders,
-  userAccount,
+class PatronRoleEnum extends RoleEnumBase {
+  List<TabItem> roleEnumList = const [
+    TabItem.browseMenu,
+    TabItem.myOrders,
+    TabItem.userAccount
+  ];
 }
 
-enum TabItemPatron {
-  browseMenu,
-  myOrders,
-  userAccount,
+class AdminRoleEnum extends RoleEnumBase {
+  final List<TabItem> roleEnumList = const [
+    TabItem.maintainRestaurants,
+    TabItem.maintainMenu,
+    TabItem.manageOrders,
+    TabItem.userAccount
+  ];
 }
 
-enum TabItemStaff {
-  manageOrders,
-  userAccount,
+class StaffRoleEnum extends RoleEnumBase {
+  List<TabItem> roleEnumList = const [
+    TabItem.manageOrders,
+    TabItem.userAccount
+  ];
+}
+
+class DevRoleEnum extends RoleEnumBase {
+  final List<TabItem> roleEnumList = const [
+    TabItem.maintainRestaurants,
+    TabItem.maintainMenu,
+    TabItem.manageOrders,
+    TabItem.myOrders,
+    TabItem.userAccount
+  ];
 }
 
 class TabItemData {
@@ -43,46 +100,18 @@ class TabItemData {
   final String title;
   final IconData icon;
 
-  static const Map<TabItemAdmin, TabItemData> allTabsAdmin = {
-    TabItemAdmin.maintainRestaurants:
-        TabItemData(title: 'Restaurant', icon: Icons.home),
-    TabItemAdmin.maintainMenu:
-        TabItemData(title: 'Menu', icon: Icons.import_contacts),
-    TabItemAdmin.manageOrders:
-        TabItemData(title: 'Orders', icon: Icons.assignment),
-    TabItemAdmin.userAccount:
-        TabItemData(title: 'My Account', icon: Icons.person),
-  };
-
-  static const Map<TabItemStaff, TabItemData> allTabsStaff = {
-    TabItemStaff.manageOrders:
-    TabItemData(title: 'Orders', icon: Icons.assignment),
-    TabItemStaff.userAccount:
-    TabItemData(title: 'My Account', icon: Icons.person),
-  };
-
-  static const Map<TabItemPatron, TabItemData> allTabsPatron = {
-    TabItemPatron.browseMenu:
-    TabItemData(title: 'Food', icon: Icons.fastfood),
-    TabItemPatron.myOrders:
-    TabItemData(title: 'My Orders', icon: Icons.shopping_cart),
-    TabItemPatron.userAccount:
-    TabItemData(title: 'My Account', icon: Icons.person),
-  };
-
-  static const Map<TabItemDev, TabItemData> allTabsDev = {
-    TabItemDev.maintainRestaurants:
+  static const Map<TabItem, TabItemData> allTabs = {
+    TabItem.maintainRestaurants:
     TabItemData(title: 'Restaurant', icon: Icons.home),
-    TabItemDev.maintainMenu:
+    TabItem.maintainMenu:
     TabItemData(title: 'Menu', icon: Icons.import_contacts),
-    TabItemDev.manageOrders:
+    TabItem.manageOrders:
     TabItemData(title: 'Orders', icon: Icons.assignment),
-    TabItemDev.browseMenu:
+    TabItem.browseMenu:
     TabItemData(title: 'Food', icon: Icons.fastfood),
-    TabItemDev.myOrders:
+    TabItem.myOrders:
     TabItemData(title: 'My Orders', icon: Icons.shopping_cart),
-    TabItemDev.userAccount:
+    TabItem.userAccount:
     TabItemData(title: 'My Account', icon: Icons.person),
   };
-
 }

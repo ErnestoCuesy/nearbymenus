@@ -14,7 +14,7 @@ class AlreadyLoggedIn extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: Text(
-          'User is already logged-in on device:\n${userDetails.userDeviceName}',
+          'User is already logged-in on device:\n${userDetails.deviceName}',
           style: Theme.of(context).textTheme.title,
         ),
       ),

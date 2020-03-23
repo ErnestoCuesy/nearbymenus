@@ -9,23 +9,14 @@ class CupertinoHomeScaffoldDev extends StatelessWidget {
     @required this.onSelectTab,
     @required this.widgetBuilders,
     @required this.navigatorKeys,
+    @required this.roleTabItems,
   }) : super(key: key);
 
-  final TabItemDev currentTab;
-  final ValueChanged<TabItemDev> onSelectTab;
-  final Map<TabItemDev, WidgetBuilder> widgetBuilders;
-  final Map<TabItemDev, GlobalKey<NavigatorState>> navigatorKeys;
-
-  List<BottomNavigationBarItem> _itemsForRole(BuildContext context) {
-    List<BottomNavigationBarItem> items = List<BottomNavigationBarItem>();
-          items.add(_buildItem(context, TabItemDev.maintainRestaurants));
-          items.add(_buildItem(context, TabItemDev.maintainMenu));
-          items.add(_buildItem(context, TabItemDev.manageOrders));
-          items.add(_buildItem(context, TabItemDev.browseMenu));
-          items.add(_buildItem(context, TabItemDev.myOrders));
-          items.add(_buildItem(context, TabItemDev.userAccount));
-    return items;
-  }
+  final TabItem currentTab;
+  final ValueChanged<TabItem> onSelectTab;
+  final Map<TabItem, WidgetBuilder> widgetBuilders;
+  final Map<TabItem, GlobalKey<NavigatorState>> navigatorKeys;
+  final RoleEnumBase roleTabItems;
 
   @override
   Widget build(BuildContext context) {
@@ -33,12 +24,12 @@ class CupertinoHomeScaffoldDev extends StatelessWidget {
       tabBar: CupertinoTabBar(
         backgroundColor: Theme.of(context).backgroundColor,
         activeColor: Theme.of(context).accentColor,
-        items: _itemsForRole(context),
-        onTap: (index) => onSelectTab(TabItemDev.values[index]),
+        items: RoleEnumBase.itemsForRole(context, currentTab, roleTabItems),
+        onTap: (index) => onSelectTab(roleTabItems.roleEnumList[index]),
       ),
       resizeToAvoidBottomInset: false,
       tabBuilder: (context, index) {
-        final item = TabItemDev.values[index];
+        final item = roleTabItems.roleEnumList[index];
         return CupertinoTabView(
           builder: (context) => widgetBuilders[item](context),
           navigatorKey: navigatorKeys[item],
@@ -47,17 +38,4 @@ class CupertinoHomeScaffoldDev extends StatelessWidget {
     );
   }
 
-  BottomNavigationBarItem _buildItem(BuildContext context, TabItemDev tabItem) {
-    final itemData = TabItemData.allTabsDev[tabItem];
-    final color = currentTab == tabItem
-        ? Theme.of(context).tabBarTheme.labelColor
-        : Theme.of(context).tabBarTheme.unselectedLabelColor;
-    return BottomNavigationBarItem(
-      icon: Icon(itemData.icon),
-      title: Text(
-        itemData.title,
-        style: TextStyle(color: color),
-      ),
-    );
-  }
 }

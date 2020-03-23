@@ -1,26 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
-import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/services/database.dart';
+import 'package:nearbymenus/app/services/session.dart';
+import 'package:provider/provider.dart';
 
 class RoleSelectionPage extends StatefulWidget {
-  final Database database;
-  final UserDetails userDetails;
-
-  const RoleSelectionPage({Key key, this.database, this.userDetails})
-      : super(key: key);
 
   @override
   _RoleSelectionPageState createState() => _RoleSelectionPageState();
 }
 
 class _RoleSelectionPageState extends State<RoleSelectionPage> {
-  Database get database => widget.database;
-  UserDetails get userDetails => widget.userDetails;
+  Database database;
+  Session session;
 
   void _changeRole(String role) {
-    userDetails.userRole = role;
-    database.setUserDetails(userDetails);
+    session.userDetails.role = role;
+    database.setUserDetails(session.userDetails);
   }
 
   List<Widget> _buildChildren(BuildContext context) {
@@ -61,6 +57,8 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
 
   @override
   Widget build(BuildContext context) {
+    session = Provider.of<Session>(context);
+    database = Provider.of<Database>(context, listen: true);
     return Scaffold(
       appBar: AppBar(
         title: Text(

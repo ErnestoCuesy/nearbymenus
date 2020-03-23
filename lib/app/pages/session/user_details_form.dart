@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
-import 'package:nearbymenus/app/pages/welcome/user_details_model.dart';
+import 'package:nearbymenus/app/pages/session/user_details_model.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/services/database.dart';
-import 'package:nearbymenus/app/services/session_manager.dart';
+import 'package:nearbymenus/app/services/device_info.dart';
+import 'package:nearbymenus/app/services/session.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
@@ -22,17 +23,19 @@ class UserDetailsForm extends StatefulWidget {
       ),
     );
   }
+
   @override
   _UserDetailsFormState createState() => _UserDetailsFormState();
+
 }
 
 class _UserDetailsFormState extends State<UserDetailsForm> {
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _userAddressController = TextEditingController();
   final TextEditingController _userLocationController = TextEditingController();
+  final TextEditingController _userNearestRestaurantController = TextEditingController();
   final FocusNode _userNameFocusNode = FocusNode();
   final FocusNode _userAddressFocusNode = FocusNode();
-  final FocusNode _userLocationFocusNode = FocusNode();
 
   UserDetailsModel get model => widget.model;
 
@@ -41,15 +44,15 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
     _userNameController.dispose();
     _userAddressController.dispose();
     _userLocationController.dispose();
+    _userNearestRestaurantController.dispose();
     _userNameFocusNode.dispose();
     _userAddressFocusNode.dispose();
-    _userLocationFocusNode.dispose();
     super.dispose();
   }
 
   Future<void> _save() async {
-    final sessionManager = Provider.of<SessionManager>(context);
-    model.deviceName = sessionManager.deviceInfo.deviceName;
+    final deviceInfo = Provider.of<DeviceInfo>(context);
+    model.deviceName = deviceInfo.deviceName;
     try {
       // await Future.delayed(Duration(seconds: 3)); // Simulate slow network
       await model.save();
@@ -70,13 +73,6 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
 
   void _userAddressEditingComplete() {
     final newFocus = model.userAddressValidator.isValid(model.userAddress)
-        ? _userLocationFocusNode
-        : _userAddressFocusNode;
-    FocusScope.of(context).requestFocus(newFocus);
-  }
-
-  void _userLocationEditingComplete() {
-    final newFocus = model.userLocationValidator.isValid(model.userLocation)
         ? _save()
         : _userAddressFocusNode;
     FocusScope.of(context).requestFocus(newFocus);
@@ -90,11 +86,15 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
       ),
       _buildUserAddressTextField(),
       SizedBox(
-        height: 8.0,
+        height: 16.0,
       ),
       _buildUserLocationTextField(),
       SizedBox(
         height: 16.0,
+      ),
+      _buildNearestRestaurantTextField(),
+      SizedBox(
+        height: 8.0,
       ),
       FormSubmitButton(
         context: context,
@@ -158,13 +158,10 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
     return TextField(
       style: Theme.of(context).inputDecorationTheme.labelStyle,
       controller: _userLocationController,
-      focusNode: _userLocationFocusNode,
       textCapitalization: TextCapitalization.words,
       cursorColor: Colors.black,
       decoration: InputDecoration(
-        labelText: 'Your Location',
-        hintText: 'i.e.: Riverswamp Estate',
-        errorText: model.userLocationErrorText,
+        labelText: 'Your Complex or Estate Name',
         enabled: model.isLoading == false,
       ),
       autocorrect: false,
@@ -172,15 +169,40 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
       enableInteractiveSelection: false,
       keyboardType: TextInputType.text,
       textInputAction: TextInputAction.next,
-      onChanged: model.updateUserLocation,
-      onEditingComplete: () => _userLocationEditingComplete(),
+      // onChanged: model.updateUserLocation,
+    );
+  }
+
+  TextField _buildNearestRestaurantTextField() {
+    return TextField(
+      style: Theme.of(context).inputDecorationTheme.labelStyle,
+      controller: _userNearestRestaurantController,
+      textCapitalization: TextCapitalization.words,
+      cursorColor: Colors.black,
+      decoration: InputDecoration(
+        labelText: 'Your Nearest Restaurant',
+        enabled: model.isLoading == false,
+      ),
+      autocorrect: false,
+      enableSuggestions: false,
+      enableInteractiveSelection: false,
+      keyboardType: TextInputType.text,
+      textInputAction: TextInputAction.next,
+      //onChanged: model.updateUserNearestRestaurant,
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final session = Provider.of<Session>(context);
+    _userNearestRestaurantController.text = session.nearestRestaurant.name + ' (' + session.nearestRestaurant.distance.round().toString() + 'm)';
+    _userLocationController.text = session.nearestRestaurant.complexName;
+    model.userNearestRestaurant = session.nearestRestaurant.name  + ' (' + session.nearestRestaurant.distance.round().toString() + 'm)';
+    model.userLocation = session.nearestRestaurant.complexName;
     return Container(
-      color: Theme.of(context).dialogBackgroundColor,
+      color: Theme
+          .of(context)
+          .dialogBackgroundColor,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

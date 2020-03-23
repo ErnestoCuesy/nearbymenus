@@ -9,19 +9,14 @@ class CupertinoHomeScaffoldStaff extends StatelessWidget {
     @required this.onSelectTab,
     @required this.widgetBuilders,
     @required this.navigatorKeys,
+    @required this.roleTabItems,
   }) : super(key: key);
 
-  final TabItemStaff currentTab;
-  final ValueChanged<TabItemStaff> onSelectTab;
-  final Map<TabItemStaff, WidgetBuilder> widgetBuilders;
-  final Map<TabItemStaff, GlobalKey<NavigatorState>> navigatorKeys;
-
-  List<BottomNavigationBarItem> _itemsForRole(BuildContext context) {
-    List<BottomNavigationBarItem> items = List<BottomNavigationBarItem>();
-          items.add(_buildItem(context, TabItemStaff.manageOrders));
-          items.add(_buildItem(context, TabItemStaff.userAccount));
-    return items;
-  }
+  final TabItem currentTab;
+  final ValueChanged<TabItem> onSelectTab;
+  final Map<TabItem, WidgetBuilder> widgetBuilders;
+  final Map<TabItem, GlobalKey<NavigatorState>> navigatorKeys;
+  final RoleEnumBase roleTabItems;
 
   @override
   Widget build(BuildContext context) {
@@ -29,12 +24,12 @@ class CupertinoHomeScaffoldStaff extends StatelessWidget {
       tabBar: CupertinoTabBar(
         backgroundColor: Theme.of(context).backgroundColor,
         activeColor: Theme.of(context).accentColor,
-        items: _itemsForRole(context),
-        onTap: (index) => onSelectTab(TabItemStaff.values[index]),
+        items: RoleEnumBase.itemsForRole(context, currentTab, roleTabItems),
+        onTap: (index) => onSelectTab(roleTabItems.roleEnumList[index]),
       ),
       resizeToAvoidBottomInset: false,
       tabBuilder: (context, index) {
-        final item = TabItemStaff.values[index];
+        final item = roleTabItems.roleEnumList[index];
         return CupertinoTabView(
           builder: (context) => widgetBuilders[item](context),
           navigatorKey: navigatorKeys[item],
@@ -43,17 +38,4 @@ class CupertinoHomeScaffoldStaff extends StatelessWidget {
     );
   }
 
-  BottomNavigationBarItem _buildItem(BuildContext context, TabItemStaff tabItem) {
-    final itemData = TabItemData.allTabsStaff[tabItem];
-    final color = currentTab == tabItem
-        ? Theme.of(context).tabBarTheme.labelColor
-        : Theme.of(context).tabBarTheme.unselectedLabelColor;
-    return BottomNavigationBarItem(
-      icon: Icon(itemData.icon),
-      title: Text(
-        itemData.title,
-        style: TextStyle(color: color),
-      ),
-    );
-  }
 }

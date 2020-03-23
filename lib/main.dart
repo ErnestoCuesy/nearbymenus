@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'app/config/flavour_config.dart';
 import 'app/app.dart';
 
-void main() async {
+void main() {
+
   var flavour = Flavour.DEV;
   FlavourConfig(
     flavour: flavour,

@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/account/account_page.dart';
 import 'package:nearbymenus/app/pages/home/cupertino_home_scaffold_staff.dart';
 import 'package:nearbymenus/app/pages/home/tab_item.dart';
+import 'package:nearbymenus/app/services/auth.dart';
+import 'package:nearbymenus/app/services/database.dart';
+import 'package:nearbymenus/app/services/session.dart';
+import 'package:provider/provider.dart';
 
 class HomePageStaff extends StatefulWidget {
-  final UserDetails userDetails;
+  final String role;
 
-  const HomePageStaff({Key key, this.userDetails}) : super(key: key);
+  const HomePageStaff({Key key, this.role}) : super(key: key);
 
   @override
   _HomePageStaffState createState() => _HomePageStaffState();
@@ -15,22 +18,26 @@ class HomePageStaff extends StatefulWidget {
 
 class _HomePageStaffState extends State<HomePageStaff> {
 
-  UserDetails get userDetails => widget.userDetails;
-  TabItemStaff _currentTab = TabItemStaff.manageOrders;
+  AuthBase auth;
+  Session session;
+  Database database;
 
-  final Map<TabItemStaff, GlobalKey<NavigatorState>> navigatorKeys = {
-    TabItemStaff.manageOrders: GlobalKey<NavigatorState>(),
-    TabItemStaff.userAccount: GlobalKey<NavigatorState>()
+  String get role => widget.role;
+  TabItem _currentTab = TabItem.manageOrders;
+
+  final Map<TabItem, GlobalKey<NavigatorState>> navigatorKeys = {
+    TabItem.manageOrders: GlobalKey<NavigatorState>(),
+    TabItem.userAccount: GlobalKey<NavigatorState>()
   };
 
-  Map<TabItemStaff, WidgetBuilder> get widgetBuilders {
+  Map<TabItem, WidgetBuilder> get widgetBuilders {
     return {
-      TabItemStaff.manageOrders: (_) => Placeholder(),
-      TabItemStaff.userAccount: (_) => AccountPage()
+      TabItem.manageOrders: (_) => Placeholder(),
+      TabItem.userAccount: (_) => AccountPage(auth: auth, session: session, database: database,)
     };
   }
 
-  void _select(TabItemStaff tabItem) {
+  void _select(TabItem tabItem) {
     if (tabItem == _currentTab) {
       navigatorKeys[tabItem].currentState.popUntil((route) => route.isFirst);
     } else {
@@ -40,6 +47,9 @@ class _HomePageStaffState extends State<HomePageStaff> {
 
   @override
   Widget build(BuildContext context) {
+    auth = Provider.of<AuthBase>(context);
+    session = Provider.of<Session>(context);
+    database = Provider.of<Database>(context);
     return WillPopScope(
       onWillPop: () async =>  !await navigatorKeys[_currentTab].currentState.maybePop(),
       child: CupertinoHomeScaffoldStaff(
@@ -47,6 +57,7 @@ class _HomePageStaffState extends State<HomePageStaff> {
         onSelectTab: _select,
         widgetBuilders: widgetBuilders,
         navigatorKeys: navigatorKeys,
+        roleTabItems: RoleEnumBase.getRoleTabItems(role),
       ),
     );
   }

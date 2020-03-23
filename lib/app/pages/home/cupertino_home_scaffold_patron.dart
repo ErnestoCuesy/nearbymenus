@@ -9,20 +9,14 @@ class CupertinoHomeScaffoldPatron extends StatelessWidget {
     @required this.onSelectTab,
     @required this.widgetBuilders,
     @required this.navigatorKeys,
+    @required this.roleTabItems,
   }) : super(key: key);
 
-  final TabItemPatron currentTab;
-  final ValueChanged<TabItemPatron> onSelectTab;
-  final Map<TabItemPatron, WidgetBuilder> widgetBuilders;
-  final Map<TabItemPatron, GlobalKey<NavigatorState>> navigatorKeys;
-
-  List<BottomNavigationBarItem> _itemsForRole(BuildContext context) {
-    List<BottomNavigationBarItem> items = List<BottomNavigationBarItem>();
-          items.add(_buildItem(context, TabItemPatron.browseMenu));
-          items.add(_buildItem(context, TabItemPatron.myOrders));
-          items.add(_buildItem(context, TabItemPatron.userAccount));
-    return items;
-  }
+  final TabItem currentTab;
+  final ValueChanged<TabItem> onSelectTab;
+  final Map<TabItem, WidgetBuilder> widgetBuilders;
+  final Map<TabItem, GlobalKey<NavigatorState>> navigatorKeys;
+  final RoleEnumBase roleTabItems;
 
   @override
   Widget build(BuildContext context) {
@@ -30,12 +24,12 @@ class CupertinoHomeScaffoldPatron extends StatelessWidget {
       tabBar: CupertinoTabBar(
         backgroundColor: Theme.of(context).backgroundColor,
         activeColor: Theme.of(context).accentColor,
-        items: _itemsForRole(context),
-        onTap: (index) => onSelectTab(TabItemPatron.values[index]),
+        items: RoleEnumBase.itemsForRole(context, currentTab, roleTabItems),
+        onTap: (index) => onSelectTab(roleTabItems.roleEnumList[index]),
       ),
       resizeToAvoidBottomInset: false,
       tabBuilder: (context, index) {
-        final item = TabItemPatron.values[index];
+        final item = roleTabItems.roleEnumList[index];
         return CupertinoTabView(
           builder: (context) => widgetBuilders[item](context),
           navigatorKey: navigatorKeys[item],
@@ -44,17 +38,4 @@ class CupertinoHomeScaffoldPatron extends StatelessWidget {
     );
   }
 
-  BottomNavigationBarItem _buildItem(BuildContext context, TabItemPatron tabItem) {
-    final itemData = TabItemData.allTabsPatron[tabItem];
-    final color = currentTab == tabItem
-        ? Theme.of(context).tabBarTheme.labelColor
-        : Theme.of(context).tabBarTheme.unselectedLabelColor;
-    return BottomNavigationBarItem(
-      icon: Icon(itemData.icon),
-      title: Text(
-        itemData.title,
-        style: TextStyle(color: color),
-      ),
-    );
-  }
 }

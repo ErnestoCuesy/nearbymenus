@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/account/account_page.dart';
 import 'package:nearbymenus/app/pages/home/tab_item.dart';
+import 'package:nearbymenus/app/services/auth.dart';
+import 'package:nearbymenus/app/services/database.dart';
+import 'package:nearbymenus/app/services/session.dart';
+import 'package:provider/provider.dart';
 import 'cupertino_home_scaffold_admin.dart';
 
 class HomePageAdmin extends StatefulWidget {
-  final UserDetails userDetails;
+  final String role;
 
-  const HomePageAdmin({Key key, this.userDetails}) : super(key: key);
+  const HomePageAdmin({Key key, this.role}) : super(key: key);
 
   @override
   _HomePageAdminState createState() => _HomePageAdminState();
@@ -15,26 +18,30 @@ class HomePageAdmin extends StatefulWidget {
 
 class _HomePageAdminState extends State<HomePageAdmin> {
 
-  UserDetails get userDetails => widget.userDetails;
-  TabItemAdmin _currentTab = TabItemAdmin.maintainRestaurants;
+  AuthBase auth;
+  Session session;
+  Database database;
 
-  final Map<TabItemAdmin, GlobalKey<NavigatorState>> navigatorKeys = {
-    TabItemAdmin.maintainRestaurants: GlobalKey<NavigatorState>(),
-    TabItemAdmin.maintainMenu: GlobalKey<NavigatorState>(),
-    TabItemAdmin.manageOrders: GlobalKey<NavigatorState>(),
-    TabItemAdmin.userAccount: GlobalKey<NavigatorState>()
+  String get role => widget.role;
+  TabItem _currentTab = TabItem.maintainRestaurants;
+
+  final Map<TabItem, GlobalKey<NavigatorState>> navigatorKeys = {
+    TabItem.maintainRestaurants: GlobalKey<NavigatorState>(),
+    TabItem.maintainMenu: GlobalKey<NavigatorState>(),
+    TabItem.manageOrders: GlobalKey<NavigatorState>(),
+    TabItem.userAccount: GlobalKey<NavigatorState>()
   };
 
-  Map<TabItemAdmin, WidgetBuilder> get widgetBuilders {
+  Map<TabItem, WidgetBuilder> get widgetBuilders {
     return {
-      TabItemAdmin.maintainRestaurants: (_) => Placeholder(),
-      TabItemAdmin.maintainMenu: (_) => Placeholder(),
-      TabItemAdmin.manageOrders: (_) => Placeholder(),
-      TabItemAdmin.userAccount: (_) => AccountPage()
+      TabItem.maintainRestaurants: (_) => Placeholder(),
+      TabItem.maintainMenu: (_) => Placeholder(),
+      TabItem.manageOrders: (_) => Placeholder(),
+      TabItem.userAccount: (_) => AccountPage(auth: auth, session: session, database: database,)
     };
   }
 
-  void _select(TabItemAdmin tabItem) {
+  void _select(TabItem tabItem) {
     if (tabItem == _currentTab) {
       navigatorKeys[tabItem].currentState.popUntil((route) => route.isFirst);
     } else {
@@ -44,6 +51,9 @@ class _HomePageAdminState extends State<HomePageAdmin> {
 
   @override
   Widget build(BuildContext context) {
+    auth = Provider.of<AuthBase>(context);
+    session = Provider.of<Session>(context);
+    database = Provider.of<Database>(context);
     return WillPopScope(
       onWillPop: () async =>  !await navigatorKeys[_currentTab].currentState.maybePop(),
       child: CupertinoHomeScaffoldAdmin(
@@ -51,6 +61,7 @@ class _HomePageAdminState extends State<HomePageAdmin> {
         onSelectTab: _select,
         widgetBuilders: widgetBuilders,
         navigatorKeys: navigatorKeys,
+        roleTabItems: RoleEnumBase.getRoleTabItems(role),
       ),
     );
   }

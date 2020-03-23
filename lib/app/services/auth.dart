@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
-class User {
-  User({@required this.uid, @required this.photoUrl, @required this.displayName, @required this.isEmailVerified});
+class UserAuth {
+  UserAuth({@required this.uid, @required this.photoUrl, @required this.displayName, @required this.isEmailVerified});
   final String uid;
   final String photoUrl;
   final String displayName;
@@ -11,9 +11,9 @@ class User {
 }
 
 abstract class AuthBase {
-  Stream<User> get onAuthStateChanged;
-  Future<User> currentUser();
-  Future<User> signInWithEmailAndPassword(String email, String password);
+  Stream<UserAuth> get onAuthStateChanged;
+  Future<UserAuth> currentUser();
+  Future<UserAuth> signInWithEmailAndPassword(String email, String password);
   Future<void> createUserWithEmailAndPassword(String email, String password);
   Future<void> resetPassword(String email);
   Future<void> signOut();
@@ -22,24 +22,24 @@ abstract class AuthBase {
 class Auth implements AuthBase {
   final _fireBaseAuth = FirebaseAuth.instance;
 
-  User _userFromFirebase(FirebaseUser user) {
+  UserAuth _userFromFirebase(FirebaseUser user) {
     print('FirebaseUser => ${user.displayName}');
-    return user == null ? null : User(uid: user.uid, displayName: user.displayName, photoUrl: user.photoUrl, isEmailVerified: user.isEmailVerified);
+    return user == null ? null : UserAuth(uid: user.uid, displayName: user.displayName, photoUrl: user.photoUrl, isEmailVerified: user.isEmailVerified);
   }
 
   @override
-  Stream<User> get onAuthStateChanged {
+  Stream<UserAuth> get onAuthStateChanged {
     return _fireBaseAuth.onAuthStateChanged.map(_userFromFirebase);
   }
 
   @override
-  Future<User> currentUser() async {
+  Future<UserAuth> currentUser() async {
     final user = await _fireBaseAuth.currentUser();
     return _userFromFirebase(user);
   }
 
   @override
-  Future<User> signInWithEmailAndPassword(String email, String password) async {
+  Future<UserAuth> signInWithEmailAndPassword(String email, String password) async {
     final authResult = await _fireBaseAuth.signInWithEmailAndPassword(email: email, password: password);
     if (!authResult.user.isEmailVerified) {
       throw PlatformException(

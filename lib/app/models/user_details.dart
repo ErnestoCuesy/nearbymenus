@@ -1,41 +1,47 @@
+const String ROLE_NONE = 'none';
+const String ROLE_ADMIN = 'admin';
+const String ROLE_STAFF = 'staff';
+const String ROLE_PATRON = 'patron';
+const String ROLE_DEV = 'dev';
+
 class UserDetails {
-  String userName;
-  String userAddress;
-  String userLocation;
-  String userRole;
-  String userDeviceName;
+  String name;
+  String address;
+  String complexName;
+  String nearestRestaurant;
+  String role;
+  String deviceName;
 
   UserDetails({
-    this.userName,
-    this.userAddress,
-    this.userLocation,
-    this.userRole = 'none',
-    this.userDeviceName = ''
+    this.name = '',
+    this.address = '',
+    this.complexName = '',
+    this.nearestRestaurant = '',
+    this.role = ROLE_NONE,
+    this.deviceName = ''
   });
 
   factory UserDetails.fromMap(Map<String, dynamic> data) {
     if (data == null) {
-      return null;
-    }
-    final String userName = data['userName'];
-    if (userName == null) {
-      return null;
+      return UserDetails();
     }
     return UserDetails(
-        userName: data['userName'],
-        userAddress: data['userAddress'],
-        userLocation: data['userLocation'],
-        userRole: data['userRole'],
-        userDeviceName: data['userDeviceName']);
+        name: data['name'],
+        address: data['address'],
+        complexName: data['complexName'],
+        nearestRestaurant: data['nearestRestaurant'],
+        role: data['role'],
+        deviceName: data['deviceName']);
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'userName': userName,
-      'userAddress': userAddress,
-      'userLocation': userLocation,
-      'userRole': userRole,
-      'userDeviceName': userDeviceName
+      'name': name,
+      'address': address,
+      'complexName': complexName,
+      'nearestRestaurant': nearestRestaurant,
+      'role': role,
+      'deviceName': deviceName
     };
   }
 }
