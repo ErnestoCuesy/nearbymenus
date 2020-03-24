@@ -43,9 +43,11 @@ class _SessionControlState extends State<SessionControl> {
                 userDetails.deviceName != deviceInfo.deviceName) {
               return AlreadyLoggedIn(
                 userDetails: userDetails,
+                database: database,
+                deviceInfo: deviceInfo,
               );
             }
-            if (userDetails.role == '' ||
+            if (userDetails.role == '' || userDetails.role == null ||
                 userDetails.role == ROLE_NONE) {
               return RoleSelectionPage();
             }

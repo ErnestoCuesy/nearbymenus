@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
+import 'package:nearbymenus/app/pages/session/restaurant_query.dart';
 import 'package:nearbymenus/app/pages/session/role_selection_page.dart';
+import 'package:nearbymenus/app/pages/session/user_details_form.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/services/session.dart';
@@ -12,14 +14,14 @@ class AccountPage extends StatefulWidget {
   final Session session;
   final Database database;
 
-  const AccountPage({Key key, this.auth, this.session, this.database}) : super(key: key);
+  const AccountPage({Key key, this.auth, this.session, this.database})
+      : super(key: key);
 
   @override
   _AccountPageState createState() => _AccountPageState();
 }
 
 class _AccountPageState extends State<AccountPage> {
-
   Auth get auth => widget.auth;
   Session get session => widget.session;
   Database get database => widget.database;
@@ -50,8 +52,42 @@ class _AccountPageState extends State<AccountPage> {
     return [
       SizedBox(height: 8.0),
       Text(
-        session.userDetails.name,
+        'Closest restaurant',
         style: Theme.of(context).primaryTextTheme.headline,
+      ),
+      SizedBox(
+        height: 8.0,
+      ),
+      Text(
+        session.userDetails.nearestRestaurant,
+        style: Theme.of(context).primaryTextTheme.body1,
+      ),
+      SizedBox(
+        height: 8.0,
+      ),
+      FormSubmitButton(
+        context: context,
+        text: 'Change Restaurant',
+        color: Theme.of(context).primaryColor,
+        onPressed: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (BuildContext context) {
+            return RestaurantQuery();
+          }),
+        ),
+      ),
+      SizedBox(
+        height: 16.0,
+      ),
+      Text(
+        'Name and address',
+        style: Theme.of(context).primaryTextTheme.headline,
+      ),
+      SizedBox(
+        height: 8.0,
+      ),
+      Text(
+        session.userDetails.name,
+        style: Theme.of(context).primaryTextTheme.body1,
       ),
       SizedBox(
         height: 8.0,
@@ -68,11 +104,38 @@ class _AccountPageState extends State<AccountPage> {
         style: Theme.of(context).primaryTextTheme.body1,
       ),
       SizedBox(
-        height: 8.0,
+        height: 16.0,
+      ),
+      FormSubmitButton(
+        context: context,
+        text: 'Change Name and Address',
+        color: Theme.of(context).primaryColor,
+        onPressed: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (BuildContext context) {
+            return Scaffold(
+              appBar: AppBar(
+                title: Text('Enter new user details', style: TextStyle(color: Theme.of(context).appBarTheme.color),),
+                elevation: 2.0,
+              ),
+              body: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Card(
+                    child: UserDetailsForm.create(context),
+                  ),
+                ),
+              ),
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            );
+          }),
+        ),
+      ),
+      SizedBox(
+        height: 16.0,
       ),
       Text(
-        session.userDetails.nearestRestaurant,
-        style: Theme.of(context).primaryTextTheme.body1,
+        'Current role',
+        style: Theme.of(context).primaryTextTheme.headline,
       ),
       SizedBox(
         height: 8.0,
@@ -82,26 +145,31 @@ class _AccountPageState extends State<AccountPage> {
         style: Theme.of(context).primaryTextTheme.body1,
       ),
       SizedBox(
-        height: 8.0,
-      ),
-      Text(
-        session.userDetails.deviceName,
-        style: Theme.of(context).primaryTextTheme.body1,
-      ),
-      SizedBox(
-        height: 8.0,
+        height: 16.0,
       ),
       FormSubmitButton(
         context: context,
         text: 'Change Role',
         color: Theme.of(context).primaryColor,
         onPressed: () => Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (BuildContext context) {
-              return RoleSelectionPage();
-            }
-          ),
+          MaterialPageRoute(builder: (BuildContext context) {
+            return RoleSelectionPage();
+          }),
         ),
+      ),
+      SizedBox(
+        height: 16.0,
+      ),
+      Text(
+        'Current device:',
+        style: Theme.of(context).primaryTextTheme.headline,
+      ),
+      SizedBox(
+        height: 8.0,
+      ),
+      Text(
+        session.userDetails.deviceName,
+        style: Theme.of(context).primaryTextTheme.body1,
       ),
     ];
   }
@@ -128,13 +196,18 @@ class _AccountPageState extends State<AccountPage> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Card(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.min,
-            children: _buildContents(),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: _buildContents(),
+              ),
+            ),
           ),
         ),
       ),

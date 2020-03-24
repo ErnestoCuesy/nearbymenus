@@ -21,36 +21,64 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
 
   List<Widget> _buildChildren(BuildContext context) {
     return [
-      Text('Please select your role'),
+      Center(child: Text('Please select your role')),
       SizedBox(height: 16.0,),
-      IconButton(
-        icon: Icon(Icons.accessibility),
-        iconSize: 36,
-        color: Colors.black,
-        onPressed: () => _changeRole('patron'),
+      Card(
+        child: Column(
+          children: <Widget>[
+            IconButton(
+              icon: Icon(Icons.accessibility),
+              iconSize: 36,
+              color: Colors.black,
+              onPressed: () => _changeRole('patron'),
+            ),
+            Text('Patron'),
+          ]
+        ),
       ),
       SizedBox(height: 16.0,),
-      IconButton(
-        icon: Icon(Icons.account_box),
-        iconSize: 36,
-        color: Colors.black,
-        onPressed: () => _changeRole('admin'),
+      Card(
+        child: Column(
+          children: <Widget>[
+            IconButton(
+              icon: Icon(Icons.account_box),
+              iconSize: 36,
+              color: Colors.black,
+              onPressed: () => _changeRole('admin'),
+            ),
+            Text('Restaurant Manager'),
+          ],
+        ),
       ),
       SizedBox(height: 16.0,),
-      IconButton(
-        icon: Icon(Icons.account_circle),
-        iconSize: 36,
-        color: Colors.black,
-        onPressed: () => _changeRole('staff'),
+      Card(
+        child: Column(
+          children: <Widget>[
+            IconButton(
+              icon: Icon(Icons.account_circle),
+              iconSize: 36,
+              color: Colors.black,
+              onPressed: () => _changeRole('staff'),
+            ),
+            Text('Restaurant Staff'),
+          ],
+        ),
       ),
       if (FlavourConfig.isDevelopment())
       SizedBox(height: 16.0,),
       if (FlavourConfig.isDevelopment())
-      IconButton(
-        icon: Icon(Icons.adb),
-        iconSize: 36,
-        color: Colors.black,
-        onPressed: () => _changeRole('dev'),
+      Card(
+        child: Column(
+          children: <Widget>[
+            IconButton(
+              icon: Icon(Icons.adb),
+              iconSize: 36,
+              color: Colors.black,
+              onPressed: () => _changeRole('dev'),
+            ),
+            Text('Developer'),
+          ],
+        ),
       ),
     ];
   }

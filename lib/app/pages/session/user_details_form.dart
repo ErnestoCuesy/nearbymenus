@@ -195,10 +195,15 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
   @override
   Widget build(BuildContext context) {
     final session = Provider.of<Session>(context);
-    _userNearestRestaurantController.text = session.nearestRestaurant.name + ' (' + session.nearestRestaurant.distance.round().toString() + 'm)';
+    // _userNameController.text = session.userDetails.name;
+    // _userAddressController.text = session.userDetails.address;
+    _userNearestRestaurantController.text = session.nearestRestaurant.name;
     _userLocationController.text = session.nearestRestaurant.complexName;
-    model.userNearestRestaurant = session.nearestRestaurant.name  + ' (' + session.nearestRestaurant.distance.round().toString() + 'm)';
+    // model.userName = session.userDetails.name;
+    // model.userAddress = session.userDetails.address;
+    model.userNearestRestaurant = session.nearestRestaurant.name;
     model.userLocation = session.nearestRestaurant.complexName;
+    model.userRole = session.userDetails.role;
     return Container(
       color: Theme
           .of(context)

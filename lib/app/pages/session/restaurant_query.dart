@@ -36,6 +36,7 @@ class RestaurantQuery extends StatelessWidget {
                   .scaffoldBackgroundColor,
             );
           } else {
+            // TODO handle empty snapshot or timeout or something
             return LoadingView();
           }
         } else {

@@ -34,6 +34,7 @@ dependencies:
   permission_handler: ^4.4.0+hotfix.2
   provider: ^3.1.0+1
   purchases_flutter: ^1.0.4
+  responsive_framework: ^0.0.4
   rxdart: ^0.22.4
 
 dependency_overrides:

@@ -10,6 +10,7 @@ import 'package:nearbymenus/app/services/session.dart';
 import 'package:nearbymenus/app/utilities/app_theme.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 class MyApp extends StatefulWidget {
   @override
@@ -83,6 +84,17 @@ class _MyAppState extends State<MyApp> {
             title: 'Nearby Menus',
             theme: AppTheme.createTheme(context),
             home: LandingPage(),
+            builder: (context, widget) => ResponsiveWrapper.builder(
+              widget,
+              maxWidth: 1200,
+              minWidth: 450,
+              defaultScale: true,
+              breakpoints: [
+                ResponsiveBreakpoint(breakpoint: 450, name: MOBILE),
+                ResponsiveBreakpoint(breakpoint: 800, name: TABLET, autoScale: true),
+                ResponsiveBreakpoint(breakpoint: 1000, name: TABLET, autoScale: true),
+              ],
+            ),
           )
       );
     } else {
