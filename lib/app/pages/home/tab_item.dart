@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:nearbymenus/app/models/user_details.dart';
 
 enum TabItem {
-  maintainRestaurants,
-  maintainMenu,
+  restaurantDetails,
+  foodMenu,
+  drinksMenu,
   manageOrders,
-  browseMenu,
   myOrders,
   userAccount,
 }
@@ -16,19 +17,19 @@ abstract class RoleEnumBase {
   static RoleEnumBase getRoleTabItems(String role) {
     RoleEnumBase items;
     switch (role) {
-      case 'patron': {
+      case ROLE_PATRON: {
         items = PatronRoleEnum();
       }
       break;
-      case 'admin': {
-        items = AdminRoleEnum();
+      case ROLE_MANAGER: {
+        items = ManagerRoleEnum();
       }
       break;
-      case 'staff': {
+      case ROLE_STAFF: {
         items = StaffRoleEnum();
       }
       break;
-      case 'dev': {
+      case ROLE_DEV: {
         items = DevRoleEnum();
       }
       break;
@@ -62,16 +63,18 @@ abstract class RoleEnumBase {
 
 class PatronRoleEnum extends RoleEnumBase {
   List<TabItem> roleEnumList = const [
-    TabItem.browseMenu,
+    TabItem.foodMenu,
+    TabItem.drinksMenu,
     TabItem.myOrders,
     TabItem.userAccount
   ];
 }
 
-class AdminRoleEnum extends RoleEnumBase {
+class ManagerRoleEnum extends RoleEnumBase {
   final List<TabItem> roleEnumList = const [
-    TabItem.maintainRestaurants,
-    TabItem.maintainMenu,
+    TabItem.restaurantDetails,
+    TabItem.foodMenu,
+    TabItem.drinksMenu,
     TabItem.manageOrders,
     TabItem.userAccount
   ];
@@ -86,8 +89,9 @@ class StaffRoleEnum extends RoleEnumBase {
 
 class DevRoleEnum extends RoleEnumBase {
   final List<TabItem> roleEnumList = const [
-    TabItem.maintainRestaurants,
-    TabItem.maintainMenu,
+    TabItem.restaurantDetails,
+    TabItem.foodMenu,
+    TabItem.drinksMenu,
     TabItem.manageOrders,
     TabItem.myOrders,
     TabItem.userAccount
@@ -101,14 +105,14 @@ class TabItemData {
   final IconData icon;
 
   static const Map<TabItem, TabItemData> allTabs = {
-    TabItem.maintainRestaurants:
+    TabItem.restaurantDetails:
     TabItemData(title: 'Restaurant', icon: Icons.home),
-    TabItem.maintainMenu:
-    TabItemData(title: 'Menu', icon: Icons.import_contacts),
+    TabItem.foodMenu:
+    TabItemData(title: 'Food Menu', icon: Icons.fastfood),
+    TabItem.drinksMenu:
+    TabItemData(title: 'Drinks Menu', icon: Icons.local_bar),
     TabItem.manageOrders:
     TabItemData(title: 'Orders', icon: Icons.assignment),
-    TabItem.browseMenu:
-    TabItemData(title: 'Food', icon: Icons.fastfood),
     TabItem.myOrders:
     TabItemData(title: 'My Orders', icon: Icons.shopping_cart),
     TabItem.userAccount:

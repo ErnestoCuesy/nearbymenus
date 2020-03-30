@@ -2,11 +2,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nearbymenus/app/pages/landing/landing_page.dart';
-import 'package:nearbymenus/app/pages/landing/loading_view.dart';
+import 'package:nearbymenus/app/pages/landing/loading_progress_indicator.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/services/device_info.dart';
-import 'package:nearbymenus/app/services/session.dart';
+import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/utilities/app_theme.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -98,7 +98,7 @@ class _MyAppState extends State<MyApp> {
           )
       );
     } else {
-      return LoadingView();
+      return LoadingProgressIndicator();
     }
   }
 }

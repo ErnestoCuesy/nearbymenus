@@ -4,7 +4,7 @@ import 'package:nearbymenus/app/pages/sign_in/sign_in_page.dart';
 import 'package:nearbymenus/app/pages/session/session_control.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
-import 'package:nearbymenus/app/services/session.dart';
+import 'package:nearbymenus/app/models/session.dart';
 import 'package:provider/provider.dart';
 
 class LandingPage extends StatelessWidget {

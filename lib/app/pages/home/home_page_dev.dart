@@ -4,7 +4,7 @@ import 'package:nearbymenus/app/pages/home/cupertino_home_scaffold_dev.dart';
 import 'package:nearbymenus/app/pages/home/tab_item.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
-import 'package:nearbymenus/app/services/session.dart';
+import 'package:nearbymenus/app/models/session.dart';
 import 'package:provider/provider.dart';
 
 class HomePageDev extends StatefulWidget {
@@ -23,23 +23,24 @@ class _HomePageDevState extends State<HomePageDev> {
   Database database;
 
   String get role => widget.role;
-  TabItem _currentTab = TabItem.maintainRestaurants;
+  TabItem _currentTab = TabItem.restaurantDetails;
   
   final Map<TabItem, GlobalKey<NavigatorState>> navigatorKeys = {
-    TabItem.maintainRestaurants: GlobalKey<NavigatorState>(),
-    TabItem.browseMenu: GlobalKey<NavigatorState>(),
+    TabItem.restaurantDetails: GlobalKey<NavigatorState>(),
+    TabItem.foodMenu: GlobalKey<NavigatorState>(),
+    TabItem.drinksMenu: GlobalKey<NavigatorState>(),
     TabItem.myOrders: GlobalKey<NavigatorState>(),
-    TabItem.maintainMenu: GlobalKey<NavigatorState>(),
     TabItem.manageOrders: GlobalKey<NavigatorState>(),
     TabItem.userAccount: GlobalKey<NavigatorState>()
   };
 
   Map<TabItem, WidgetBuilder> get widgetBuilders {
     return {
-      TabItem.maintainRestaurants: (_) => Placeholder(),
-      TabItem.browseMenu: (_) => Placeholder(),
+      TabItem.restaurantDetails: (_) => Placeholder(),
+      TabItem.foodMenu: (_) => Placeholder(),
+      TabItem.drinksMenu: (_) => Placeholder(),
       TabItem.myOrders: (_) => Placeholder(),
-      TabItem.maintainMenu: (_) => Placeholder(),
+      TabItem.foodMenu: (_) => Placeholder(),
       TabItem.manageOrders: (_) => Placeholder(),
       TabItem.userAccount: (_) => AccountPage(auth: auth, session: session, database: database,)
     };

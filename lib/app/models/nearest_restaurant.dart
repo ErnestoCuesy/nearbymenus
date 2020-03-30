@@ -12,21 +12,21 @@ class NearestRestaurant {
 }
 
 class NearRestaurantBloc {
-  final Stream<List<Restaurant>> source;
+  final Future<List<Restaurant>> source;
   final Position userCoordinates;
   final _stream = StreamController<List<NearestRestaurant>>();
 
   NearRestaurantBloc({this.source, this.userCoordinates}) {
     List<NearestRestaurant> resList = List<NearestRestaurant>();
-    source.listen((rest) {
+    source.then((rest) {
       rest.forEach((res) async {
         await Geolocator().distanceBetween(userCoordinates.latitude, userCoordinates.longitude, res.coordinates.latitude, res.coordinates.longitude).then((distance) {
           if (distance < res.deliveryRadius) {
-            resList.add(NearestRestaurant(name: res.name, complexName: res.complexName, distance: distance));
+            resList.add(NearestRestaurant(name: res.name, complexName: res.restaurantLocation, distance: distance));
           }
         });
+        _stream.add(resList);
       });
-      _stream.add(resList);
     });
   }
 

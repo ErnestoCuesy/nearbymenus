@@ -5,7 +5,7 @@ import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/sign_in/validators.dart';
 import 'package:nearbymenus/app/services/database.dart';
 
-class UserDetailsModel with UserCredentialsValidators, ChangeNotifier {
+class UserDetailsModel with UserDetailsValidators, ChangeNotifier {
   final Database database;
   String userName;
   String userAddress;

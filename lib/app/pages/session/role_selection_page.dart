@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
+import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/services/database.dart';
-import 'package:nearbymenus/app/services/session.dart';
+import 'package:nearbymenus/app/models/session.dart';
 import 'package:provider/provider.dart';
 
 class RoleSelectionPage extends StatefulWidget {
@@ -21,68 +22,76 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
 
   List<Widget> _buildChildren(BuildContext context) {
     return [
-      Center(child: Text('Please select your role')),
-      SizedBox(height: 16.0,),
-      Card(
-        child: Column(
-          children: <Widget>[
-            IconButton(
-              icon: Icon(Icons.accessibility),
-              iconSize: 36,
-              color: Colors.black,
-              onPressed: () => _changeRole('patron'),
-            ),
-            Text('Patron'),
-          ]
-        ),
+      _roleContainer(
+        width: 200.0,
+        height: 200.0,
+        icon: Icon(Icons.accessibility),
+        roleName: ROLE_PATRON,
+        roleDescription: 'Hungry? Browse the restaurant\'s menu and place your order!',
+        onPressed: () => _changeRole(ROLE_PATRON),
       ),
       SizedBox(height: 16.0,),
-      Card(
-        child: Column(
-          children: <Widget>[
-            IconButton(
-              icon: Icon(Icons.account_box),
-              iconSize: 36,
-              color: Colors.black,
-              onPressed: () => _changeRole('admin'),
-            ),
-            Text('Restaurant Manager'),
-          ],
-        ),
+      _roleContainer(
+        width: 200.0,
+        height: 200.0,
+        icon: Icon(Icons.account_box),
+        roleName: ROLE_MANAGER,
+        roleDescription: 'Open a restaurant, create menus and manage orders! \n(Requires subscription)',
+        onPressed: () => _changeRole(ROLE_MANAGER),
       ),
       SizedBox(height: 16.0,),
-      Card(
-        child: Column(
-          children: <Widget>[
-            IconButton(
-              icon: Icon(Icons.account_circle),
-              iconSize: 36,
-              color: Colors.black,
-              onPressed: () => _changeRole('staff'),
-            ),
-            Text('Restaurant Staff'),
-          ],
-        ),
+      _roleContainer(
+        width: 200.0,
+        height: 200.0,
+        icon: Icon(Icons.account_circle),
+        roleName: ROLE_STAFF,
+        roleDescription: 'Request access to the restaurant to manage orders.',
+        onPressed: () => _changeRole(ROLE_STAFF),
       ),
       if (FlavourConfig.isDevelopment())
       SizedBox(height: 16.0,),
       if (FlavourConfig.isDevelopment())
-      Card(
-        child: Column(
-          children: <Widget>[
-            IconButton(
-              icon: Icon(Icons.adb),
-              iconSize: 36,
-              color: Colors.black,
-              onPressed: () => _changeRole('dev'),
-            ),
-            Text('Developer'),
-          ],
-        ),
+      _roleContainer(
+        width: 125.0,
+        height: 125.0,
+        icon: Icon(Icons.adb),
+        roleName: ROLE_DEV,
+        roleDescription: '',
+        onPressed: () => _changeRole(ROLE_DEV),
       ),
     ];
   }
 
+  Widget _roleContainer({Icon icon, String roleName, String roleDescription, VoidCallback onPressed, double height, double width}) {
+    return Container(
+      width: width,
+      height: height,
+      child: Card(
+        child: Column(
+          children: <Widget>[
+            IconButton(
+              icon: icon,
+              iconSize: 36,
+              color: Colors.black,
+              onPressed: onPressed,
+            ),
+            Text(roleName, style: Theme.of(context).textTheme.title,),
+            SizedBox(
+              height: 8.0,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                roleDescription,
+                style: Theme.of(context).textTheme.body2,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+  }
   @override
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
@@ -90,7 +99,7 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Welcome to Nearby Menus',
+          'Select your role at ${session.nearestRestaurant.name}',
           style: TextStyle(color: Theme.of(context).appBarTheme.color),
         ),
         elevation: 2.0,
@@ -98,9 +107,9 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Card(
+          child: Center(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: _buildChildren(context),
             ),

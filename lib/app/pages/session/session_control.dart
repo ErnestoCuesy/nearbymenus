@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
-import 'package:nearbymenus/app/pages/home/home_page_admin.dart';
+import 'package:nearbymenus/app/pages/home/home_page_manager.dart';
 import 'package:nearbymenus/app/pages/home/home_page_dev.dart';
 import 'package:nearbymenus/app/pages/home/home_page_patron.dart';
 import 'package:nearbymenus/app/pages/home/home_page_staff.dart';
-import 'package:nearbymenus/app/pages/landing/loading_view.dart';
+import 'package:nearbymenus/app/pages/landing/loading_progress_indicator.dart';
 import 'package:nearbymenus/app/pages/session/already_logged_in_page.dart';
 import 'package:nearbymenus/app/pages/session/restaurant_query.dart';
 import 'package:nearbymenus/app/pages/session/role_selection_page.dart';
 import 'package:nearbymenus/app/pages/session/user_details_page.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/services/device_info.dart';
-import 'package:nearbymenus/app/services/session.dart';
+import 'package:nearbymenus/app/models/session.dart';
 import 'package:provider/provider.dart';
 
 class SessionControl extends StatefulWidget {
@@ -61,26 +61,26 @@ class _SessionControlState extends State<SessionControl> {
             }
             userDetails.deviceName = deviceInfo.deviceName;
             database.setUserDetails(userDetails);
-            Widget home = LoadingView();
+            Widget home = LoadingProgressIndicator();
             switch (userDetails.role) {
               case ROLE_PATRON:
                 {
-                  home = HomePagePatron(role: 'patron',);
+                  home = HomePagePatron(role: ROLE_PATRON,);
                 }
                 break;
-              case ROLE_ADMIN:
+              case ROLE_MANAGER:
                 {
-                  home = HomePageAdmin(role: 'admin',);
+                  home = HomePageManager(role: ROLE_MANAGER,);
                 }
                 break;
               case ROLE_STAFF:
                 {
-                  home = HomePageStaff(role: 'staff',);
+                  home = HomePageStaff(role: ROLE_STAFF,);
                 }
                 break;
               case ROLE_DEV:
                 {
-                  home = HomePageDev(role: 'dev',);
+                  home = HomePageDev(role: ROLE_DEV,);
                 }
                 break;
             }

@@ -4,7 +4,7 @@ import 'package:nearbymenus/app/pages/session/user_details_model.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/services/device_info.dart';
-import 'package:nearbymenus/app/services/session.dart';
+import 'package:nearbymenus/app/models/session.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
@@ -56,6 +56,7 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
     try {
       // await Future.delayed(Duration(seconds: 3)); // Simulate slow network
       await model.save();
+      Navigator.of(context).pop();
     } on PlatformException catch (e) {
       PlatformExceptionAlertDialog(
         title: 'Save User Details',
@@ -117,7 +118,7 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
       cursorColor: Colors.black,
       decoration: InputDecoration(
         labelText: 'Name',
-        hintText: 'i.e.: Pat',
+        hintText: 'Your name',
         errorText: model.userNameErrorText,
         enabled: model.isLoading == false,
       ),
@@ -139,8 +140,8 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
       textCapitalization: TextCapitalization.words,
       cursorColor: Colors.black,
       decoration: InputDecoration(
-        labelText: 'Address or unit number',
-        hintText: 'i.e.: Unit 123',
+        labelText: 'Address',
+        hintText: 'Unit, flat or house number',
         errorText: model.userAddressErrorText,
         enabled: model.isLoading == false,
       ),
@@ -161,7 +162,7 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
       textCapitalization: TextCapitalization.words,
       cursorColor: Colors.black,
       decoration: InputDecoration(
-        labelText: 'Your Complex or Estate Name',
+        labelText: 'Complex or Estate Name',
         enabled: model.isLoading == false,
       ),
       autocorrect: false,
@@ -180,7 +181,7 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
       textCapitalization: TextCapitalization.words,
       cursorColor: Colors.black,
       decoration: InputDecoration(
-        labelText: 'Your Nearest Restaurant',
+        labelText: 'Nearest Restaurant',
         enabled: model.isLoading == false,
       ),
       autocorrect: false,

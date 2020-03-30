@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
-import 'package:nearbymenus/app/pages/session/restaurant_query.dart';
-import 'package:nearbymenus/app/pages/session/role_selection_page.dart';
+import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/session/user_details_form.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
-import 'package:nearbymenus/app/services/session.dart';
+import 'package:nearbymenus/app/models/session.dart';
 
 class AccountPage extends StatefulWidget {
   final AuthBase auth;
@@ -50,135 +48,97 @@ class _AccountPageState extends State<AccountPage> {
 
   List<Widget> _buildContents() {
     return [
-      SizedBox(height: 8.0),
-      Text(
-        'Closest restaurant',
-        style: Theme.of(context).primaryTextTheme.headline,
+      // RESTAURANT
+      _detailsSection(
+        sectionTitle: 'Closest restaurant',
+        cardTitle: session.userDetails.nearestRestaurant,
+        cardSubtitle: session.userDetails.complexName,
+        onPressed: () {
+          session.userDetails.nearestRestaurant = '';
+          database.setUserDetails(session.userDetails);
+        },
       ),
-      SizedBox(
-        height: 8.0,
-      ),
-      Text(
-        session.userDetails.nearestRestaurant,
-        style: Theme.of(context).primaryTextTheme.body1,
-      ),
-      SizedBox(
-        height: 8.0,
-      ),
-      FormSubmitButton(
-        context: context,
-        text: 'Change Restaurant',
-        color: Theme.of(context).primaryColor,
-        onPressed: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (BuildContext context) {
-            return RestaurantQuery();
-          }),
-        ),
-      ),
-      SizedBox(
-        height: 16.0,
-      ),
-      Text(
-        'Name and address',
-        style: Theme.of(context).primaryTextTheme.headline,
-      ),
-      SizedBox(
-        height: 8.0,
-      ),
-      Text(
-        session.userDetails.name,
-        style: Theme.of(context).primaryTextTheme.body1,
-      ),
-      SizedBox(
-        height: 8.0,
-      ),
-      Text(
-        session.userDetails.address,
-        style: Theme.of(context).primaryTextTheme.body1,
-      ),
-      SizedBox(
-        height: 8.0,
-      ),
-      Text(
-        session.userDetails.complexName,
-        style: Theme.of(context).primaryTextTheme.body1,
-      ),
-      SizedBox(
-        height: 16.0,
-      ),
-      FormSubmitButton(
-        context: context,
-        text: 'Change Name and Address',
-        color: Theme.of(context).primaryColor,
-        onPressed: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (BuildContext context) {
-            return Scaffold(
-              appBar: AppBar(
-                title: Text('Enter new user details', style: TextStyle(color: Theme.of(context).appBarTheme.color),),
-                elevation: 2.0,
+      // NAME AND ADDRESS
+      _detailsSection(
+        sectionTitle: 'Name and address',
+        cardTitle: session.userDetails.name,
+        cardSubtitle: session.userDetails.address,
+        onPressed: () => Navigator.of(context)
+            .push(MaterialPageRoute(builder: (BuildContext context) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(
+                'Change your details',
+                style:
+                TextStyle(color: Theme.of(context).appBarTheme.color),
               ),
-              body: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Card(
-                    child: UserDetailsForm.create(context),
-                  ),
+              elevation: 2.0,
+            ),
+            body: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Card(
+                  child: UserDetailsForm.create(context),
                 ),
               ),
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            );
-          }),
-        ),
+            ),
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          );
+        })),
       ),
-      SizedBox(
-        height: 16.0,
-      ),
-      Text(
-        'Current role',
-        style: Theme.of(context).primaryTextTheme.headline,
-      ),
-      SizedBox(
-        height: 8.0,
-      ),
-      Text(
-        session.userDetails.role,
-        style: Theme.of(context).primaryTextTheme.body1,
-      ),
-      SizedBox(
-        height: 16.0,
-      ),
-      FormSubmitButton(
-        context: context,
-        text: 'Change Role',
-        color: Theme.of(context).primaryColor,
-        onPressed: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (BuildContext context) {
-            return RoleSelectionPage();
-          }),
-        ),
-      ),
-      SizedBox(
-        height: 16.0,
-      ),
-      Text(
-        'Current device:',
-        style: Theme.of(context).primaryTextTheme.headline,
-      ),
-      SizedBox(
-        height: 8.0,
-      ),
-      Text(
-        session.userDetails.deviceName,
-        style: Theme.of(context).primaryTextTheme.body1,
+      // ROLE
+      _detailsSection(
+        sectionTitle: 'Current role',
+        cardTitle: session.userDetails.role,
+        cardSubtitle: '',
+        onPressed: () {
+          session.userDetails.role = ROLE_NONE;
+          database.setUserDetails(session.userDetails);
+        },
       ),
     ];
   }
 
+  Widget _detailsSection(
+      {String sectionTitle,
+      String cardTitle,
+      String cardSubtitle,
+      VoidCallback onPressed}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0, top: 8.0),
+          child: Text(
+            sectionTitle,
+            style: Theme.of(context).primaryTextTheme.headline,
+          ),
+        ),
+        SizedBox(
+          height: 8.0,
+        ),
+        Card(
+          child: ListTile(
+            title: Text(
+              cardTitle,
+              style: Theme.of(context).primaryTextTheme.body1,
+            ),
+            subtitle: Text(
+              cardSubtitle,
+              style: Theme.of(context).primaryTextTheme.body1,
+            ),
+            trailing: IconButton(
+              icon: Icon(Icons.edit),
+              onPressed: onPressed,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-//    auth = Provider.of<Auth>(context);
-//    sessionManager = Provider.of<Session>(context);
-//    database = Provider.of<Database>(context);
     var accountText = 'Account Details';
     return Scaffold(
       appBar: AppBar(
@@ -199,15 +159,10 @@ class _AccountPageState extends State<AccountPage> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: _buildContents(),
-              ),
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: _buildContents(),
           ),
         ),
       ),

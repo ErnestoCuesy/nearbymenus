@@ -4,7 +4,7 @@ import 'package:nearbymenus/app/pages/home/cupertino_home_scaffold_staff.dart';
 import 'package:nearbymenus/app/pages/home/tab_item.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
-import 'package:nearbymenus/app/services/session.dart';
+import 'package:nearbymenus/app/models/session.dart';
 import 'package:provider/provider.dart';
 
 class HomePageStaff extends StatefulWidget {

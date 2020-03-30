@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/models/nearest_restaurant.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/services/database.dart';
-import 'package:nearbymenus/app/services/session.dart';
+import 'package:nearbymenus/app/models/session.dart';
 import 'package:provider/provider.dart';
 
 class RestaurantList extends StatefulWidget {

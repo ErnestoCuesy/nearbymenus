@@ -4,7 +4,7 @@ import 'package:nearbymenus/app/pages/home/cupertino_home_scaffold_patron.dart';
 import 'package:nearbymenus/app/pages/home/tab_item.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
-import 'package:nearbymenus/app/services/session.dart';
+import 'package:nearbymenus/app/models/session.dart';
 import 'package:provider/provider.dart';
 
 class HomePagePatron extends StatefulWidget {
@@ -23,17 +23,19 @@ class _HomePagePatronState extends State<HomePagePatron> {
   Database database;
 
   String get role => widget.role;
-  TabItem _currentTab = TabItem.browseMenu;
+  TabItem _currentTab = TabItem.foodMenu;
 
   final Map<TabItem, GlobalKey<NavigatorState>> navigatorKeys = {
-    TabItem.browseMenu: GlobalKey<NavigatorState>(),
+    TabItem.foodMenu: GlobalKey<NavigatorState>(),
+    TabItem.drinksMenu: GlobalKey<NavigatorState>(),
     TabItem.myOrders: GlobalKey<NavigatorState>(),
     TabItem.userAccount: GlobalKey<NavigatorState>()
   };
 
   Map<TabItem, WidgetBuilder> get widgetBuilders {
     return {
-      TabItem.browseMenu: (_) => Placeholder(),
+      TabItem.foodMenu: (_) => Placeholder(),
+      TabItem.drinksMenu: (_) => Placeholder(),
       TabItem.myOrders: (_) => Placeholder(),
       TabItem.userAccount: (_) => AccountPage(auth: auth, session: session, database: database,)
     };

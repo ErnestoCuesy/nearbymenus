@@ -1,14 +1,15 @@
-const String ROLE_NONE = 'none';
-const String ROLE_ADMIN = 'admin';
-const String ROLE_STAFF = 'staff';
-const String ROLE_PATRON = 'patron';
-const String ROLE_DEV = 'dev';
+const String ROLE_NONE = 'None';
+const String ROLE_MANAGER = 'Manager';
+const String ROLE_STAFF = 'Staff';
+const String ROLE_PATRON = 'Patron';
+const String ROLE_DEV = 'Dev';
 
 class UserDetails {
   String name;
   String address;
   String complexName;
   String nearestRestaurant;
+  String managesRestaurant;
   String role;
   String deviceName;
 
@@ -17,6 +18,7 @@ class UserDetails {
     this.address = '',
     this.complexName = '',
     this.nearestRestaurant = '',
+    this.managesRestaurant,
     this.role = ROLE_NONE,
     this.deviceName = ''
   });
@@ -30,6 +32,7 @@ class UserDetails {
         address: data['address'],
         complexName: data['complexName'],
         nearestRestaurant: data['nearestRestaurant'],
+        managesRestaurant: data['managesRestaurant'],
         role: data['role'],
         deviceName: data['deviceName']);
   }
@@ -40,6 +43,7 @@ class UserDetails {
       'address': address,
       'complexName': complexName,
       'nearestRestaurant': nearestRestaurant,
+      'managesRestaurant': managesRestaurant,
       'role': role,
       'deviceName': deviceName
     };
