@@ -5,9 +5,10 @@ import 'package:nearbymenus/app/models/restaurant.dart';
 class NearestRestaurant {
   final String name;
   final String complexName;
+  final Restaurant restaurant;
   final double distance;
 
-  NearestRestaurant({this.name, this.complexName, this.distance});
+  NearestRestaurant({this.name, this.complexName, this.restaurant, this.distance});
 
 }
 
@@ -21,8 +22,8 @@ class NearRestaurantBloc {
     source.then((rest) {
       rest.forEach((res) async {
         await Geolocator().distanceBetween(userCoordinates.latitude, userCoordinates.longitude, res.coordinates.latitude, res.coordinates.longitude).then((distance) {
-          if (distance < res.deliveryRadius) {
-            resList.add(NearestRestaurant(name: res.name, complexName: res.restaurantLocation, distance: distance));
+          if (res.active && distance < res.deliveryRadius) {
+            resList.add(NearestRestaurant(name: res.name, complexName: res.restaurantLocation, restaurant: res, distance: distance));
           }
         });
         _stream.add(resList);

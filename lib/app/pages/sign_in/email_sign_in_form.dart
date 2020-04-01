@@ -74,8 +74,8 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
 
   void _toggleFormType(EmailSignInFormType toggleForm) {
     model.toggleFormType(toggleForm);
-    _emailController.clear();
-    _passwordController.clear();
+    // _emailController.clear();
+    // _passwordController.clear();
   }
 
   List<Widget> _buildChildren() {

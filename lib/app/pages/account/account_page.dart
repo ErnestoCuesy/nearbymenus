@@ -49,6 +49,7 @@ class _AccountPageState extends State<AccountPage> {
   List<Widget> _buildContents() {
     return [
       // RESTAURANT
+      if (session.userDetails.role == ROLE_PATRON)
       _detailsSection(
         sectionTitle: 'Closest restaurant',
         cardTitle: session.userDetails.nearestRestaurant,
@@ -59,6 +60,7 @@ class _AccountPageState extends State<AccountPage> {
         },
       ),
       // NAME AND ADDRESS
+      if (session.userDetails.role == ROLE_PATRON)
       _detailsSection(
         sectionTitle: 'Name and address',
         cardTitle: session.userDetails.name,
@@ -96,6 +98,7 @@ class _AccountPageState extends State<AccountPage> {
           database.setUserDetails(session.userDetails);
         },
       ),
+      // TODO add subscription details for managers
     ];
   }
 

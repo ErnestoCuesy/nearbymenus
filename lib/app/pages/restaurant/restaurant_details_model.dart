@@ -20,10 +20,14 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
   int deliveryRadius;
   TimeOfDay workingHoursFrom;
   TimeOfDay workingHoursTo;
+  String telephoneNumber;
   String notes;
   bool active;
   bool open;
   bool acceptingStaffRequests;
+  bool acceptCash;
+  bool acceptCard;
+  bool acceptZapper;
   bool isLoading;
   bool submitted;
 
@@ -39,10 +43,14 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     this.deliveryRadius,
     this.workingHoursFrom,
     this.workingHoursTo,
+    this.telephoneNumber,
     this.notes,
     this.active = false,
     this.open = false,
     this.acceptingStaffRequests = false,
+    this.acceptCash = false,
+    this.acceptCard = false,
+    this.acceptZapper = false,
     this.isLoading = false,
     this.submitted = false,
   });
@@ -65,10 +73,14 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
             deliveryRadius: deliveryRadius,
           workingHoursFrom: workingHoursFrom,
           workingHoursTo: workingHoursTo,
+          telephoneNumber: telephoneNumber,
           notes: notes,
           open: open,
           active: active,
-          acceptingStaffRequests: acceptingStaffRequests
+          acceptingStaffRequests: acceptingStaffRequests,
+          acceptCash: acceptCash,
+          acceptCard: acceptCard,
+          acceptZapper: acceptZapper,
         ),
       );
       await database.setUserDetails(session.userDetails);
@@ -87,6 +99,7 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
         restaurantLocationValidator.isValid(restaurantLocation) &&
         typeOfFoodValidator.isValid(typeOfFood) &&
         deliveryRadiusValidator.isValid(deliveryRadius) &&
+        telephoneNumberValidator.isValid(telephoneNumber) &&
         workingHoursFrom != null && workingHoursTo != null &&
         !isLoading) {
       canSubmitFlag = true;
@@ -114,6 +127,11 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     return showErrorText ? invalidDeliveryRadiusErrorText : null;
   }
 
+  String get telephoneNumberErrorText {
+    bool showErrorText = !telephoneNumberValidator.isValid(telephoneNumber);
+    return showErrorText ? invalidTelephoneNumberErrorText : null;
+  }
+
   void updateRestaurantName(String name) => updateWith(name: name);
 
   void updateRestaurantLocation(String restaurantLocation) =>
@@ -134,6 +152,9 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
   void updateWorkingHoursTo(TimeOfDay workingHoursTo) =>
       updateWith(workingHoursTo: workingHoursTo);
 
+  void updateTelephoneNumber(String telephoneNumber) =>
+      updateWith(telephoneNumber: telephoneNumber);
+
   void updateNotes(String notes) =>
       updateWith(notes: notes);
 
@@ -146,6 +167,15 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
   void updateAcceptingStaffRequests(bool acceptingStaffRequests) =>
       updateWith(acceptingStaffRequests: acceptingStaffRequests);
 
+  void updateAcceptCash(bool acceptCash) =>
+      updateWith(acceptCash: acceptCash);
+
+  void updateAcceptCard(bool acceptCard) =>
+      updateWith(acceptCard: acceptCard);
+
+  void updateAcceptZapper(bool acceptZapper) =>
+      updateWith(acceptZapper: acceptZapper);
+
   void updateWith({
     String name,
     String restaurantLocation,
@@ -154,10 +184,14 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     int deliveryRadius,
     TimeOfDay workingHoursFrom,
     TimeOfDay workingHoursTo,
+    String telephoneNumber,
     String notes,
     bool active,
     bool open,
     bool acceptingStaffRequests,
+    bool acceptCash,
+    bool acceptCard,
+    bool acceptZapper,
     bool isLoading,
     bool submitted,
   }) {
@@ -168,10 +202,14 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     this.deliveryRadius = deliveryRadius ?? this.deliveryRadius;
     this.workingHoursFrom = workingHoursFrom ?? this.workingHoursFrom;
     this.workingHoursTo = workingHoursTo ?? this.workingHoursTo;
+    this.telephoneNumber = telephoneNumber ?? this.telephoneNumber;
     this.notes = notes ?? this.notes;
     this.active = active ?? this.active;
     this.open = open ?? this.open;
     this.acceptingStaffRequests = acceptingStaffRequests ?? this.acceptingStaffRequests;
+    this.acceptCash = acceptCash ?? this.acceptCash;
+    this.acceptCard = acceptCard ?? this.acceptCard;
+    this.acceptZapper = acceptZapper ?? this.acceptZapper;
     this.isLoading = isLoading ?? this.isLoading;
     this.submitted = this.submitted;
     notifyListeners();

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 
 class LoadingProgressIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(body: Center(child: CircularProgressIndicator())),
+      home: Scaffold(body: Center(child: PlatformProgressIndicator())),
     );
   }
 }

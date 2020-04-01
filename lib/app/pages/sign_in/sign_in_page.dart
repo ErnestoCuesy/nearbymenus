@@ -30,7 +30,7 @@ class SignInPage extends StatelessWidget {
         children: <Widget>[
           Expanded(
             child: Image.asset(
-              'images/logo.jfif',
+              'images/LauncherIcon.png',
             ),
           ),
           SizedBox(height: 24.0),

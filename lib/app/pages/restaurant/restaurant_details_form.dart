@@ -29,10 +29,14 @@ class RestaurantDetailsForm extends StatefulWidget {
         deliveryRadius: restaurant.deliveryRadius ?? 0,
         workingHoursFrom: restaurant.workingHoursFrom ?? TimeOfDay.now(),
         workingHoursTo: restaurant.workingHoursTo ?? TimeOfDay.now(),
+        telephoneNumber: restaurant.telephoneNumber ?? '',
         notes: restaurant.notes ?? '',
         active: restaurant.active ?? false,
         open: restaurant.open ?? false,
-        acceptingStaffRequests: restaurant.acceptingStaffRequests ?? false
+        acceptingStaffRequests: restaurant.acceptingStaffRequests ?? false,
+        acceptCash: restaurant.acceptCash ?? false,
+        acceptCard: restaurant.acceptCard ?? false,
+        acceptZapper: restaurant.acceptZapper ?? false,
       ),
       child: Consumer<RestaurantDetailsModel>(
         builder: (context, model, _) => RestaurantDetailsForm(
@@ -47,21 +51,20 @@ class RestaurantDetailsForm extends StatefulWidget {
 }
 
 class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
-  final TextEditingController _restaurantNameController =
-      TextEditingController();
-  final TextEditingController _restaurantLocationController = TextEditingController();
+  final TextEditingController _restaurantNameController = TextEditingController();
   final TextEditingController _typeOfFoodController = TextEditingController();
-  final TextEditingController _deliveryRadiusController =
-      TextEditingController();
+  final TextEditingController _restaurantLocationController = TextEditingController();
+  final TextEditingController _deliveryRadiusController = TextEditingController();
   final TextEditingController _notesController = TextEditingController();
+  final TextEditingController _telephoneNumberController = TextEditingController();
   final FocusNode _restaurantNameFocusNode = FocusNode();
-  final FocusNode _restaurantLocationFocusNode = FocusNode();
   final FocusNode _typeOfFoodFocusNode = FocusNode();
-  final FocusNode _coordinatesFocusNode = FocusNode();
+  final FocusNode _restaurantLocationFocusNode = FocusNode();
   final FocusNode _deliveryRadiusFocusNode = FocusNode();
+  final FocusNode _notesFocusNode = FocusNode();
+  final FocusNode _telephoneNumberFocusNode = FocusNode();
   final FocusNode _hoursFromFocusNode = FocusNode();
   final FocusNode _hoursToFocusNode = FocusNode();
-  final FocusNode _notesFocusNode = FocusNode();
   final FocusNode _statusFocusNode = FocusNode();
 
   TimeOfDay _openFrom = TimeOfDay.now();
@@ -75,10 +78,11 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
     super.initState();
     if (model != null) {
       _restaurantNameController.text = model.name ?? null;
-      _restaurantLocationController.text = model.restaurantLocation ?? null;
       _typeOfFoodController.text = model.typeOfFood ?? null;
+      _restaurantLocationController.text = model.restaurantLocation ?? null;
       _deliveryRadiusController.text = model.deliveryRadius.toString() ?? null;
       _notesController.text = model.notes ?? null;
+      _telephoneNumberController.text = model.telephoneNumber ?? null;
       _openFrom = model.workingHoursFrom ?? null;
       _openTo = model.workingHoursTo ?? null;
     }
@@ -87,18 +91,19 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
   @override
   void dispose() {
     _restaurantNameController.dispose();
-    _restaurantLocationController.dispose();
     _typeOfFoodController.dispose();
+    _restaurantLocationController.dispose();
     _deliveryRadiusController.dispose();
     _notesController.dispose();
+    _telephoneNumberController.dispose();
     _restaurantNameFocusNode.dispose();
     _restaurantLocationFocusNode.dispose();
     _typeOfFoodFocusNode.dispose();
-    _coordinatesFocusNode.dispose();
     _deliveryRadiusFocusNode.dispose();
+    _notesFocusNode.dispose();
+    _telephoneNumberFocusNode.dispose();
     _hoursFromFocusNode.dispose();
     _hoursToFocusNode.dispose();
-    _notesFocusNode.dispose();
     _statusFocusNode.dispose();
     super.dispose();
   }
@@ -139,20 +144,22 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
 
   void _deliveryRadiusEditingComplete() {
     final newFocus = model.deliveryRadiusValidator.isValid(model.deliveryRadius)
-        ? _hoursFromFocusNode
+        ? _telephoneNumberFocusNode
         : _deliveryRadiusFocusNode;
     FocusScope.of(context).requestFocus(newFocus);
   }
 
-  void _hoursFromEditingComplete() {
-    final newFocus = _hoursToFocusNode;
+  void _telephoneNumberEditingComplete() {
+    final newFocus = model.telephoneNumberValidator.isValid(model.telephoneNumber)
+        ? _notesFocusNode
+        : _telephoneNumberFocusNode;
     FocusScope.of(context).requestFocus(newFocus);
   }
 
-  void _hoursToEditingComplete() {
-    final newFocus = _notesFocusNode;
-    FocusScope.of(context).requestFocus(newFocus);
+  void _notesEditingComplete() {
+    FocusScope.of(context).requestFocus(_hoursFromFocusNode);
   }
+
 
   // TODO add a use current location check box and a way to refresh if user moves around
 
@@ -168,9 +175,17 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       ),
       _buildRestaurantLocationTextField(),
       SizedBox(
-        height: 16.0,
+        height: 8.0,
       ),
       _buildDeliveryRadiusTextField(),
+      SizedBox(
+        height: 8.0,
+      ),
+      _buildTelephoneNumberTextField(),
+      SizedBox(
+        height: 8.0,
+      ),
+      _buildNotesTextField(),
       SizedBox(
         height: 16.0,
       ),
@@ -182,10 +197,20 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       SizedBox(
         height: 16.0,
       ),
-      _buildNotesTextField(),
+      // CHECKBOXES
+      Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          _buildAcceptCashCheckBox(),
+          _buildAcceptCardCheckBox(),
+          _buildAcceptZapperCheckBox()
+        ],
+      ),
       SizedBox(
         height: 16.0,
       ),
+      // SWITCHES
       Column(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -248,30 +273,8 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
     ];
   }
 
-  // TODO add payment option checkboxes
   // TODO add use current location checkbox
   // TODO allow recalculation of current location
-
-  Widget _buildActiveSwitch() {
-    return CupertinoSwitch(
-      value: model.active,
-      onChanged: model.updateActive,
-    );
-  }
-
-  Widget _buildOpenSwitch() {
-    return CupertinoSwitch(
-      value: model.open,
-      onChanged: model.updateOpen,
-    );
-  }
-
-  Widget _buildAcceptingStaffRequestsSwitch() {
-    return CupertinoSwitch(
-      value: model.acceptingStaffRequests,
-      onChanged: model.updateAcceptingStaffRequests,
-    );
-  }
 
   TextField _buildRestaurantNameTextField() {
     return TextField(
@@ -293,29 +296,6 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       textInputAction: TextInputAction.next,
       onChanged: model.updateRestaurantName,
       onEditingComplete: () => _restaurantNameEditingComplete(),
-    );
-  }
-
-  TextField _buildRestaurantLocationTextField() {
-    return TextField(
-      style: Theme.of(context).inputDecorationTheme.labelStyle,
-      controller: _restaurantLocationController,
-      focusNode: _restaurantLocationFocusNode,
-      textCapitalization: TextCapitalization.words,
-      cursorColor: Colors.black,
-      decoration: InputDecoration(
-        labelText: 'Restaurant\'s location',
-        hintText: 'i.e.: Lonehill Village Estate',
-        errorText: model.restaurantLocationErrorText,
-        enabled: model.isLoading == false,
-      ),
-      autocorrect: false,
-      enableSuggestions: false,
-      enableInteractiveSelection: false,
-      keyboardType: TextInputType.text,
-      textInputAction: TextInputAction.next,
-      onChanged: model.updateRestaurantLocation,
-      onEditingComplete: () => _restaurantLocationEditingComplete(),
     );
   }
 
@@ -342,10 +322,34 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
     );
   }
 
+  TextField _buildRestaurantLocationTextField() {
+    return TextField(
+      style: Theme.of(context).inputDecorationTheme.labelStyle,
+      controller: _restaurantLocationController,
+      focusNode: _restaurantLocationFocusNode,
+      textCapitalization: TextCapitalization.words,
+      cursorColor: Colors.black,
+      decoration: InputDecoration(
+        labelText: 'Restaurant\'s complex name',
+        hintText: 'i.e.: Lonehill Village Estate',
+        errorText: model.restaurantLocationErrorText,
+        enabled: model.isLoading == false,
+      ),
+      autocorrect: false,
+      enableSuggestions: false,
+      enableInteractiveSelection: false,
+      keyboardType: TextInputType.text,
+      textInputAction: TextInputAction.next,
+      onChanged: model.updateRestaurantLocation,
+      onEditingComplete: () => _restaurantLocationEditingComplete(),
+    );
+  }
+
   TextField _buildDeliveryRadiusTextField() {
     return TextField(
       style: Theme.of(context).inputDecorationTheme.labelStyle,
       controller: _deliveryRadiusController,
+      focusNode: _deliveryRadiusFocusNode,
       textCapitalization: TextCapitalization.words,
       cursorColor: Colors.black,
       decoration: InputDecoration(
@@ -357,10 +361,54 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       autocorrect: false,
       enableSuggestions: false,
       enableInteractiveSelection: false,
-      keyboardType: TextInputType.text,
+      keyboardType: TextInputType.number,
       textInputAction: TextInputAction.next,
       onChanged: (value) => model.updateDeliveryRadius(int.tryParse(value)),
       onEditingComplete: () => _deliveryRadiusEditingComplete(),
+    );
+  }
+
+  TextField _buildTelephoneNumberTextField() {
+    return TextField(
+      style: Theme.of(context).inputDecorationTheme.labelStyle,
+      controller: _telephoneNumberController,
+      focusNode: _telephoneNumberFocusNode,
+      textCapitalization: TextCapitalization.words,
+      cursorColor: Colors.black,
+      decoration: InputDecoration(
+        labelText: 'Telephone number',
+        hintText: 'i.e.: 082123456',
+        enabled: model.isLoading == false,
+      ),
+      autocorrect: false,
+      enableSuggestions: false,
+      enableInteractiveSelection: false,
+      keyboardType: TextInputType.number,
+      textInputAction: TextInputAction.next,
+      onChanged: (value) => model.updateTelephoneNumber(value),
+      onEditingComplete: () => _telephoneNumberEditingComplete(),
+    );
+  }
+
+  TextField _buildNotesTextField() {
+    return TextField(
+      style: Theme.of(context).inputDecorationTheme.labelStyle,
+      controller: _notesController,
+      focusNode: _notesFocusNode,
+      textCapitalization: TextCapitalization.words,
+      cursorColor: Colors.black,
+      decoration: InputDecoration(
+        labelText: 'Special notice to patrons',
+        hintText: 'i.e.: Residents only',
+        enabled: model.isLoading == false,
+      ),
+      autocorrect: false,
+      enableSuggestions: false,
+      enableInteractiveSelection: false,
+      keyboardType: TextInputType.text,
+      textInputAction: TextInputAction.next,
+      onChanged: (value) => model.updateNotes(value),
+      onEditingComplete: () => _notesEditingComplete(),
     );
   }
 
@@ -398,24 +446,51 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
     );
   }
 
-  TextField _buildNotesTextField() {
-    return TextField(
-      style: Theme.of(context).inputDecorationTheme.labelStyle,
-      controller: _notesController,
-      textCapitalization: TextCapitalization.words,
-      cursorColor: Colors.black,
-      decoration: InputDecoration(
-        labelText: 'Special notice to patrons',
-        hintText: 'i.e.: Residents only',
-        enabled: model.isLoading == false,
-      ),
-      autocorrect: false,
-      enableSuggestions: false,
-      enableInteractiveSelection: false,
-      keyboardType: TextInputType.text,
-      textInputAction: TextInputAction.next,
-      onChanged: (value) => model.updateNotes(value),
-      onEditingComplete: () => _save(),
+  Widget _buildAcceptCashCheckBox() {
+    return CheckboxListTile(
+      title: const Text('Cash accepted'),
+      value: model.acceptCash,
+      onChanged: model.updateAcceptCash,
+      secondary: const Icon(Icons.euro_symbol),
+    );
+  }
+
+  Widget _buildAcceptCardCheckBox() {
+    return CheckboxListTile(
+      title: const Text('Card accepted'),
+      value: model.acceptCard,
+      onChanged: model.updateAcceptCard,
+      secondary: const Icon(Icons.credit_card),
+    );
+  }
+
+  Widget _buildAcceptZapperCheckBox() {
+    return CheckboxListTile(
+      title: const Text('Zapper accepted'),
+      value: model.acceptZapper,
+      onChanged: model.updateAcceptZapper,
+      secondary: const Icon(Icons.flash_on),
+    );
+  }
+
+  Widget _buildActiveSwitch() {
+    return CupertinoSwitch(
+      value: model.active,
+      onChanged: model.updateActive,
+    );
+  }
+
+  Widget _buildOpenSwitch() {
+    return CupertinoSwitch(
+      value: model.open,
+      onChanged: model.updateOpen,
+    );
+  }
+
+  Widget _buildAcceptingStaffRequestsSwitch() {
+    return CupertinoSwitch(
+      value: model.acceptingStaffRequests,
+      onChanged: model.updateAcceptingStaffRequests,
     );
   }
 

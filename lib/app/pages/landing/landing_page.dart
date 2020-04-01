@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/config/flavour_banner.dart';
 import 'package:nearbymenus/app/pages/sign_in/sign_in_page.dart';
 import 'package:nearbymenus/app/pages/session/session_control.dart';
@@ -29,7 +30,7 @@ class LandingPage extends StatelessWidget {
           } else {
             return Scaffold(
               body: Center(
-                child: CircularProgressIndicator(),
+                child: PlatformProgressIndicator(),
               ),
             );
           }

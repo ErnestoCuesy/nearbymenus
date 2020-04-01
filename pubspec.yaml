@@ -48,7 +48,7 @@ dev_dependencies:
 flutter_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "images/logo.jfif"
+  image_path: "images/LauncherIcon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -67,9 +67,7 @@ flutter:
   #  - images/a_dot_ham.jpeg
 
   assets:
-    - images/facebook-logo.png
-    - images/google-logo.png
-    - logo.jfif
+    - LauncherIcon.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

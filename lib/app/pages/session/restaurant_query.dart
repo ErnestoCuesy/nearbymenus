@@ -18,27 +18,26 @@ class RestaurantQuery extends StatelessWidget {
       stream: bloc.stream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.active) {
+          var restaurantList = List<NearestRestaurant>();
           if (snapshot.hasData && snapshot.data.length > 0) {
-            return Scaffold(
-              appBar: AppBar(
-                title: Text(
-                  'Select your nearest restaurant',
-                  style: TextStyle(color: Theme
-                      .of(context)
-                      .appBarTheme
-                      .color),
-                ),
-                elevation: 2.0,
-              ),
-              body: RestaurantList(nearbyRestaurantsList: snapshot.data),
-              backgroundColor: Theme
-                  .of(context)
-                  .scaffoldBackgroundColor,
-            );
-          } else {
-            // TODO handle empty snapshot or timeout or something
-            return LoadingProgressIndicator();
+            restaurantList = snapshot.data;
           }
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(
+                'Select your nearest restaurant',
+                style: TextStyle(color: Theme
+                    .of(context)
+                    .appBarTheme
+                    .color),
+              ),
+              elevation: 2.0,
+            ),
+            backgroundColor: Theme
+                .of(context)
+                .scaffoldBackgroundColor,
+            body: RestaurantList(nearbyRestaurantsList: restaurantList),
+          );
         } else {
           return LoadingProgressIndicator();
         }

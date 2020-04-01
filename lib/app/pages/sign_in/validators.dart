@@ -46,10 +46,12 @@ class RestaurantDetailsValidators {
   final StringValidator restaurantLocationValidator = NonEmptyStringValidator();
   final StringValidator typeOfFoodValidator = NonEmptyStringValidator();
   final NumberValidator deliveryRadiusValidator = NumericFieldValidator();
+  final StringValidator telephoneNumberValidator = NonEmptyStringValidator();
   final String invalidRestaurantNameErrorText = 'Restaurant name can\'t be empty';
   final String invalidRestaurantLocationErrorText = 'Restaurant location can\'t be empty';
   final String invalidTypeOfFoodErrorText = 'Type of food can\'t be empty';
   final String invalidDeliveryRadiusErrorText = 'Delivery radius can\'t be empty';
+  final String invalidTelephoneNumberErrorText = 'Telephone number can\'t be empty';
 }
 
 class JobNameAndRatePerHourValidators {

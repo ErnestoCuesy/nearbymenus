@@ -12,10 +12,14 @@ class Restaurant {
   final int deliveryRadius;
   final TimeOfDay workingHoursFrom;
   final TimeOfDay workingHoursTo;
+  final String telephoneNumber;
   final String notes;
   final bool active;
   final bool open;
   final bool acceptingStaffRequests;
+  final bool acceptCash;
+  final bool acceptCard;
+  final bool acceptZapper;
 
   Restaurant({
     this.id,
@@ -27,10 +31,14 @@ class Restaurant {
     this.deliveryRadius,
     this.workingHoursFrom,
     this.workingHoursTo,
+    this.telephoneNumber,
     this.notes,
     this.active,
     this.open,
     this.acceptingStaffRequests,
+    this.acceptCash,
+    this.acceptCard,
+    this.acceptZapper,
   });
 
   factory Restaurant.fromMap(Map<dynamic, dynamic> value, String documentId) {
@@ -54,10 +62,14 @@ class Restaurant {
         deliveryRadius: deliveryRadius,
         workingHoursFrom: TimeOfDay(hour: hoursFromHours, minute: hoursFromMinutes),
         workingHoursTo: TimeOfDay(hour: hoursToHours, minute: hoursToMinutes),
+        telephoneNumber: value['telephoneNumber'],
         notes: value['notes'],
         active: value['active'],
         open: value['open'],
-        acceptingStaffRequests: value['acceptingStaffRequests']
+        acceptingStaffRequests: value['acceptingStaffRequests'],
+        acceptCash: value['acceptCash'],
+        acceptCard: value['acceptCard'],
+        acceptZapper: value['acceptZapper'],
     );
   }
 
@@ -76,10 +88,14 @@ class Restaurant {
       'hoursFromMinutes': workingHoursFrom.minute,
       'hoursToHours': workingHoursTo.hour,
       'hoursToMinutes': workingHoursTo.minute,
+      'telephoneNumber': telephoneNumber,
       'notes': notes,
       'active': active,
       'open': open,
-      'acceptingStaffRequests': acceptingStaffRequests
+      'acceptingStaffRequests': acceptingStaffRequests,
+      'acceptCash': acceptCash,
+      'acceptCard': acceptCard,
+      'acceptZapper': acceptZapper,
     };
   }
 }

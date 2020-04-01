@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/home/home_page_manager.dart';
 import 'package:nearbymenus/app/pages/home/home_page_dev.dart';
@@ -88,14 +89,14 @@ class _SessionControlState extends State<SessionControl> {
           } else {
             return Scaffold(
               body: Center(
-                child: CircularProgressIndicator(),
+                child: PlatformProgressIndicator(),
               ),
             );
           }
         } else {
           return Scaffold(
             body: Center(
-              child: CircularProgressIndicator(),
+              child: PlatformProgressIndicator(),
             ),
           );
         }

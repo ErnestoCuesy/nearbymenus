@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:nearbymenus/app/models/nearest_restaurant.dart';
+import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 
 class Session {
@@ -18,6 +19,7 @@ class Session {
     this.nearestRestaurant = NearestRestaurant(
       name: userDetails.nearestRestaurant,
       complexName: userDetails.complexName,
+      restaurant: Restaurant(),
       distance: 0.0,
     );
   }

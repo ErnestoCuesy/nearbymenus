@@ -317,7 +317,7 @@ class GreenishTheme {
     inputDecorationTheme: InputDecorationTheme(
       labelStyle: TextStyle(
         color: Color(0xdd000000),
-        fontSize: 16.0,
+        fontSize: 20.0,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
