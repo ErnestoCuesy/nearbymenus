@@ -16,7 +16,7 @@ class Session {
 
   void setUserDetails(UserDetails userDetails) {
     this.userDetails = userDetails;
-    this.nearestRestaurant = NearestRestaurant(
+    this.nearestRestaurant = nearestRestaurant ?? NearestRestaurant(
       name: userDetails.nearestRestaurant,
       complexName: userDetails.complexName,
       restaurant: Restaurant(),

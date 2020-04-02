@@ -10,7 +10,6 @@ class NonEmptyStringValidator implements StringValidator {
   @override
   bool isValid(String value) {
     if (value == null || value.isEmpty) return false;
-    print('String is valid $value');
     return true;
   }
 }
@@ -19,7 +18,6 @@ class NumericFieldValidator implements NumberValidator{
   @override
   bool isValid(int value) {
     if (value == null || value.isNaN) return false;
-    print('Number is valid $value');
     return true;
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/empty_content.dart';
+import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 
 typedef ItemWidgetBuilder<T> = Widget Function(BuildContext context, T item);
 
@@ -25,7 +26,7 @@ class ListItemsBuilder<T> extends StatelessWidget {
       );
     }
     return Center(
-      child: CircularProgressIndicator(),
+      child: PlatformProgressIndicator(),
     );
   }
 

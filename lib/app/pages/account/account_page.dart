@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
+import 'package:nearbymenus/app/pages/session/restaurant_list_tile.dart';
 import 'package:nearbymenus/app/pages/session/user_details_form.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -47,13 +48,21 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   List<Widget> _buildContents() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     return [
+      Container(
+        width: screenWidth / 4,
+        height: screenHeight / 4,
+        child: Image.asset(
+          'images/OriginalonTransparent.png',
+        ),
+      ),
       // RESTAURANT
-      if (session.userDetails.role == ROLE_PATRON)
-      _detailsSection(
-        sectionTitle: 'Closest restaurant',
-        cardTitle: session.userDetails.nearestRestaurant,
-        cardSubtitle: session.userDetails.complexName,
+      if (session.userDetails.role == ROLE_PATRON || session.userDetails.role == ROLE_STAFF)
+      _restaurantDetailsSection(
+        sectionTitle: 'Restaurant details',
+        restaurantListTile: RestaurantListTile(nearbyRestaurant: session.nearestRestaurant,),
         onPressed: () {
           session.userDetails.nearestRestaurant = '';
           database.setUserDetails(session.userDetails);
@@ -61,8 +70,8 @@ class _AccountPageState extends State<AccountPage> {
       ),
       // NAME AND ADDRESS
       if (session.userDetails.role == ROLE_PATRON)
-      _detailsSection(
-        sectionTitle: 'Name and address',
+      _userDetailsSection(
+        sectionTitle: 'Name and address at ' + session.userDetails.complexName,
         cardTitle: session.userDetails.name,
         cardSubtitle: session.userDetails.address,
         onPressed: () => Navigator.of(context)
@@ -89,7 +98,7 @@ class _AccountPageState extends State<AccountPage> {
         })),
       ),
       // ROLE
-      _detailsSection(
+      _userDetailsSection(
         sectionTitle: 'Current role',
         cardTitle: session.userDetails.role,
         cardSubtitle: '',
@@ -102,7 +111,7 @@ class _AccountPageState extends State<AccountPage> {
     ];
   }
 
-  Widget _detailsSection(
+  Widget _userDetailsSection(
       {String sectionTitle,
       String cardTitle,
       String cardSubtitle,
@@ -130,6 +139,35 @@ class _AccountPageState extends State<AccountPage> {
               cardSubtitle,
               style: Theme.of(context).primaryTextTheme.body1,
             ),
+            trailing: IconButton(
+              icon: Icon(Icons.edit),
+              onPressed: onPressed,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _restaurantDetailsSection(
+      {String sectionTitle, RestaurantListTile restaurantListTile,
+        VoidCallback onPressed}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0, top: 8.0),
+          child: Text(
+            sectionTitle,
+            style: Theme.of(context).primaryTextTheme.headline,
+          ),
+        ),
+        SizedBox(
+          height: 8.0,
+        ),
+        Card(
+          child: ListTile(
+            title: restaurantListTile,
             trailing: IconButton(
               icon: Icon(Icons.edit),
               onPressed: onPressed,

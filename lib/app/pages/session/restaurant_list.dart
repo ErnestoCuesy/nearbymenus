@@ -5,6 +5,7 @@ import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/models/nearest_restaurant.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
+import 'package:nearbymenus/app/pages/session/restaurant_list_tile.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:provider/provider.dart';
@@ -135,20 +136,20 @@ class _RestaurantListState extends State<RestaurantList> {
               ),
             ),
             if (nearbyRestaurantsList[index].restaurant.acceptCash)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Icon(Icons.euro_symbol, size: 14.0,),
-            ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(Icons.euro_symbol, size: 14.0,),
+              ),
             if (nearbyRestaurantsList[index].restaurant.acceptCard)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Icon(Icons.credit_card, size: 14.0,),
-            ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(Icons.credit_card, size: 14.0,),
+              ),
             if (nearbyRestaurantsList[index].restaurant.acceptZapper)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Icon(Icons.flash_on, size: 14.0,),
-            ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(Icons.flash_on, size: 14.0,),
+              ),
           ],
         ),
       ],
@@ -179,13 +180,14 @@ class _RestaurantListState extends State<RestaurantList> {
             itemBuilder: (BuildContext context, int index) {
                 return Card(
                   child: ListTile(
-                    //leading: Icon(Icons.restaurant),
-                    title: _buildTitle(index),
+                    leading: Icon(Icons.restaurant),
+                    // title: _buildTitle(index),
+                    title: RestaurantListTile(nearbyRestaurant: nearbyRestaurantsList[index],),
                     trailing: Text(
                       nearbyRestaurantsList[index].distance.round().toString() +
-                          'm',
+                          ' metres',
                     ),
-                    subtitle: _buildSubtitle(index),
+                    // subtitle: _buildSubtitle(index),
                     onTap: () => _setNearestRestaurant(index),
                   ),
                 );

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:nearbymenus/app/services/device_info.dart';
+import 'package:provider/provider.dart';
 import 'email_sign_in_page.dart';
 import 'sign_in_button.dart';
 
@@ -17,20 +19,24 @@ class SignInPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _buildContent(context),
-      backgroundColor: Theme.of(context).backgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     );
   }
 
   Widget _buildContent(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     return Padding(
       padding: EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Expanded(
+          Container(
+            width: screenWidth / 3,
+            height: screenHeight / 3,
             child: Image.asset(
-              'images/LauncherIcon.png',
+              'images/OriginalonTransparent.png',
             ),
           ),
           SizedBox(height: 24.0),
@@ -40,7 +46,7 @@ class SignInPage extends StatelessWidget {
           SignInButton(
             text: 'Sign in',
             textColor: Theme.of(context).accentColor,
-            color: Theme.of(context).buttonColor,
+            color: Theme.of(context).colorScheme.primary,
             onPressed: () => _signInWithEmail(context),
           ),
           SizedBox(height: 36.0),
