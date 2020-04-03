@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
+import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
+import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/session/restaurant_list_tile.dart';
 import 'package:nearbymenus/app/pages/session/user_details_form.dart';
@@ -21,6 +23,9 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
+  Restaurant restaurant = Restaurant(name: '', restaurantLocation: '');
+  bool restaurantFound = false;
+
   Auth get auth => widget.auth;
   Session get session => widget.session;
   Database get database => widget.database;
@@ -47,7 +52,7 @@ class _AccountPageState extends State<AccountPage> {
     }
   }
 
-  List<Widget> _buildContents() {
+  List<Widget> _buildAccountDetails() {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     return [
@@ -62,18 +67,18 @@ class _AccountPageState extends State<AccountPage> {
       if (session.userDetails.role == ROLE_PATRON || session.userDetails.role == ROLE_STAFF)
       _restaurantDetailsSection(
         sectionTitle: 'Restaurant details',
-        restaurantListTile: RestaurantListTile(nearbyRestaurant: session.nearestRestaurant,),
+        restaurantListTile: RestaurantListTile(restaurant: restaurant, restaurantFound: restaurantFound,),
         onPressed: () {
-          session.userDetails.nearestRestaurant = '';
+          session.userDetails.nearestRestaurantId = '';
           database.setUserDetails(session.userDetails);
         },
       ),
       // NAME AND ADDRESS
       if (session.userDetails.role == ROLE_PATRON)
       _userDetailsSection(
-        sectionTitle: 'Name and address at ' + session.userDetails.complexName,
-        cardTitle: session.userDetails.name,
-        cardSubtitle: session.userDetails.address,
+        sectionTitle: 'Name and address at ' + restaurant.restaurantLocation,
+        cardTitle: session.userDetails.name ?? '',
+        cardSubtitle: session.userDetails.address ?? '',
         onPressed: () => Navigator.of(context)
             .push(MaterialPageRoute(builder: (BuildContext context) {
           return Scaffold(
@@ -178,6 +183,32 @@ class _AccountPageState extends State<AccountPage> {
     );
   }
 
+  Widget _buildContents(BuildContext context) {
+    return StreamBuilder<List<Restaurant>>(
+      stream: database.userRestaurant(session.userDetails.nearestRestaurantId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.active) {
+          if (snapshot.hasData && snapshot.data.length > 0) {
+            restaurant = snapshot.data.elementAt(0);
+            restaurantFound = true;
+          }
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: _buildAccountDetails(),
+              ),
+            ),
+          );
+        } else {
+          return PlatformProgressIndicator();
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var accountText = 'Account Details';
@@ -197,19 +228,9 @@ class _AccountPageState extends State<AccountPage> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.min,
-            children: _buildContents(),
-          ),
-        ),
-      ),
+      body: _buildContents(context),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     );
   }
 }
-// TODO store user name and address in Firebase.
 // TODO Display here along with subscription status

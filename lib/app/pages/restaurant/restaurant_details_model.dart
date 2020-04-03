@@ -60,7 +60,6 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     if (id == null || id == '') {
       id = documentIdFromCurrentDate();
     }
-    session.userDetails.managesRestaurant = 'Yes';
     try {
       await database.setRestaurantDetails(
         Restaurant(

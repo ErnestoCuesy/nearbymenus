@@ -52,7 +52,7 @@ class _SessionControlState extends State<SessionControl> {
                 userDetails.role == ROLE_NONE) {
               return RoleSelectionPage();
             }
-            if ((userDetails.nearestRestaurant == '') &&
+            if ((userDetails.nearestRestaurantId == '' || userDetails.nearestRestaurantId == null) &&
                 (userDetails.role == ROLE_PATRON ||
                  userDetails.role == ROLE_STAFF)) {
               return RestaurantQuery();

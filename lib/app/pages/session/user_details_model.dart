@@ -7,6 +7,7 @@ import 'package:nearbymenus/app/services/database.dart';
 
 class UserDetailsModel with UserDetailsValidators, ChangeNotifier {
   final Database database;
+  final String role;
   String userName;
   String userAddress;
   String userLocation;
@@ -18,6 +19,7 @@ class UserDetailsModel with UserDetailsValidators, ChangeNotifier {
 
   UserDetailsModel({
     @required this.database,
+    @required this.role,
     this.userName,
     this.userAddress,
     this.userLocation,
@@ -34,8 +36,7 @@ class UserDetailsModel with UserDetailsValidators, ChangeNotifier {
         UserDetails(
           name: userName,
           address: userAddress,
-          complexName: userLocation,
-          nearestRestaurant: userNearestRestaurant,
+          nearestRestaurantId: userNearestRestaurant,
           role: userRole,
           deviceName: deviceName
         ),
@@ -51,10 +52,23 @@ class UserDetailsModel with UserDetailsValidators, ChangeNotifier {
 
   bool get canSave {
     bool canSubmitFlag = false;
-    if (userNameValidator.isValid(userName) &&
-        userAddressValidator.isValid(userAddress) &&
-        !isLoading) {
-      canSubmitFlag = true;
+    switch (role) {
+      case ROLE_PATRON: {
+        if (userNameValidator.isValid(userName) &&
+            userAddressValidator.isValid(userAddress) &&
+            !isLoading) {
+          canSubmitFlag = true;
+        }
+      }
+      break;
+      case ROLE_STAFF:
+      case ROLE_MANAGER: {
+      if (userNameValidator.isValid(userName) &&
+          !isLoading) {
+        canSubmitFlag = true;
+      }
+      }
+      break;
     }
     return canSubmitFlag;
   }

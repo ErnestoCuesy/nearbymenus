@@ -7,18 +7,14 @@ const String ROLE_DEV = 'Dev';
 class UserDetails {
   String name;
   String address;
-  String complexName;
-  String nearestRestaurant;
-  String managesRestaurant;
+  String nearestRestaurantId;
   String role;
   String deviceName;
 
   UserDetails({
     this.name = '',
     this.address = '',
-    this.complexName = '',
-    this.nearestRestaurant = '',
-    this.managesRestaurant,
+    this.nearestRestaurantId = '',
     this.role = ROLE_NONE,
     this.deviceName = ''
   });
@@ -30,9 +26,7 @@ class UserDetails {
     return UserDetails(
         name: data['name'],
         address: data['address'],
-        complexName: data['complexName'],
-        nearestRestaurant: data['nearestRestaurant'],
-        managesRestaurant: data['managesRestaurant'],
+        nearestRestaurantId: data['nearestRestaurantId'],
         role: data['role'],
         deviceName: data['deviceName']);
   }
@@ -41,9 +35,7 @@ class UserDetails {
     return {
       'name': name,
       'address': address,
-      'complexName': complexName,
-      'nearestRestaurant': nearestRestaurant,
-      'managesRestaurant': managesRestaurant,
+      'nearestRestaurantId': nearestRestaurantId,
       'role': role,
       'deviceName': deviceName
     };

@@ -1,68 +1,94 @@
 import 'package:flutter/material.dart';
-import 'package:nearbymenus/app/models/nearest_restaurant.dart';
+import 'package:nearbymenus/app/models/restaurant.dart';
 
 class RestaurantListTile extends StatelessWidget {
-  final NearestRestaurant nearbyRestaurant;
+  final Restaurant restaurant;
+  final bool restaurantFound;
 
-  const RestaurantListTile({Key key, this.nearbyRestaurant}) : super(key: key);
+  const RestaurantListTile({Key key, this.restaurant, this.restaurantFound})
+      : super(key: key);
 
   Widget _buildTitle(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          nearbyRestaurant.name,
-          style: Theme.of(context).textTheme.headline,
-        ),
-        SizedBox(
-          height: 8.0,
-        ),
-        Row(
+    if (!restaurantFound) {
+      return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: Icon(Icons.home, size: 20.0,),
-            ),
             Text(
-              nearbyRestaurant.complexName,
-              //style: Theme.of(context).textTheme.subhead,
+              'No restaurants found near you',
+              style: Theme.of(context).textTheme.subhead,
             ),
-          ],
-        ),
-        Row(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: Icon(Icons.restaurant, size: 20.0,),
+            SizedBox(
+              height: 8.0,
             ),
-            Text(
-              nearbyRestaurant.restaurant.typeOfFood,
-            ),
-          ],
-        ),
-        Row(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: Icon(Icons.info_outline, size: 20.0,),
-            ),
-            Text(
-              nearbyRestaurant.restaurant.notes,
-            ),
-          ],
-        ),
-        _buildSubtitle(context),
-      ],
-    );
+          ]);
+    } else {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            restaurant.name,
+            style: Theme.of(context).textTheme.headline,
+          ),
+          SizedBox(
+            height: 8.0,
+          ),
+          Row(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Icon(
+                  Icons.home,
+                  size: 20.0,
+                ),
+              ),
+              Text(
+                restaurant.restaurantLocation,
+                //style: Theme.of(context).textTheme.subhead,
+              ),
+            ],
+          ),
+          Row(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Icon(
+                  Icons.restaurant,
+                  size: 20.0,
+                ),
+              ),
+              Text(
+                restaurant.typeOfFood,
+              ),
+            ],
+          ),
+          Row(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Icon(
+                  Icons.info_outline,
+                  size: 20.0,
+                ),
+              ),
+              Text(
+                restaurant.notes,
+              ),
+            ],
+          ),
+          _buildSubtitle(context),
+        ],
+      );
+    }
   }
 
   Widget _buildSubtitle(BuildContext context) {
-    final MaterialLocalizations localizations = MaterialLocalizations.of(context);
-    final String hoursFrom = localizations.formatTimeOfDay(nearbyRestaurant.restaurant.workingHoursFrom);
-    final String hoursTo = localizations.formatTimeOfDay(nearbyRestaurant.restaurant.workingHoursTo);
-    final status = nearbyRestaurant.restaurant.open
-        ? 'Open'
-        : 'Closed';
+    final MaterialLocalizations localizations =
+        MaterialLocalizations.of(context);
+    final String hoursFrom =
+        localizations.formatTimeOfDay(restaurant.workingHoursFrom);
+    final String hoursTo =
+        localizations.formatTimeOfDay(restaurant.workingHoursTo);
+    final status = restaurant.open ? 'Open' : 'Closed';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -70,7 +96,10 @@ class RestaurantListTile extends StatelessWidget {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.all(4.0),
-              child: Icon(Icons.access_time, size: 20.0,),
+              child: Icon(
+                Icons.access_time,
+                size: 20.0,
+              ),
             ),
             Text(
               '$hoursFrom  - $hoursTo ($status)',
@@ -81,10 +110,13 @@ class RestaurantListTile extends StatelessWidget {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.all(4.0),
-              child: Icon(Icons.call, size: 20.0,),
+              child: Icon(
+                Icons.call,
+                size: 20.0,
+              ),
             ),
             Text(
-              nearbyRestaurant.restaurant.telephoneNumber,
+              restaurant.telephoneNumber,
             ),
           ],
         ),
@@ -96,20 +128,29 @@ class RestaurantListTile extends StatelessWidget {
                 'Payment on delivery: ',
               ),
             ),
-            if (nearbyRestaurant.restaurant.acceptCash)
+            if (restaurant.acceptCash)
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Icon(Icons.euro_symbol, size: 14.0,),
+                child: Icon(
+                  Icons.euro_symbol,
+                  size: 14.0,
+                ),
               ),
-            if (nearbyRestaurant.restaurant.acceptCard)
+            if (restaurant.acceptCard)
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Icon(Icons.credit_card, size: 14.0,),
+                child: Icon(
+                  Icons.credit_card,
+                  size: 14.0,
+                ),
               ),
-            if (nearbyRestaurant.restaurant.acceptZapper)
+            if (restaurant.acceptZapper)
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Icon(Icons.flash_on, size: 14.0,),
+                child: Icon(
+                  Icons.flash_on,
+                  size: 14.0,
+                ),
               ),
           ],
         ),
@@ -119,6 +160,17 @@ class RestaurantListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _buildTitle(context);
+    if (restaurant.id == '') {
+      return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              'No restaurant selected. Tap to search for nearby Restaurants',
+              style: Theme.of(context).textTheme.headline,
+            ),
+          ]);
+    } else {
+      return _buildTitle(context);
+    }
   }
 }

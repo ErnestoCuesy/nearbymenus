@@ -32,11 +32,14 @@ class SignInPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Container(
-            width: screenWidth / 3,
-            height: screenHeight / 3,
-            child: Image.asset(
-              'images/OriginalonTransparent.png',
+          Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Container(
+              width: screenWidth / 3,
+              height: screenHeight / 3,
+              child: Image.asset(
+                'images/OriginalonTransparent.png',
+              ),
             ),
           ),
           SizedBox(height: 24.0),

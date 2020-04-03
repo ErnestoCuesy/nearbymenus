@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
+import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/session/user_details_model.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -16,8 +17,9 @@ class UserDetailsForm extends StatefulWidget {
 
   static Widget create(BuildContext context) {
     final database = Provider.of<Database>(context);
+    final session = Provider.of<Session>(context);
     return ChangeNotifierProvider<UserDetailsModel>(
-      create: (context) => UserDetailsModel(database: database),
+      create: (context) => UserDetailsModel(database: database, role: session.userDetails.role),
       child: Consumer<UserDetailsModel>(
         builder: (context, model, _) => UserDetailsForm(model: model,),
       ),
@@ -36,6 +38,7 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
   final TextEditingController _userNearestRestaurantController = TextEditingController();
   final FocusNode _userNameFocusNode = FocusNode();
   final FocusNode _userAddressFocusNode = FocusNode();
+  Session session;
 
   UserDetailsModel get model => widget.model;
 
@@ -85,14 +88,19 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
       SizedBox(
         height: 8.0,
       ),
+      if (session.userDetails.role == ROLE_PATRON)
       _buildUserAddressTextField(),
+      if (session.userDetails.role == ROLE_PATRON)
       SizedBox(
         height: 16.0,
       ),
+      if (session.userDetails.role == ROLE_PATRON)
       _buildUserLocationTextField(),
+      if (session.userDetails.role == ROLE_PATRON)
       SizedBox(
         height: 16.0,
       ),
+      if (session.userDetails.role == ROLE_PATRON)
       _buildNearestRestaurantTextField(),
       SizedBox(
         height: 8.0,
@@ -195,15 +203,11 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
 
   @override
   Widget build(BuildContext context) {
-    final session = Provider.of<Session>(context);
-    // _userNameController.text = session.userDetails.name;
-    // _userAddressController.text = session.userDetails.address;
+    session = Provider.of<Session>(context);
     _userNearestRestaurantController.text = session.nearestRestaurant.name;
-    _userLocationController.text = session.nearestRestaurant.complexName;
-    // model.userName = session.userDetails.name;
-    // model.userAddress = session.userDetails.address;
-    model.userNearestRestaurant = session.nearestRestaurant.name;
-    model.userLocation = session.nearestRestaurant.complexName;
+    _userLocationController.text = session.nearestRestaurant.restaurantLocation;
+    model.userNearestRestaurant = session.nearestRestaurant.id;
+    model.userLocation = session.nearestRestaurant.restaurantLocation;
     model.userRole = session.userDetails.role;
     return Container(
       color: Theme

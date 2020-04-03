@@ -33,7 +33,7 @@ dependencies:
   location: ^2.3.5
   permission_handler: ^4.4.0+hotfix.2
   provider: ^3.1.0+1
-  purchases_flutter: ^1.0.4
+  purchases_flutter: ^1.1.0
   responsive_framework: ^0.0.4
   rxdart: ^0.22.4
 

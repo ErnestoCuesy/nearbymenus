@@ -21,6 +21,7 @@ abstract class Database {
   Future<void> setUserDetails(UserDetails userDetails);
   Stream<UserDetails> userDetailsStream();
   Stream<List<Restaurant>> managerRestaurants(String restaurantId);
+  Stream<List<Restaurant>> userRestaurant(String restaurantId);
   Stream<List<Restaurant>> restaurantsStream(String restaurantId);
   Future<List<Restaurant>> patronRestaurants();
   Stream<Restaurant> restaurantStream();
@@ -111,6 +112,16 @@ class FirestoreDatabase implements Database {
     queryBuilder: managerId != null
           ? (query) => query.where('managerId', isEqualTo: managerId)
           : null,
+    builder: (data, documentId) => Restaurant.fromMap(data, documentId),
+  );
+
+  // Used by account page to load user's (patron or staff) restaurant
+  @override
+  Stream<List<Restaurant>> userRestaurant(String restaurantId) => _service.collectionStream(
+    path: APIPath.restaurants(),
+    queryBuilder: restaurantId != null
+        ? (query) => query.where('id', isEqualTo: restaurantId)
+        : null,
     builder: (data, documentId) => Restaurant.fromMap(data, documentId),
   );
 
