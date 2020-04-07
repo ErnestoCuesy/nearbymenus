@@ -353,7 +353,7 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       textCapitalization: TextCapitalization.words,
       cursorColor: Colors.black,
       decoration: InputDecoration(
-        labelText: 'Delivery radius (in metres)',
+        labelText: 'Restaurant discovery radius (in metres)',
         hintText: 'i.e.: 1000',
         errorText: model.deliveryRadiusErrorText,
         enabled: model.isLoading == false,
@@ -496,7 +496,6 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
 
   @override
   Widget build(BuildContext context) {
-    final session = Provider.of<Session>(context);
     return Container(
       color: Theme.of(context).dialogBackgroundColor,
       child: Padding(

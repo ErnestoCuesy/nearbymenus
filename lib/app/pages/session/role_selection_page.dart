@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
+import 'package:nearbymenus/app/pages/session/upsell_screen.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/models/session.dart';
+import 'package:nearbymenus/app/services/iap_manager.dart';
 import 'package:provider/provider.dart';
 
 class RoleSelectionPage extends StatefulWidget {
@@ -37,7 +39,20 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
         icon: Icon(Icons.account_box),
         roleName: ROLE_MANAGER,
         roleDescription: 'Open a restaurant, create menus and manage orders! \n(Requires subscription)',
-        onPressed: () => _changeRole(ROLE_MANAGER),
+        // onPressed: () => _changeRole(ROLE_CHECK_SUBSCRIPTION),
+        onPressed: () {
+          if (session.subscription.subscriptionType == SubscriptionType.Unsubscribed) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    UpsellScreen(subscription: session.subscription),
+              ),
+            );
+          } else {
+            _changeRole(ROLE_MANAGER);
+          }
+        },
       ),
       SizedBox(height: 16.0,),
       _roleContainer(
@@ -48,17 +63,17 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
         roleDescription: 'Request access to the restaurant to manage orders.',
         onPressed: () => _changeRole(ROLE_STAFF),
       ),
-      if (FlavourConfig.isDevelopment())
-      SizedBox(height: 16.0,),
-      if (FlavourConfig.isDevelopment())
-      _roleContainer(
-        width: 125.0,
-        height: 125.0,
-        icon: Icon(Icons.adb),
-        roleName: ROLE_DEV,
-        roleDescription: '',
-        onPressed: () => _changeRole(ROLE_DEV),
-      ),
+//      if (FlavourConfig.isDevelopment())
+//      SizedBox(height: 16.0,),
+//      if (FlavourConfig.isDevelopment())
+//      _roleContainer(
+//        width: 125.0,
+//        height: 125.0,
+//        icon: Icon(Icons.adb),
+//        roleName: ROLE_DEV,
+//        roleDescription: '',
+//        onPressed: () => _changeRole(ROLE_DEV),
+//      ),
     ];
   }
 
@@ -99,7 +114,7 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Select your role at ${session.nearestRestaurant.name}',
+          'Select your role',
           style: TextStyle(color: Theme.of(context).appBarTheme.color),
         ),
         elevation: 2.0,

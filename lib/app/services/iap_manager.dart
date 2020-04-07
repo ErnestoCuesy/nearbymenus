@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:meta/meta.dart';
+import 'package:nearbymenus/app/services/iap_test_data.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 enum SubscriptionType { Unsubscribed, Expired, Standard, Pro }
@@ -59,59 +60,8 @@ abstract class IAPManagerBase {
   Stream<Subscription> get onSubscriptionChanged;
   SubscriptionType get subscriptionType;
   void purchasePackage(Package package);
-}
 
-class IAPManager implements IAPManagerBase {
-  final String userID;
-  PurchaserInfo _purchaserInfo;
-  Offerings _offerings;
-  Subscription _subscription;
-  StreamController<Subscription> controller = StreamController<Subscription>();
-
-  @override
-  Stream<Subscription> get onSubscriptionChanged => controller.stream;
-
-  IAPManager({@required this.userID}) {
-    init();
-  }
-
-  Future<void> init() async {
-    Purchases.setDebugLogsEnabled(true);
-    // TODO add user ID below
-    await Purchases.setup("FoiMDaBFSSGwOphzusDBzgaRIuhFytmt");
-    // await Purchases.setAllowSharingStoreAccount(true);
-    // Purchases.addAttributionData({}, PurchasesAttributionNetwork.facebook);
-    _purchaserInfo = await Purchases.getPurchaserInfo();
-    _offerings = await Purchases.getOfferings();
-    streamSubscription(_purchaserInfo, _offerings);
-    Purchases.addPurchaserInfoUpdateListener((pi) {
-      print('RevenueCat update 1: ${pi.activeSubscriptions}');
-      print('RevenueCat update 2: ${pi.latestExpirationDate}');
-      streamSubscription(pi, _offerings);
-    });
-  }
-
-  void streamSubscription(PurchaserInfo pi, Offerings of) {
-    _subscription = Subscription(purchaserInfo: pi, offerings: of);
-    controller.add(_subscription);
-  }
-
-  @override
-  SubscriptionType get subscriptionType => _subscription.subscriptionType;
-
-  @override
-  void purchasePackage(Package package) async {
-    try {
-      await Purchases.purchasePackage(package);
-      // Don't have to add anything to the stream as the listener above
-      // will pick-up the subscription change and add it to the stream
-    } on PlatformException catch (e) {
-      var errorCode = PurchasesErrorHelper.getErrorCode(e);
-      controller.addError(parseErrorCode(errorCode));
-    }
-  }
-
-  String parseErrorCode(PurchasesErrorCode errorCode) {
+  static String parseErrorCode(PurchasesErrorCode errorCode) {
     switch (errorCode) {
       case PurchasesErrorCode.unknownError: {
         return 'Unknown error';
@@ -195,4 +145,94 @@ class IAPManager implements IAPManagerBase {
     }
   }
 
+}
+
+class IAPManagerMock implements IAPManagerBase {
+  final String userID;
+  PurchaserInfo _purchaserInfo;
+  Offerings _offerings;
+  Subscription _subscription;
+  StreamController<Subscription> controller = StreamController<Subscription>.broadcast();
+
+  IAPManagerMock({@required this.userID}) {
+    init();
+  }
+
+  Future<void> init() async {
+    _purchaserInfo = PurchaserInfo.fromJson(purchaserInfoTestDataU);
+    _offerings = Offerings.fromJson(offeringsTestData);
+    await Future.delayed(Duration(seconds: 3)); // Simulate slow network
+    streamSubscription(pi: _purchaserInfo, of: _offerings);
+  }
+  
+  @override
+  Stream<Subscription> get onSubscriptionChanged => controller.stream;
+
+  @override
+  void purchasePackage(Package package) {
+    print('Purchasing package: ${package.identifier}');
+    _purchaserInfo = PurchaserInfo.fromJson(purchaserInfoTestDataS);
+    streamSubscription(pi: _purchaserInfo, of: _offerings);
+  }
+
+  @override
+  SubscriptionType get subscriptionType => _subscription.subscriptionType;
+
+  void streamSubscription({PurchaserInfo pi, Offerings of}) {
+    _subscription = Subscription(purchaserInfo: pi, offerings: of);
+    controller.add(_subscription);
+  }
+
+}
+
+class IAPManager implements IAPManagerBase {
+  final String userID;
+  PurchaserInfo _purchaserInfo;
+  Offerings _offerings;
+  Subscription _subscription;
+  StreamController<Subscription> controller = StreamController<Subscription>();
+
+  @override
+  Stream<Subscription> get onSubscriptionChanged => controller.stream;
+
+  IAPManager({@required this.userID}) {
+    init();
+  }
+
+  Future<void> init() async {
+    Purchases.setDebugLogsEnabled(true);
+    // TODO add user ID below
+    await Purchases.setup("FoiMDaBFSSGwOphzusDBzgaRIuhFytmt");
+    // await Purchases.setAllowSharingStoreAccount(true);
+    // Purchases.addAttributionData({}, PurchasesAttributionNetwork.facebook);
+    _purchaserInfo = await Purchases.getPurchaserInfo();
+    _offerings = await Purchases.getOfferings();
+    streamSubscription(pi: _purchaserInfo, of: _offerings);
+    Purchases.addPurchaserInfoUpdateListener((pi) {
+      print('RevenueCat update 1: ${pi.activeSubscriptions}');
+      print('RevenueCat update 2: ${pi.latestExpirationDate}');
+      streamSubscription(pi: pi, of: _offerings);
+    });
+  }
+
+  void streamSubscription({PurchaserInfo pi, Offerings of}) {
+    _subscription = Subscription(purchaserInfo: pi, offerings: of);
+    controller.add(_subscription);
+  }
+
+  @override
+  SubscriptionType get subscriptionType => _subscription.subscriptionType;
+
+  @override
+  void purchasePackage(Package package) async {
+    try {
+      await Purchases.purchasePackage(package);
+      // Don't have to add anything to the stream as the listener above
+      // will pick-up the subscription change and add it to the stream
+    } on PlatformException catch (e) {
+      var errorCode = PurchasesErrorHelper.getErrorCode(e);
+      controller.addError(IAPManagerBase.parseErrorCode(errorCode));
+    }
+  }
+  
 }

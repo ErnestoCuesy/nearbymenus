@@ -59,4 +59,3 @@ class JobNameAndRatePerHourValidators {
   final String invalidRatePerHourText = 'Rate per hour must be a number';
 }
 
-// TODO use geo stuff to get user location i.e. estate/complex name

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/services/device_info.dart';
+import 'package:nearbymenus/app/utilities/logo_image_asset.dart';
 import 'package:provider/provider.dart';
 import 'email_sign_in_page.dart';
 import 'sign_in_button.dart';
@@ -26,6 +27,7 @@ class SignInPage extends StatelessWidget {
   Widget _buildContent(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final imageAsset = Provider.of<LogoImageAsset>(context);
     return Padding(
       padding: EdgeInsets.all(16.0),
       child: Column(
@@ -37,9 +39,7 @@ class SignInPage extends StatelessWidget {
             child: Container(
               width: screenWidth / 3,
               height: screenHeight / 3,
-              child: Image.asset(
-                'images/OriginalonTransparent.png',
-              ),
+              child: imageAsset.image,
             ),
           ),
           SizedBox(height: 24.0),

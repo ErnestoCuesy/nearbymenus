@@ -5,10 +5,13 @@ import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/session/restaurant_list_tile.dart';
+import 'package:nearbymenus/app/pages/session/upsell_screen.dart';
 import 'package:nearbymenus/app/pages/session/user_details_form.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/models/session.dart';
+import 'package:nearbymenus/app/utilities/logo_image_asset.dart';
+import 'package:provider/provider.dart';
 
 class AccountPage extends StatefulWidget {
   final AuthBase auth;
@@ -55,13 +58,12 @@ class _AccountPageState extends State<AccountPage> {
   List<Widget> _buildAccountDetails() {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final imageAsset = Provider.of<LogoImageAsset>(context);
     return [
       Container(
         width: screenWidth / 4,
         height: screenHeight / 4,
-        child: Image.asset(
-          'images/OriginalonTransparent.png',
-        ),
+        child: imageAsset.image,
       ),
       // RESTAURANT
       if (session.userDetails.role == ROLE_PATRON || session.userDetails.role == ROLE_STAFF)
@@ -112,8 +114,62 @@ class _AccountPageState extends State<AccountPage> {
           database.setUserDetails(session.userDetails);
         },
       ),
-      // TODO add subscription details for managers
+      // TODO in progress subscription details for managers
+      // SUBSCRIPTION
+      if (session.userDetails.role == ROLE_MANAGER)
+      _subscriptionDetailsSection(
+        sectionTitle: 'Subscription details',
+        cardTitle: session.subscription.subscriptionTypeString,
+        cardSubtitle: 'Expired on: ${session.subscription.latestExpirationDate}',
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  UpsellScreen(subscription: session.subscription),
+            ),
+          );
+        },
+      ),
     ];
+  }
+
+  Widget _subscriptionDetailsSection(
+      {String sectionTitle,
+        String cardTitle,
+        String cardSubtitle,
+        VoidCallback onPressed}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0, top: 8.0),
+          child: Text(
+            sectionTitle,
+            style: Theme.of(context).primaryTextTheme.headline,
+          ),
+        ),
+        SizedBox(
+          height: 8.0,
+        ),
+        Card(
+          child: ListTile(
+            title: Text(
+              cardTitle,
+              style: Theme.of(context).primaryTextTheme.body1,
+            ),
+            subtitle: Text(
+              cardSubtitle,
+              style: Theme.of(context).primaryTextTheme.body1,
+            ),
+            trailing: IconButton(
+              icon: Icon(Icons.edit),
+              onPressed: onPressed,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _userDetailsSection(
@@ -233,4 +289,3 @@ class _AccountPageState extends State<AccountPage> {
     );
   }
 }
-// TODO Display here along with subscription status

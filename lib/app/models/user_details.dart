@@ -2,6 +2,7 @@ const String ROLE_NONE = 'None';
 const String ROLE_MANAGER = 'Manager';
 const String ROLE_STAFF = 'Staff';
 const String ROLE_PATRON = 'Patron';
+const String ROLE_CHECK_SUBSCRIPTION = 'Subscription';
 const String ROLE_DEV = 'Dev';
 
 class UserDetails {
