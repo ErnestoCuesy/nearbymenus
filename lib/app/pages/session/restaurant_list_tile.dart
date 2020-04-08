@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 
 class RestaurantListTile extends StatelessWidget {
@@ -82,6 +83,7 @@ class RestaurantListTile extends StatelessWidget {
   }
 
   Widget _buildSubtitle(BuildContext context) {
+    final currencySymbol = NumberFormat.simpleCurrency(locale: "en_ZA");
     final MaterialLocalizations localizations =
         MaterialLocalizations.of(context);
     final String hoursFrom =
@@ -131,10 +133,7 @@ class RestaurantListTile extends StatelessWidget {
             if (restaurant.acceptCash)
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Icon(
-                  Icons.euro_symbol,
-                  size: 14.0,
-                ),
+                child: Text(currencySymbol.currencySymbol),
               ),
             if (restaurant.acceptCard)
               Padding(
