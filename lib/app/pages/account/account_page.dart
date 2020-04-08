@@ -59,51 +59,58 @@ class _AccountPageState extends State<AccountPage> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final imageAsset = Provider.of<LogoImageAsset>(context);
+    final nameAndAddressTitle = restaurant.restaurantLocation != '' ? 'at ' + restaurant.restaurantLocation : '';
     return [
       Container(
         width: screenWidth / 4,
         height: screenHeight / 4,
         child: imageAsset.image,
       ),
-      // RESTAURANT
-      if (session.userDetails.role == ROLE_PATRON || session.userDetails.role == ROLE_STAFF)
-      _restaurantDetailsSection(
-        sectionTitle: 'Restaurant details',
-        restaurantListTile: RestaurantListTile(restaurant: restaurant, restaurantFound: restaurantFound,),
-        onPressed: () {
-          session.userDetails.nearestRestaurantId = '';
-          database.setUserDetails(session.userDetails);
-        },
+      SizedBox(
+        height: 16.0,
       ),
+      // RESTAURANT
+      if (session.userDetails.role == ROLE_PATRON ||
+          session.userDetails.role == ROLE_STAFF)
+        _restaurantDetailsSection(
+          sectionTitle: 'Restaurant details',
+          restaurantListTile: RestaurantListTile(
+            restaurant: restaurant,
+            restaurantFound: restaurantFound,
+          ),
+          onPressed: () {
+            session.userDetails.nearestRestaurantId = '';
+            database.setUserDetails(session.userDetails);
+          },
+        ),
       // NAME AND ADDRESS
       if (session.userDetails.role == ROLE_PATRON)
-      _userDetailsSection(
-        sectionTitle: 'Name and address at ' + restaurant.restaurantLocation,
-        cardTitle: session.userDetails.name ?? '',
-        cardSubtitle: session.userDetails.address ?? '',
-        onPressed: () => Navigator.of(context)
-            .push(MaterialPageRoute(builder: (BuildContext context) {
-          return Scaffold(
-            appBar: AppBar(
-              title: Text(
-                'Change your details',
-                style:
-                TextStyle(color: Theme.of(context).appBarTheme.color),
+        _userDetailsSection(
+          sectionTitle: 'Name and address $nameAndAddressTitle',
+          cardTitle: session.userDetails.name ?? '',
+          cardSubtitle: session.userDetails.address ?? 'Address unknown',
+          onPressed: () => Navigator.of(context)
+              .push(MaterialPageRoute(builder: (BuildContext context) {
+            return Scaffold(
+              appBar: AppBar(
+                title: Text(
+                  'Change your details',
+                  style: TextStyle(color: Theme.of(context).appBarTheme.color),
+                ),
+                elevation: 2.0,
               ),
-              elevation: 2.0,
-            ),
-            body: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Card(
-                  child: UserDetailsForm.create(context),
+              body: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Card(
+                    child: UserDetailsForm.create(context),
+                  ),
                 ),
               ),
-            ),
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          );
-        })),
-      ),
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            );
+          })),
+        ),
       // ROLE
       _userDetailsSection(
         sectionTitle: 'Current role',
@@ -117,28 +124,29 @@ class _AccountPageState extends State<AccountPage> {
       // TODO in progress subscription details for managers
       // SUBSCRIPTION
       if (session.userDetails.role == ROLE_MANAGER)
-      _subscriptionDetailsSection(
-        sectionTitle: 'Subscription details',
-        cardTitle: session.subscription.subscriptionTypeString,
-        cardSubtitle: 'Expired on: ${session.subscription.latestExpirationDate}',
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  UpsellScreen(subscription: session.subscription),
-            ),
-          );
-        },
-      ),
+        _subscriptionDetailsSection(
+          sectionTitle: 'Subscription details',
+          cardTitle: session.subscription.subscriptionTypeString,
+          cardSubtitle:
+              'Expired on: ${session.subscription.latestExpirationDate}',
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    UpsellScreen(subscription: session.subscription),
+              ),
+            );
+          },
+        ),
     ];
   }
 
   Widget _subscriptionDetailsSection(
       {String sectionTitle,
-        String cardTitle,
-        String cardSubtitle,
-        VoidCallback onPressed}) {
+      String cardTitle,
+      String cardSubtitle,
+      VoidCallback onPressed}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -194,11 +202,9 @@ class _AccountPageState extends State<AccountPage> {
           child: ListTile(
             title: Text(
               cardTitle,
-              style: Theme.of(context).primaryTextTheme.body1,
             ),
             subtitle: Text(
               cardSubtitle,
-              style: Theme.of(context).primaryTextTheme.body1,
             ),
             trailing: IconButton(
               icon: Icon(Icons.edit),
@@ -211,8 +217,9 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   Widget _restaurantDetailsSection(
-      {String sectionTitle, RestaurantListTile restaurantListTile,
-        VoidCallback onPressed}) {
+      {String sectionTitle,
+      RestaurantListTile restaurantListTile,
+      VoidCallback onPressed}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -260,7 +267,9 @@ class _AccountPageState extends State<AccountPage> {
             ),
           );
         } else {
-          return PlatformProgressIndicator();
+          return Center(
+            child: PlatformProgressIndicator(),
+          );
         }
       },
     );
