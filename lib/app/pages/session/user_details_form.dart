@@ -34,8 +34,6 @@ class UserDetailsForm extends StatefulWidget {
 class _UserDetailsFormState extends State<UserDetailsForm> {
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _userAddressController = TextEditingController();
-  final TextEditingController _userLocationController = TextEditingController();
-  final TextEditingController _userNearestRestaurantController = TextEditingController();
   final FocusNode _userNameFocusNode = FocusNode();
   final FocusNode _userAddressFocusNode = FocusNode();
   Session session;
@@ -46,8 +44,6 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
   void dispose() {
     _userNameController.dispose();
     _userAddressController.dispose();
-    _userLocationController.dispose();
-    _userNearestRestaurantController.dispose();
     _userNameFocusNode.dispose();
     _userAddressFocusNode.dispose();
     super.dispose();
@@ -90,20 +86,8 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
       ),
       if (session.userDetails.role == ROLE_PATRON)
       _buildUserAddressTextField(),
-      if (session.userDetails.role == ROLE_PATRON)
       SizedBox(
         height: 16.0,
-      ),
-      if (session.userDetails.role == ROLE_PATRON)
-      _buildUserLocationTextField(),
-      if (session.userDetails.role == ROLE_PATRON)
-      SizedBox(
-        height: 16.0,
-      ),
-      if (session.userDetails.role == ROLE_PATRON)
-      _buildNearestRestaurantTextField(),
-      SizedBox(
-        height: 8.0,
       ),
       FormSubmitButton(
         context: context,
@@ -148,7 +132,7 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
       textCapitalization: TextCapitalization.words,
       cursorColor: Colors.black,
       decoration: InputDecoration(
-        labelText: 'Address',
+        labelText: 'Unit or address at ${model.userLocation}',
         hintText: 'Unit, flat or house number',
         errorText: model.userAddressErrorText,
         enabled: model.isLoading == false,
@@ -163,52 +147,13 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
     );
   }
 
-  TextField _buildUserLocationTextField() {
-    return TextField(
-      style: Theme.of(context).inputDecorationTheme.labelStyle,
-      controller: _userLocationController,
-      textCapitalization: TextCapitalization.words,
-      cursorColor: Colors.black,
-      decoration: InputDecoration(
-        labelText: 'Complex or Estate Name',
-        enabled: model.isLoading == false,
-      ),
-      autocorrect: false,
-      enableSuggestions: false,
-      enableInteractiveSelection: false,
-      keyboardType: TextInputType.text,
-      textInputAction: TextInputAction.next,
-      // onChanged: model.updateUserLocation,
-    );
-  }
-
-  TextField _buildNearestRestaurantTextField() {
-    return TextField(
-      style: Theme.of(context).inputDecorationTheme.labelStyle,
-      controller: _userNearestRestaurantController,
-      textCapitalization: TextCapitalization.words,
-      cursorColor: Colors.black,
-      decoration: InputDecoration(
-        labelText: 'Nearest Restaurant',
-        enabled: model.isLoading == false,
-      ),
-      autocorrect: false,
-      enableSuggestions: false,
-      enableInteractiveSelection: false,
-      keyboardType: TextInputType.text,
-      textInputAction: TextInputAction.next,
-      //onChanged: model.updateUserNearestRestaurant,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
-    _userNearestRestaurantController.text = session.nearestRestaurant.name;
-    _userLocationController.text = session.nearestRestaurant.restaurantLocation;
     model.userNearestRestaurant = session.nearestRestaurant.id;
     model.userLocation = session.nearestRestaurant.restaurantLocation;
     model.userRole = session.userDetails.role;
+    model.deviceName = session.userDetails.deviceName;
     return Container(
       color: Theme
           .of(context)
