@@ -9,6 +9,7 @@ import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 class RestaurantDetailsForm extends StatefulWidget {
   final RestaurantDetailsModel model;
@@ -284,7 +285,7 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       textCapitalization: TextCapitalization.words,
       cursorColor: Colors.black,
       decoration: InputDecoration(
-        labelText: 'Restaurant name',
+        labelText: 'Restaurant\'s name',
         hintText: 'i.e.: Johnny\'s',
         errorText: model.restaurantNameErrorText,
         enabled: model.isLoading == false,
@@ -350,7 +351,6 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       style: Theme.of(context).inputDecorationTheme.labelStyle,
       controller: _deliveryRadiusController,
       focusNode: _deliveryRadiusFocusNode,
-      textCapitalization: TextCapitalization.words,
       cursorColor: Colors.black,
       decoration: InputDecoration(
         labelText: 'Restaurant discovery radius (in metres)',
@@ -373,7 +373,6 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       style: Theme.of(context).inputDecorationTheme.labelStyle,
       controller: _telephoneNumberController,
       focusNode: _telephoneNumberFocusNode,
-      textCapitalization: TextCapitalization.words,
       cursorColor: Colors.black,
       decoration: InputDecoration(
         labelText: 'Telephone number',
@@ -398,7 +397,7 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       textCapitalization: TextCapitalization.words,
       cursorColor: Colors.black,
       decoration: InputDecoration(
-        labelText: 'Special notice to patrons',
+        labelText: 'Notice to patrons',
         hintText: 'i.e.: Residents only',
         enabled: model.isLoading == false,
       ),
@@ -447,11 +446,13 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
   }
 
   Widget _buildAcceptCashCheckBox() {
+    final currencySymbol = NumberFormat.simpleCurrency(locale: "en_ZA");
     return CheckboxListTile(
       title: const Text('Cash accepted'),
       value: model.acceptCash,
       onChanged: model.updateAcceptCash,
-      secondary: const Icon(Icons.euro_symbol),
+      //secondary: const Icon(Icons.euro_symbol),
+      secondary: Text(currencySymbol.currencySymbol),
     );
   }
 
