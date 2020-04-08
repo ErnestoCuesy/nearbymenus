@@ -56,7 +56,7 @@ class PlatformAlertDialog extends PlatformWidget {
       actions.add(PlatformAlertDialogAction(
         child: Text(
           cancelActionText,
-          style: Theme.of(context).primaryTextTheme.button,
+          style: Theme.of(context).textTheme.button,
         ),
         onPressed: () => Navigator.of(context).pop(false),
       ));
@@ -64,7 +64,7 @@ class PlatformAlertDialog extends PlatformWidget {
     actions.add(PlatformAlertDialogAction(
       child: Text(
         defaultActionText,
-        style: Theme.of(context).primaryTextTheme.button,
+        style: Theme.of(context).textTheme.button,
       ),
       onPressed: () => Navigator.of(context).pop(true),
     ));
