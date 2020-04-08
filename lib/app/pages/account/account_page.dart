@@ -246,6 +246,7 @@ class _AccountPageState extends State<AccountPage> {
         if (snapshot.connectionState == ConnectionState.active) {
           if (snapshot.hasData && snapshot.data.length > 0) {
             restaurant = snapshot.data.elementAt(0);
+            session.nearestRestaurant = restaurant;
             restaurantFound = true;
           }
           return SingleChildScrollView(
