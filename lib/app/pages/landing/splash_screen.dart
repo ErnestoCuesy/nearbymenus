@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/utilities/logo_image_asset.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -32,7 +33,7 @@ class SplashScreenState extends State<SplashScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      CircularProgressIndicator(),
+                      PlatformProgressIndicator(),
                       Padding(
                         padding: EdgeInsets.only(top: 20.0),
                       ),
