@@ -84,7 +84,7 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
       SizedBox(
         height: 8.0,
       ),
-      if (session.userDetails.role == ROLE_PATRON)
+      if (session.userDetails.role == ROLE_PATRON && model.userLocation != null)
       _buildUserAddressTextField(),
       SizedBox(
         height: 16.0,
