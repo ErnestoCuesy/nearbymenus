@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/date_time_picker.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
+import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/pages/restaurant/restaurant_details_model.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
@@ -112,7 +113,13 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
   Future<void> _save() async {
     try {
       // await Future.delayed(Duration(seconds: 3)); // Simulate slow network
-      await model.save();
+      final useCurrentLocation = await PlatformAlertDialog(
+        title: 'Restaurant location',
+        content: 'Is your current location where the restaurant actually is?',
+        cancelActionText: 'No',
+        defaultActionText: 'Yes',
+      ).show(context);
+      await model.save(useCurrentLocation);
       Navigator.of(context).pop();
     } on PlatformException catch (e) {
       PlatformExceptionAlertDialog(
