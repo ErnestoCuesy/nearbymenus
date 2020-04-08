@@ -44,7 +44,6 @@ class RestaurantListTile extends StatelessWidget {
               ),
               Text(
                 restaurant.restaurantLocation,
-                //style: Theme.of(context).textTheme.subhead,
               ),
             ],
           ),
