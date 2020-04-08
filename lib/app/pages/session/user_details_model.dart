@@ -55,7 +55,7 @@ class UserDetailsModel with UserDetailsValidators, ChangeNotifier {
     switch (role) {
       case ROLE_PATRON: {
         if (userNameValidator.isValid(userName) &&
-            userAddressValidator.isValid(userAddress) &&
+            (userAddressValidator.isValid(userAddress) || userLocation == null) &&
             !isLoading) {
           canSubmitFlag = true;
         }
