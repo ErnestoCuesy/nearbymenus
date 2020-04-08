@@ -82,7 +82,7 @@ class _RestaurantListState extends State<RestaurantList> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('No restaurants found near you'),
+            Text('No restaurants found near you', style: Theme.of(context).accentTextTheme.title,),
             SizedBox(
               height: 32.0,
             ),
