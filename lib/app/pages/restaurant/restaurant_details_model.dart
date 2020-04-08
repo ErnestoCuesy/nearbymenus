@@ -55,7 +55,7 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     this.submitted = false,
   });
 
-  Future<void> save() async {
+  Future<void> save(bool useCurrentLocation) async {
     updateWith(isLoading: true, submitted: true);
     if (id == null || id == '') {
       id = documentIdFromCurrentDate();
@@ -68,7 +68,7 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
             name: name,
             restaurantLocation: restaurantLocation,
             typeOfFood: typeOfFood,
-            coordinates: session.position,
+            coordinates: useCurrentLocation ? session.position : coordinates,
             deliveryRadius: deliveryRadius,
           workingHoursFrom: workingHoursFrom,
           workingHoursTo: workingHoursTo,
