@@ -88,15 +88,6 @@ class UserDetailsModel with UserDetailsValidators, ChangeNotifier {
   void updateUserAddress(String userAddress) =>
       updateWith(userAddress: userAddress);
 
-  void updateUserLocation(String userLocation) =>
-      updateWith(userLocation: userLocation);
-
-  void updateUserNearestRestaurant(String userNearestRestaurant) =>
-      updateWith(userNearestRestaurant: userNearestRestaurant);
-
-  void updateUserRole(String userRole) =>
-      updateWith(userRole: userRole);
-
   void updateWith({
     String userName,
     String userAddress,
