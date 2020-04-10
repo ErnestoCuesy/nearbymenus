@@ -154,7 +154,7 @@ class _AccountPageState extends State<AccountPage> {
           padding: const EdgeInsets.only(left: 16.0, top: 8.0),
           child: Text(
             sectionTitle,
-            style: Theme.of(context).primaryTextTheme.headline,
+            style: Theme.of(context).primaryTextTheme.headline5,
           ),
         ),
         SizedBox(
@@ -164,11 +164,9 @@ class _AccountPageState extends State<AccountPage> {
           child: ListTile(
             title: Text(
               cardTitle,
-              style: Theme.of(context).primaryTextTheme.body1,
             ),
             subtitle: Text(
               cardSubtitle,
-              style: Theme.of(context).primaryTextTheme.body1,
             ),
             trailing: IconButton(
               icon: Icon(Icons.edit),
@@ -192,7 +190,7 @@ class _AccountPageState extends State<AccountPage> {
           padding: const EdgeInsets.only(left: 16.0, top: 8.0),
           child: Text(
             sectionTitle,
-            style: Theme.of(context).primaryTextTheme.headline,
+            style: Theme.of(context).primaryTextTheme.headline5,
           ),
         ),
         SizedBox(
@@ -227,7 +225,7 @@ class _AccountPageState extends State<AccountPage> {
           padding: const EdgeInsets.only(left: 16.0, top: 8.0),
           child: Text(
             sectionTitle,
-            style: Theme.of(context).primaryTextTheme.headline,
+            style: Theme.of(context).primaryTextTheme.headline5,
           ),
         ),
         SizedBox(
