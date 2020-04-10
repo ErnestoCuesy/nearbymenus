@@ -16,7 +16,7 @@ class RestaurantListTile extends StatelessWidget {
           children: <Widget>[
             Text(
               'No restaurants found near you',
-              style: Theme.of(context).textTheme.subhead,
+              style: Theme.of(context).textTheme.subtitle1,
             ),
             SizedBox(
               height: 8.0,
@@ -28,7 +28,7 @@ class RestaurantListTile extends StatelessWidget {
         children: <Widget>[
           Text(
             restaurant.name,
-            style: Theme.of(context).textTheme.headline,
+            style: Theme.of(context).textTheme.headline5,
           ),
           SizedBox(
             height: 8.0,
@@ -89,7 +89,13 @@ class RestaurantListTile extends StatelessWidget {
         localizations.formatTimeOfDay(restaurant.workingHoursFrom);
     final String hoursTo =
         localizations.formatTimeOfDay(restaurant.workingHoursTo);
-    final status = restaurant.open ? 'Open' : 'Closed';
+    final double hFrom = restaurant.workingHoursFrom.hour.toDouble() + restaurant.workingHoursFrom.minute.toDouble() / 60;
+    final double hTo = restaurant.workingHoursTo.hour.toDouble() + restaurant.workingHoursTo.minute.toDouble() / 60;
+    final double now = TimeOfDay.now().hour.toDouble() + TimeOfDay.now().minute.toDouble() / 60;
+    var status = restaurant.open ? 'Open' : 'Closed';
+    if (restaurant.open && now < hFrom || now > hTo) {
+      status = 'Closed';
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -164,7 +170,7 @@ class RestaurantListTile extends StatelessWidget {
           children: <Widget>[
             Text(
               'No restaurant selected. Tap to search for nearby Restaurants',
-              style: Theme.of(context).textTheme.headline,
+              style: Theme.of(context).textTheme.headline5,
             ),
           ]);
     } else {
