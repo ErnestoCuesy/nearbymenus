@@ -6,13 +6,20 @@ import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:provider/provider.dart';
 
-class RestaurantQuery extends StatelessWidget {
+class RestaurantQuery extends StatefulWidget {
+  @override
+  _RestaurantQueryState createState() => _RestaurantQueryState();
+}
+
+class _RestaurantQueryState extends State<RestaurantQuery> {
+  NearRestaurantBloc bloc;
+
   @override
   Widget build(BuildContext context) {
     final database = Provider.of<Database>(context, listen: true);
     final session = Provider.of<Session>(context);
     final userCoordinates = session.position;
-    final bloc = NearRestaurantBloc(
+    bloc = NearRestaurantBloc(
         source: database.patronRestaurants(), userCoordinates: userCoordinates);
     return StreamBuilder<List<Restaurant>>(
       stream: bloc.stream,
@@ -37,4 +44,11 @@ class RestaurantQuery extends StatelessWidget {
       },
     );
   }
+
+  @override
+  void dispose() {
+    bloc.dispose();
+    super.dispose();
+  }
+
 }
