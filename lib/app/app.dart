@@ -1,6 +1,12 @@
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
+import 'package:nearbymenus/app/models/notification_streams.dart';
+import 'package:nearbymenus/app/models/received_notification.dart';
 import 'package:nearbymenus/app/pages/landing/splash_screen.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -13,6 +19,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:nearbymenus/app/pages/landing/subscription_check.dart';
+import 'package:rxdart/subjects.dart';
 
 class MyApp extends StatefulWidget {
   @override
@@ -23,19 +30,104 @@ class _MyAppState extends State<MyApp> {
   Geolocator _geolocator;
   Position _currentLocation;
   PermissionStatus _permissionStatus;
+  final MethodChannel platform = MethodChannel('crossingthestreams.io/resourceResolver');
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+// Streams are created so that app can respond to notification-related events since the plugin is initialised in the `main` function
+  final BehaviorSubject<ReceivedNotification> didReceiveLocalNotificationSubject =
+  BehaviorSubject<ReceivedNotification>();
+
+  final BehaviorSubject<String> selectNotificationSubject =
+  BehaviorSubject<String>();
+
+  NotificationAppLaunchDetails notificationAppLaunchDetails;
 
   @override
   void initState() {
     super.initState();
-    _determinePermissions();
+    _determineLocationPermissions();
+    _initNotifications();
+    _requestIOSPermissions();
+    _configureDidReceiveLocalNotificationSubject();
+    // _configureSelectNotificationSubject();
   }
 
-  _determinePermissions(){
+  void _initNotifications() async {
+    notificationAppLaunchDetails =
+        await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+
+    var initializationSettingsAndroid = AndroidInitializationSettings('launchericon');
+    // Note: permissions aren't requested here just to demonstrate that can be done later using the `requestPermissions()` method
+    // of the `IOSFlutterLocalNotificationsPlugin` class
+    var initializationSettingsIOS = IOSInitializationSettings(
+        requestAlertPermission: false,
+        requestBadgePermission: false,
+        requestSoundPermission: false,
+        onDidReceiveLocalNotification:
+            (int id, String title, String body, String payload) async {
+          didReceiveLocalNotificationSubject.add(ReceivedNotification(
+              id: id, title: title, body: body, payload: payload));
+        });
+    var initializationSettings = InitializationSettings(
+        initializationSettingsAndroid, initializationSettingsIOS);
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: (String payload) async {
+          if (payload != null) {
+            debugPrint('notification payload: ' + payload);
+          }
+          selectNotificationSubject.add(payload);
+        });
+  }
+
+  void _requestIOSPermissions() {
+    flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+        IOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+  }
+
+  void _configureDidReceiveLocalNotificationSubject() {
+    didReceiveLocalNotificationSubject.stream
+        .listen((ReceivedNotification receivedNotification) async {
+      final notificationReceived = await PlatformAlertDialog(
+        title: receivedNotification.title != null
+            ? receivedNotification.title
+            : null,
+        content: receivedNotification.body != null
+            ? receivedNotification.body
+            : null,
+        defaultActionText: 'Ok',
+      ).show(context);
+      if (notificationReceived) {
+        Navigator.of(context, rootNavigator: true).pop();
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                Placeholder(),
+          ),
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    didReceiveLocalNotificationSubject.close();
+    selectNotificationSubject.close();
+    super.dispose();
+  }
+
+  _determineLocationPermissions(){
     PermissionHandler().checkPermissionStatus(PermissionGroup.location)
-        .then((status) => _updatePermissions(status));
+        .then((status) => _updateLocationPermissions(status));
   }
 
-  _updatePermissions(PermissionStatus status){
+  _updateLocationPermissions(PermissionStatus status){
     if (_permissionStatus != status) {
       setState(() {
         _permissionStatus = status;
@@ -77,6 +169,8 @@ class _MyAppState extends State<MyApp> {
     if (_currentLocation != null) {
       return MultiProvider(
           providers: [
+            Provider.value(value: flutterLocalNotificationsPlugin),
+            Provider<NotificationStreams>(create: (context) => NotificationStreams(didReceiveLocalNotificationSubject: didReceiveLocalNotificationSubject, selectNotificationSubject: selectNotificationSubject),),
             Provider<LogoImageAsset>(create: (context) => LogoImageAsset()),
             Provider<IAPManagerBase>(create: (context) => IAPManagerMock(userID: 'test@test.com')),
             Provider<DeviceInfo>(create: (context) => DeviceInfo()),
