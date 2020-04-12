@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
+import 'package:nearbymenus/app/models/notification_streams.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/home/home_page_manager.dart';
 import 'package:nearbymenus/app/pages/home/home_page_dev.dart';
@@ -26,12 +27,30 @@ class _SessionControlState extends State<SessionControl> {
   Database database;
   DeviceInfo deviceInfo;
   UserDetails userDetails;
+  NotificationStreams notificationStreams;
+
+  void _configureSelectNotificationSubject() {
+    notificationStreams.selectNotificationSubject.stream.listen((String payload) async {
+      await Navigator.push( // TODO there's a problem here
+        context,
+        MaterialPageRoute(builder: (context) => Placeholder()),
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    notificationStreams.selectNotificationSubject.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context, listen: true);
     deviceInfo = Provider.of<DeviceInfo>(context);
+    notificationStreams = Provider.of<NotificationStreams>(context, listen: true);
+    _configureSelectNotificationSubject();
     return StreamBuilder<UserDetails>(
       stream: database.userDetailsStream(),
       builder: (context, snapshot) {
