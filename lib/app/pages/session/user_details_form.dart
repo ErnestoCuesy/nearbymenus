@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
-import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/session/user_details_model.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -55,7 +54,7 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
     try {
       // await Future.delayed(Duration(seconds: 3)); // Simulate slow network
       await model.save();
-      Navigator.of(context).pop();
+      //Navigator.of(context).pop();
     } on PlatformException catch (e) {
       PlatformExceptionAlertDialog(
         title: 'Save User Details',
@@ -84,7 +83,7 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
       SizedBox(
         height: 8.0,
       ),
-      if (session.userDetails.role == ROLE_PATRON && model.userLocation != null)
+      //if (session.userDetails.role == ROLE_PATRON && model.userLocation != null)
       _buildUserAddressTextField(),
       SizedBox(
         height: 16.0,
@@ -151,7 +150,7 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
     model.userNearestRestaurant = session.nearestRestaurant.id;
-    model.userLocation = session.nearestRestaurant.restaurantLocation;
+    model.userLocation = session.nearestRestaurant.restaurantLocation ?? '(unknown)';
     model.userRole = session.userDetails.role;
     model.deviceName = session.userDetails.deviceName;
     return Container(
