@@ -9,7 +9,8 @@ class APIPath {
   static String userDetails(String uid) => 'users/$uid/';
   static String restaurant(String restaurantId) => 'restaurants/$restaurantId';
   static String restaurants() => 'restaurants';
-  static String notifications() => 'notifications';
-  static String notification(String id) => 'notifications/$id';
+  static String messages() => 'messages';
+  static String message(String id) => 'messages/$id';
   static String authorization(String restaurantId) => 'authorizations/$restaurantId';
+  static String authorizations() => 'authorizations';
 }
