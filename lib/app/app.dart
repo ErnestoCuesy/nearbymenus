@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/models/notification_streams.dart';
 import 'package:nearbymenus/app/models/received_notification.dart';
 import 'package:nearbymenus/app/pages/landing/splash_screen.dart';
@@ -48,8 +47,6 @@ class _MyAppState extends State<MyApp> {
     _determineLocationPermissions();
     _initNotifications();
     _requestIOSPermissions();
-    _configureDidReceiveLocalNotificationSubject();
-    // _configureSelectNotificationSubject();
   }
 
   void _initNotifications() async {
@@ -68,8 +65,10 @@ class _MyAppState extends State<MyApp> {
           didReceiveLocalNotificationSubject.add(ReceivedNotification(
               id: id, title: title, body: body, payload: payload));
         });
+
     var initializationSettings = InitializationSettings(
         initializationSettingsAndroid, initializationSettingsIOS);
+
     await flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onSelectNotification: (String payload) async {
           if (payload != null) {
@@ -88,31 +87,6 @@ class _MyAppState extends State<MyApp> {
       badge: true,
       sound: true,
     );
-  }
-
-  void _configureDidReceiveLocalNotificationSubject() {
-    didReceiveLocalNotificationSubject.stream
-        .listen((ReceivedNotification receivedNotification) async {
-      final notificationReceived = await PlatformAlertDialog(
-        title: receivedNotification.title != null
-            ? receivedNotification.title
-            : null,
-        content: receivedNotification.body != null
-            ? receivedNotification.body
-            : null,
-        defaultActionText: 'Ok',
-      ).show(context);
-      if (notificationReceived) {
-        Navigator.of(context, rootNavigator: true).pop();
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                Placeholder(),
-          ),
-        );
-      }
-    });
   }
 
   @override
@@ -170,7 +144,10 @@ class _MyAppState extends State<MyApp> {
       return MultiProvider(
           providers: [
             Provider.value(value: flutterLocalNotificationsPlugin),
-            Provider<NotificationStreams>(create: (context) => NotificationStreams(didReceiveLocalNotificationSubject: didReceiveLocalNotificationSubject, selectNotificationSubject: selectNotificationSubject),),
+            Provider<NotificationStreams>(create: (context) => NotificationStreams(
+                didReceiveLocalNotificationSubject: didReceiveLocalNotificationSubject,
+                selectNotificationSubject: selectNotificationSubject),
+            ),
             Provider<LogoImageAsset>(create: (context) => LogoImageAsset()),
             Provider<IAPManagerBase>(create: (context) => IAPManagerMock(userID: 'test@test.com')),
             Provider<DeviceInfo>(create: (context) => DeviceInfo()),
