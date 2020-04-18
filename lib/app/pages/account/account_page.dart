@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
+import 'package:nearbymenus/app/models/user_notification.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/session/restaurant_list_tile.dart';
@@ -59,7 +60,12 @@ class _AccountPageState extends State<AccountPage> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final imageAsset = Provider.of<LogoImageAsset>(context);
-    final nameAndAddressTitle = restaurant.restaurantLocation != '' ? 'at ' + restaurant.restaurantLocation : '';
+    // TODO restaurant could be null - fix
+    final restaurantStatus = restaurant.acceptingStaffRequests ? '' : 'not ';
+    final restaurantStatusTitle =  'Restaurant ${restaurantStatus}accepting staff requests';
+    final restaurantName = restaurant.name == '' ? '(unknown)' : restaurant.name;
+    final staffAccessStatus = session.restaurantAccessGranted ? '' : 'not ';
+    final staffAccessSubtitle = 'You are ${staffAccessStatus}allowed to access orders';
     return [
       Container(
         width: screenWidth / 4,
@@ -84,11 +90,12 @@ class _AccountPageState extends State<AccountPage> {
           },
         ),
       // NAME AND ADDRESS
-      if (session.userDetails.role == ROLE_PATRON)
         _userDetailsSection(
-          sectionTitle: 'Name and address $nameAndAddressTitle',
+          sectionTitle: 'Your details',
           cardTitle: session.userDetails.name ?? '',
-          cardSubtitle: session.userDetails.address ?? 'Address unknown',
+          cardSubtitle: session.userDetails.address == null
+              ? 'Address unknown'
+              : '${session.userDetails.address} ${restaurant.restaurantLocation}',
           onPressed: () => Navigator.of(context)
               .push(MaterialPageRoute(builder: (BuildContext context) {
             return Scaffold(
@@ -115,7 +122,7 @@ class _AccountPageState extends State<AccountPage> {
       _userDetailsSection(
         sectionTitle: 'Current role',
         cardTitle: session.userDetails.role,
-        cardSubtitle: '',
+        cardSubtitle: 'At $restaurantName',
         onPressed: () {
           session.userDetails.role = ROLE_NONE;
           database.setUserDetails(session.userDetails);
@@ -124,7 +131,7 @@ class _AccountPageState extends State<AccountPage> {
       // TODO in progress subscription details for managers
       // SUBSCRIPTION
       if (session.userDetails.role == ROLE_MANAGER)
-        _subscriptionDetailsSection(
+        _userDetailsSection(
           sectionTitle: 'Subscription details',
           cardTitle: session.subscription.subscriptionTypeString,
           cardSubtitle:
@@ -139,43 +146,27 @@ class _AccountPageState extends State<AccountPage> {
             );
           },
         ),
+      // STAFF STATUS SECTION
+      if (session.userDetails.role == ROLE_STAFF && restaurantFound)
+        _userDetailsSection(
+          sectionTitle: 'Restaurant status',
+          cardTitle: staffAccessSubtitle,
+          cardSubtitle: restaurantStatusTitle,
+          onPressed: () {
+            database.setNotificationDetails(UserNotification(
+              id: documentIdFromCurrentDate(),
+              fromUid: database.userId,
+              toUid: session.nearestRestaurant.managerId,
+              restaurantId: session.userDetails.nearestRestaurantId,
+              fromRole: ROLE_STAFF,
+              toRole: ROLE_MANAGER,
+              fromName: session.userDetails.name,
+              read: false,
+              type: 'Access'
+            ));
+          },
+        ),
     ];
-  }
-
-  Widget _subscriptionDetailsSection(
-      {String sectionTitle,
-      String cardTitle,
-      String cardSubtitle,
-      VoidCallback onPressed}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(left: 16.0, top: 8.0),
-          child: Text(
-            sectionTitle,
-            style: Theme.of(context).primaryTextTheme.headline5,
-          ),
-        ),
-        SizedBox(
-          height: 8.0,
-        ),
-        Card(
-          child: ListTile(
-            title: Text(
-              cardTitle,
-            ),
-            subtitle: Text(
-              cardSubtitle,
-            ),
-            trailing: IconButton(
-              icon: Icon(Icons.edit),
-              onPressed: onPressed,
-            ),
-          ),
-        ),
-      ],
-    );
   }
 
   Widget _userDetailsSection(
@@ -280,7 +271,7 @@ class _AccountPageState extends State<AccountPage> {
       appBar: AppBar(
         title: Text(
           FlavourConfig.isProduction() ? accountText : accountText + ' [DEV]',
-          style: Theme.of(context).primaryTextTheme.title,
+          style: Theme.of(context).primaryTextTheme.headline6,
         ),
         actions: <Widget>[
           FlatButton(
