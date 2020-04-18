@@ -22,7 +22,7 @@ class LandingPage extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.active) {
             UserAuth user = snapshot.data;
-            if (user == null || user.isEmailVerified == false) {
+            if (user == null) {
               return SignInPage();
             }
             database.setUserId(user.uid);
