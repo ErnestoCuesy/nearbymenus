@@ -5,8 +5,11 @@ class APIPath {
   static String jobs(String uid) => 'users/$uid/jobs';
   static String entry(String uid, String entryId) => 'users/$uid/entries/$entryId';
   static String entries(String uid) => 'users/$uid/entries';
-  static String userDetails(String uid) => 'users/$uid/details/$uid'; // Repeat uid to add an even number of paths, otherwise throws error
+  // TODO cleanup above unused definitions
+  static String userDetails(String uid) => 'users/$uid/';
   static String restaurant(String restaurantId) => 'restaurants/$restaurantId';
   static String restaurants() => 'restaurants';
-  static String managerRestaurants(String uid) => 'restaurants/$uid/restaurants';
+  static String notifications() => 'notifications';
+  static String notification(String id) => 'notifications/$id';
+  static String authorization(String restaurantId) => 'authorizations/$restaurantId';
 }
