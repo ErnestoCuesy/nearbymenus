@@ -7,6 +7,10 @@ import 'package:nearbymenus/app/models/session.dart';
 import 'package:provider/provider.dart';
 
 class RestaurantQuery extends StatefulWidget {
+  final String role;
+
+  const RestaurantQuery({Key key, this.role}) : super(key: key);
+
   @override
   _RestaurantQueryState createState() => _RestaurantQueryState();
 }
@@ -19,8 +23,9 @@ class _RestaurantQueryState extends State<RestaurantQuery> {
     final database = Provider.of<Database>(context, listen: true);
     final session = Provider.of<Session>(context);
     final userCoordinates = session.position;
+    final useStaffFilter = false; //widget.role == ROLE_STAFF ? true : false;
     bloc = NearRestaurantBloc(
-        source: database.patronRestaurants(), userCoordinates: userCoordinates);
+        source: database.patronRestaurants(), userCoordinates: userCoordinates, useStaffFilter: useStaffFilter);
     return StreamBuilder<List<Restaurant>>(
       stream: bloc.stream,
       builder: (context, snapshot) {
