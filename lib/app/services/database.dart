@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:meta/meta.dart';
 import 'package:nearbymenus/app/models/authorizations.dart';
-import 'package:nearbymenus/app/models/user_notification.dart';
+import 'package:nearbymenus/app/models/user_message.dart';
 import 'package:nearbymenus/app/models/job.dart';
 import 'package:nearbymenus/app/models/entry.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
@@ -26,12 +26,12 @@ abstract class Database {
   Stream<List<Restaurant>> userRestaurant(String restaurantId);
   Future<List<Restaurant>> patronRestaurants();
   Future<void> setRestaurantDetails(Restaurant restaurant);
-  Future<void> setNotificationDetails(UserNotification roleNotification);
-  Stream<UserNotification> userNotifications(String uid);
-  //Stream<List<UserNotification>> userNotifications2(String uId);
-  Stream<List<UserNotification>> userNotifications2(String restaurantId, String uid, String toRole);
+  Future<void> setMessageDetails(UserMessage roleNotification);
+  Stream<UserMessage> userMessage(String uid);
+  Stream<List<UserMessage>> userMessages(String restaurantId, String uid, String toRole);
   Stream<Authorizations> authorizationsStream(String restaurantId);
   Future<void> setAuthorization(String restaurantId, Authorizations authorizations);
+  Future<List<Authorizations>> authorizationsSnapshot();
 }
 
 String documentIdFromCurrentDate() => DateTime.now().toIso8601String();
@@ -120,6 +120,13 @@ class FirestoreDatabase implements Database {
     builder: (data, documentId) => Authorizations.fromMap(data, documentId),
   );
 
+  // Used by nearest restaurant query
+  @override
+  Future<List<Authorizations>> authorizationsSnapshot() => _service.collectionSnapshot(
+    path: APIPath.authorizations(),
+    builder: (data, documentId) => Authorizations.fromMap(data, documentId),
+  );
+
   // Used by restaurant details page
   @override
   Stream<List<Restaurant>> managerRestaurants(String managerId) => _service.collectionStream(
@@ -129,16 +136,6 @@ class FirestoreDatabase implements Database {
           : null,
     builder: (data, documentId) => Restaurant.fromMap(data, documentId),
   );
-
-  // Used in notifications page
-//  @override
-//  Stream<List<UserNotification>> userNotifications2(String uId) => _service.collectionStream(
-//    path: APIPath.notifications(),
-//    queryBuilder: uId != null
-//        ? (query) => query.where('toUid', isEqualTo: uId)
-//        : null,
-//    builder: (data, documentId) => UserNotification.fromMap(data, documentId),
-//  );
 
   // Used by account page to load user's (patron or staff) restaurant
   @override
@@ -150,23 +147,23 @@ class FirestoreDatabase implements Database {
     builder: (data, documentId) => Restaurant.fromMap(data, documentId),
   );
 
-  // User notifications 2 - in progress
+  // Used by messages listener and messages page widgets
   @override
-  Stream<List<UserNotification>> userNotifications2(String restaurantId, String uid, String toRole) => _service.collectionStream(
-    path: APIPath.notifications(),
+  Stream<List<UserMessage>> userMessages(String restaurantId, String uid, String toRole) => _service.collectionStream(
+    path: APIPath.messages(),
     queryBuilder: restaurantId != null
         ? (query) => query.where('restaurantId', isEqualTo: restaurantId)
                           .where('toUid', isEqualTo: uid)
                           .where('toRole', isEqualTo: toRole)
         : null,
-    builder: (data, documentId) => UserNotification.fromMap(data, documentId),
+    builder: (data, documentId) => UserMessage.fromMap(data, documentId),
   );
 
-  // Used to listen to notifications sent to user
+  // Used to listen to messages sent to user
   @override
-  Stream<UserNotification> userNotifications(String uid) => _service.documentStream(
-    path: APIPath.notification(uid),
-    builder: (data, documentId) => UserNotification.fromMap(data, documentId),
+  Stream<UserMessage> userMessage(String uid) => _service.documentStream(
+    path: APIPath.message(uid),
+    builder: (data, documentId) => UserMessage.fromMap(data, documentId),
   );
 
   // Used by nearest restaurant query
@@ -181,10 +178,10 @@ class FirestoreDatabase implements Database {
   Future<void> setRestaurantDetails(Restaurant restaurant) async => await _service
       .setData(path: APIPath.restaurant(restaurant.id), data: restaurant.toMap());
 
-  // Used when saving notification details
+  // Used when saving message details
   @override
-  Future<void> setNotificationDetails(UserNotification roleNotification) async => await _service
-      .setData(path: APIPath.notification(roleNotification.id), data: roleNotification.toMap());
+  Future<void> setMessageDetails(UserMessage message) async => await _service
+      .setData(path: APIPath.message(message.id), data: message.toMap());
 
   // Used when saving authorizations
   @override
