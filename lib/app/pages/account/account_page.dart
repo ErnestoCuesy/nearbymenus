@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
-import 'package:nearbymenus/app/models/user_notification.dart';
+import 'package:nearbymenus/app/models/user_message.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/session/restaurant_list_tile.dart';
@@ -153,7 +153,7 @@ class _AccountPageState extends State<AccountPage> {
           cardTitle: staffAccessSubtitle,
           cardSubtitle: restaurantStatusTitle,
           onPressed: () {
-            database.setNotificationDetails(UserNotification(
+            database.setMessageDetails(UserMessage(
               id: documentIdFromCurrentDate(),
               fromUid: database.userId,
               toUid: session.nearestRestaurant.managerId,
@@ -161,8 +161,8 @@ class _AccountPageState extends State<AccountPage> {
               fromRole: ROLE_STAFF,
               toRole: ROLE_MANAGER,
               fromName: session.userDetails.name,
-              read: false,
-              type: 'Access'
+              delivered: false,
+              type: 'Staff access request'
             ));
           },
         ),
