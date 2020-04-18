@@ -2,26 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/list_items_builder.dart';
 import 'package:nearbymenus/app/models/authorizations.dart';
 import 'package:nearbymenus/app/models/session.dart';
-import 'package:nearbymenus/app/models/user_notification.dart';
+import 'package:nearbymenus/app/models/user_message.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
-class NotificationsPage extends StatefulWidget {
+class MessagesPage extends StatefulWidget {
   @override
-  _NotificationsPageState createState() => _NotificationsPageState();
+  _MessagesPageState createState() => _MessagesPageState();
 }
 
-class _NotificationsPageState extends State<NotificationsPage> {
+class _MessagesPageState extends State<MessagesPage> {
   Session session;
   Database database;
+  Authorizations authorizations = Authorizations(authorizedRoles: {}, authorizedNames: {});
+
+  void _getAuthorizations() async {
+    await database.authorizationsSnapshot().then((authorizationsList) {
+      if (authorizationsList.length > 0) {
+        authorizationsList.forEach((authorization) {
+          if (authorization.id == session.nearestRestaurant.id) {
+            authorizations = authorization;
+          }
+        });
+      }
+    });
+  }
 
   Widget _buildContents(BuildContext context) {
-    return StreamBuilder<List<UserNotification>>(
-      stream: database.userNotifications2(session.nearestRestaurant.id, database.userId, session.userDetails.role),
+    return StreamBuilder<List<UserMessage>>(
+      stream: database.userMessages(
+        session.nearestRestaurant.id,
+        database.userId,
+        session.userDetails.role,
+      ),
       builder: (context, snapshot) {
-        return ListItemsBuilder<UserNotification>(
+        return ListItemsBuilder<UserMessage>(
             snapshot: snapshot,
-            itemBuilder: (context, notification) {
+            itemBuilder: (context, message) {
               return Card(
                 child: ListTile(
                   isThreeLine: true,
@@ -30,34 +47,31 @@ class _NotificationsPageState extends State<NotificationsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        'To:  ${notification.toRole}',
+                        message.type,
                         style: Theme.of(context).textTheme.headline6,
                       ),
                       Text(
-                          'From: ${notification.fromRole} (${notification.fromName})',
+                        'From: ${message.fromName}',
+                      ),
+                      Text(
+                        'To:  ${session.userDetails.name}',
                       ),
                     ],
                   ),
-                  // subtitle: Text('${restaurant.restaurantLocation}'),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(notification.type)
-                    ],
+                    children: <Widget>[Text(message.id)],
                   ),
                   trailing: Icon(Icons.traffic),
                   onTap: () {
                     // TODO append to existing document's maps
-                      final authorizations = Authorizations(
-                          authorizedRoles: {'${notification.fromUid}': 'Staff'},
-                          authorizedNames: {'${notification.fromUid}': '${notification.fromName}'}
-                      );
-                      database.setAuthorization(session.nearestRestaurant.id, authorizations);
-                    },
+                    authorizations.authorizedRoles.putIfAbsent(message.fromUid, () => 'Staff');
+                    authorizations.authorizedNames.putIfAbsent(message.fromUid, () => message.fromName);
+                    database.setAuthorization(session.nearestRestaurant.id, authorizations);
+                  },
                 ),
               );
-            }
-        );
+            });
       },
     );
   }
@@ -66,17 +80,19 @@ class _NotificationsPageState extends State<NotificationsPage> {
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
+    _getAuthorizations();
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Notifications', style: TextStyle(color: Theme
-            .of(context)
-            .appBarTheme
-            .color),
+          'Messages',
+          style: TextStyle(color: Theme.of(context).appBarTheme.color),
         ),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.delete, color: Theme.of(context).appBarTheme.color,),
+            icon: Icon(
+              Icons.delete,
+              color: Theme.of(context).appBarTheme.color,
+            ),
             iconSize: 32.0,
             padding: const EdgeInsets.only(right: 16.0),
             onPressed: () => {},
