@@ -40,7 +40,6 @@ class _HomePageDevState extends State<HomePageDev> {
       TabItem.foodMenu: (_) => Placeholder(),
       TabItem.drinksMenu: (_) => Placeholder(),
       TabItem.myOrders: (_) => Placeholder(),
-      TabItem.foodMenu: (_) => Placeholder(),
       TabItem.manageOrders: (_) => Placeholder(),
       TabItem.userAccount: (_) => AccountPage(auth: auth, session: session, database: database,)
     };
