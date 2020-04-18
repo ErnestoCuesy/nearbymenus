@@ -9,12 +9,13 @@ class Session {
   Restaurant nearestRestaurant;
   bool restaurantsFound = false;
   Subscription subscription = Subscription();
+  bool restaurantAccessGranted = false;
 
   Session({this.position});
 
   void setUserDetails(UserDetails userDetails) {
     this.userDetails = userDetails;
-    this.nearestRestaurant = nearestRestaurant ?? Restaurant(id: '');
+    this.nearestRestaurant = nearestRestaurant ?? Restaurant(id: 'None');
   }
 
   void setSubscription(Subscription subscription) {
