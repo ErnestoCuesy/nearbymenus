@@ -45,7 +45,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
                   children: <Widget>[
                     Text(
                         restaurant.name,
-                      style: Theme.of(context).textTheme.title,
+                      style: Theme.of(context).textTheme.headline6,
                     ),
                     Text(restaurant.restaurantLocation),
                   ],
@@ -56,14 +56,17 @@ class _RestaurantPageState extends State<RestaurantPage> {
                     CheckboxListTile(
                       title: Text('Listing is active'),
                       value: restaurant.active,
+                      onChanged: null,
                     ),
                     CheckboxListTile(
                       title: Text('Restaurant shows as open'),
                       value: restaurant.open,
+                      onChanged: null,
                     ),
                     CheckboxListTile(
                       title: Text('Accepting staff requests'),
                       value: restaurant.acceptingStaffRequests,
+                      onChanged: null,
                     ),
                   ],
                 ),
