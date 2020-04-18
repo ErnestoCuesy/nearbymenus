@@ -82,6 +82,7 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
           acceptZapper: acceptZapper,
         ),
       );
+      session.userDetails.nearestRestaurantId = id;
       await database.setUserDetails(session.userDetails);
     } catch (e) {
       print(e);
