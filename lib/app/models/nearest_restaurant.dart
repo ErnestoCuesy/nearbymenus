@@ -14,17 +14,28 @@ class NearestRestaurant {
 class NearRestaurantBloc {
   final Future<List<Restaurant>> source;
   final Position userCoordinates;
+  final bool useStaffFilter;
   final _stream = StreamController<List<Restaurant>>();
 
-  NearRestaurantBloc({this.source, this.userCoordinates}) {
+  NearRestaurantBloc({this.source, this.userCoordinates, this.useStaffFilter}) {
     List<Restaurant> resList = List<Restaurant>();
     source.then((rest) {
       rest.forEach((res) async {
-        await Geolocator().distanceBetween(userCoordinates.latitude, userCoordinates.longitude, res.coordinates.latitude, res.coordinates.longitude).then((distance) {
-          if (res.active && distance < res.deliveryRadius) {
-            resList.add(res);
+        if (useStaffFilter) {
+          if (res.acceptingStaffRequests) {
+            await Geolocator().distanceBetween(userCoordinates.latitude, userCoordinates.longitude, res.coordinates.latitude, res.coordinates.longitude).then((distance) {
+              if (res.active && distance < res.deliveryRadius) {
+                resList.add(res);
+              }
+            });
           }
-        });
+        } else {
+          await Geolocator().distanceBetween(userCoordinates.latitude, userCoordinates.longitude, res.coordinates.latitude, res.coordinates.longitude).then((distance) {
+            if (res.active && distance < res.deliveryRadius) {
+              resList.add(res);
+            }
+          });
+        }
         _stream.add(resList);
       });
     });
