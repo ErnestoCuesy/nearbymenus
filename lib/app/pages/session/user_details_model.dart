@@ -52,23 +52,10 @@ class UserDetailsModel with UserDetailsValidators, ChangeNotifier {
 
   bool get canSave {
     bool canSubmitFlag = false;
-    switch (role) {
-      case ROLE_PATRON: {
-        if (userNameValidator.isValid(userName) &&
-            (userAddressValidator.isValid(userAddress) || userLocation == null) &&
-            !isLoading) {
-          canSubmitFlag = true;
-        }
-      }
-      break;
-      case ROLE_STAFF:
-      case ROLE_MANAGER: {
-      if (userNameValidator.isValid(userName) &&
-          !isLoading) {
-        canSubmitFlag = true;
-      }
-      }
-      break;
+    if (userNameValidator.isValid(userName) &&
+        (userAddressValidator.isValid(userAddress) || userLocation == null) &&
+        !isLoading) {
+      canSubmitFlag = true;
     }
     return canSubmitFlag;
   }
