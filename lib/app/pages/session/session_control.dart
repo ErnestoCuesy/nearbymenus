@@ -10,7 +10,7 @@ import 'package:nearbymenus/app/pages/home/home_page_patron.dart';
 import 'package:nearbymenus/app/pages/home/home_page_staff.dart';
 import 'package:nearbymenus/app/pages/landing/loading_progress_indicator.dart';
 import 'package:nearbymenus/app/pages/session/already_logged_in_page.dart';
-import 'package:nearbymenus/app/pages/session/dbnotifications_listener.dart';
+import 'package:nearbymenus/app/pages/session/messages_listener.dart';
 import 'package:nearbymenus/app/pages/session/restaurant_query.dart';
 import 'package:nearbymenus/app/pages/session/role_selection_page.dart';
 import 'package:nearbymenus/app/pages/session/user_details_page.dart';
@@ -60,12 +60,12 @@ class _SessionControlState extends State<SessionControl> {
   void _configureSelectNotificationSubject() {
     notificationStreams.selectNotificationSubject.stream.listen((String payload) async {
       // TODO there's a problem here
-      await Navigator.of(context).push(
-        MaterialPageRoute(
-          fullscreenDialog: false,
-            builder: (context) => Placeholder(),
-        ),
-      );
+      final didRequestContinue = await PlatformAlertDialog(
+        title: 'Nearby Menus',
+        content: 'You have a new message. Go to your messages page to check it out.',
+        //cancelActionText: 'Exit',
+        defaultActionText: 'Ok',
+      ).show(context);
     });
   }
 
@@ -82,8 +82,8 @@ class _SessionControlState extends State<SessionControl> {
     database = Provider.of<Database>(context, listen: true);
     deviceInfo = Provider.of<DeviceInfo>(context);
     notificationStreams = Provider.of<NotificationStreams>(context, listen: true);
-    _configureSelectNotificationSubject();
-    _configureDidReceiveLocalNotificationSubject();
+    //_configureSelectNotificationSubject();
+    //_configureDidReceiveLocalNotificationSubject();
     return StreamBuilder<UserDetails>(
       stream: database.userDetailsStream(),
       builder: (context, snapshot) {
@@ -139,7 +139,7 @@ class _SessionControlState extends State<SessionControl> {
                 }
                 break;
             }
-            return DBNotificationsListener(page: home);
+            return MessagesListener(page: home);
           } else {
             return Scaffold(
               body: Center(
