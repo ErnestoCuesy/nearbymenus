@@ -8,6 +8,7 @@ enum TabItem {
   drinksMenu,
   manageOrders,
   myOrders,
+  notifications,
   userAccount,
 }
 
@@ -66,6 +67,7 @@ class PatronRoleEnum extends RoleEnumBase {
     TabItem.foodMenu,
     TabItem.drinksMenu,
     TabItem.myOrders,
+    TabItem.notifications,
     TabItem.userAccount
   ];
 }
@@ -76,6 +78,7 @@ class ManagerRoleEnum extends RoleEnumBase {
     TabItem.foodMenu,
     TabItem.drinksMenu,
     TabItem.manageOrders,
+    TabItem.notifications,
     TabItem.userAccount
   ];
 }
@@ -83,6 +86,7 @@ class ManagerRoleEnum extends RoleEnumBase {
 class StaffRoleEnum extends RoleEnumBase {
   List<TabItem> roleEnumList = const [
     TabItem.manageOrders,
+    TabItem.notifications,
     TabItem.userAccount
   ];
 }
@@ -94,6 +98,7 @@ class DevRoleEnum extends RoleEnumBase {
     TabItem.drinksMenu,
     TabItem.manageOrders,
     TabItem.myOrders,
+    TabItem.notifications,
     TabItem.userAccount
   ];
 }
@@ -115,6 +120,8 @@ class TabItemData {
     TabItemData(title: 'Orders', icon: Icons.assignment),
     TabItem.myOrders:
     TabItemData(title: 'My Orders', icon: Icons.shopping_cart),
+    TabItem.notifications:
+    TabItemData(title: 'Notifications', icon: Icons.message),
     TabItem.userAccount:
     TabItemData(title: 'My Account', icon: Icons.person),
   };
