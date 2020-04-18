@@ -1,6 +1,6 @@
 import 'package:meta/meta.dart';
 
-class UserNotification {
+class UserMessage {
   final String id;
   final String fromUid;
   final String toUid;
@@ -8,10 +8,10 @@ class UserNotification {
   final String fromRole;
   final String toRole;
   final String fromName;
-  final bool read;
+  final bool delivered;
   final String type;
 
-  UserNotification({
+  UserMessage({
     @required this.id,
     @required this.fromUid,
     @required this.toUid,
@@ -19,16 +19,16 @@ class UserNotification {
     @required this.fromRole,
     @required this.toRole,
     @required this.fromName,
-    @required this.read,
+    @required this.delivered,
     @required this.type,
   });
 
-  factory UserNotification.fromMap(
+  factory UserMessage.fromMap(
       Map<String, dynamic> data, String documentID) {
     if (data == null) {
       return null;
     }
-    return UserNotification(
+    return UserMessage(
         id: data['id'],
         fromUid: data['fromUid'],
         toUid: data['toUid'],
@@ -36,7 +36,7 @@ class UserNotification {
         fromRole: data['fromRole'],
         toRole: data['toRole'],
         fromName: data['fromName'],
-        read: data['read'],
+        delivered: data['delivered'],
         type: data['type']);
   }
 
@@ -49,13 +49,13 @@ class UserNotification {
       'fromRole': fromRole,
       'toRole': toRole,
       'fromName': fromName,
-      'read': read,
+      'delivered': delivered,
       'type': type
     };
   }
 
   @override
   String toString() {
-    return 'id: $id, fromUid: $fromUid, toUid: $toUid, restaurantId: $restaurantId, fromRole: $fromRole, toRole: $toRole, fromName: $fromName, read: $read, type: $type';
+    return 'id: $id, fromUid: $fromUid, toUid: $toUid, restaurantId: $restaurantId, fromRole: $fromRole, toRole: $toRole, fromName: $fromName, delivered: $delivered, type: $type';
   }
 }
