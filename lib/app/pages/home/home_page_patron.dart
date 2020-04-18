@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/pages/account/account_page.dart';
 import 'package:nearbymenus/app/pages/home/cupertino_home_scaffold_patron.dart';
 import 'package:nearbymenus/app/pages/home/tab_item.dart';
-import 'package:nearbymenus/app/pages/notifications/notifications_page.dart';
+import 'package:nearbymenus/app/pages/notifications/messages_page.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/models/session.dart';
@@ -30,7 +30,7 @@ class _HomePagePatronState extends State<HomePagePatron> {
     TabItem.foodMenu: GlobalKey<NavigatorState>(),
     TabItem.drinksMenu: GlobalKey<NavigatorState>(),
     TabItem.myOrders: GlobalKey<NavigatorState>(),
-    TabItem.notifications: GlobalKey<NavigatorState>(),
+    TabItem.messages: GlobalKey<NavigatorState>(),
     TabItem.userAccount: GlobalKey<NavigatorState>()
   };
 
@@ -39,7 +39,7 @@ class _HomePagePatronState extends State<HomePagePatron> {
       TabItem.foodMenu: (_) => Placeholder(),
       TabItem.drinksMenu: (_) => Placeholder(),
       TabItem.myOrders: (_) => Placeholder(),
-      TabItem.notifications: (_) => NotificationsPage(),
+      TabItem.messages: (_) => MessagesPage(),
       TabItem.userAccount: (_) => AccountPage(auth: auth, session: session, database: database,)
     };
   }
