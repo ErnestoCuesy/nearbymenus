@@ -20,6 +20,8 @@ class Restaurant {
   final bool acceptCash;
   final bool acceptCard;
   final bool acceptZapper;
+  final Map<String, dynamic> restaurantFlags;
+  final Map<String, dynamic> paymentFlags;
 
   Restaurant({
     this.id,
@@ -39,6 +41,8 @@ class Restaurant {
     this.acceptCash,
     this.acceptCard,
     this.acceptZapper,
+    this.restaurantFlags,
+    this.paymentFlags,
   });
 
   factory Restaurant.fromMap(Map<dynamic, dynamic> value, String documentId) {
@@ -64,12 +68,14 @@ class Restaurant {
         workingHoursTo: TimeOfDay(hour: hoursToHours, minute: hoursToMinutes),
         telephoneNumber: value['telephoneNumber'],
         notes: value['notes'],
-        active: value['active'],
-        open: value['open'],
-        acceptingStaffRequests: value['acceptingStaffRequests'],
-        acceptCash: value['acceptCash'],
-        acceptCard: value['acceptCard'],
-        acceptZapper: value['acceptZapper'],
+        active: value['restaurantFlags']['active'],
+        open: value['restaurantFlags']['open'],
+        acceptingStaffRequests: value['restaurantFlags']['acceptingStaffRequests'],
+        acceptCash: value['paymentFlags']['acceptCash'],
+        acceptCard: value['paymentFlags']['acceptCard'],
+        acceptZapper: value['paymentFlags']['acceptZapper'],
+        restaurantFlags: value['restaurantFlags'],
+        paymentFlags: value['paymentFlags'],
     );
   }
 
@@ -90,12 +96,14 @@ class Restaurant {
       'hoursToMinutes': workingHoursTo.minute,
       'telephoneNumber': telephoneNumber,
       'notes': notes,
-      'active': active,
-      'open': open,
-      'acceptingStaffRequests': acceptingStaffRequests,
-      'acceptCash': acceptCash,
-      'acceptCard': acceptCard,
-      'acceptZapper': acceptZapper,
+//      'active': active,
+//      'open': open,
+//      'acceptingStaffRequests': acceptingStaffRequests,
+//      'acceptCash': acceptCash,
+//      'acceptCard': acceptCard,
+//      'acceptZapper': acceptZapper,
+      'restaurantFlags': restaurantFlags,
+      'paymentFlags': paymentFlags,
     };
   }
 }
