@@ -2,6 +2,7 @@ import 'package:meta/meta.dart';
 
 class UserMessage {
   final String id;
+  final double timestamp;
   final String fromUid;
   final String toUid;
   final String restaurantId;
@@ -13,6 +14,7 @@ class UserMessage {
 
   UserMessage({
     @required this.id,
+    @required this.timestamp,
     @required this.fromUid,
     @required this.toUid,
     @required this.restaurantId,
@@ -30,6 +32,7 @@ class UserMessage {
     }
     return UserMessage(
         id: data['id'],
+        timestamp: data['timestamp'],
         fromUid: data['fromUid'],
         toUid: data['toUid'],
         restaurantId: data['restaurantId'],
@@ -43,6 +46,7 @@ class UserMessage {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'timestamp': timestamp,
       'fromUid': fromUid,
       'toUid': toUid,
       'restaurantId': restaurantId,
