@@ -27,7 +27,7 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
-  Restaurant restaurant = Restaurant(name: '', restaurantLocation: '');
+  Restaurant restaurant = Restaurant(name: '', restaurantLocation: '', acceptingStaffRequests: false);
   bool restaurantFound = false;
 
   Auth get auth => widget.auth;
@@ -61,11 +61,15 @@ class _AccountPageState extends State<AccountPage> {
     final screenHeight = MediaQuery.of(context).size.height;
     final imageAsset = Provider.of<LogoImageAsset>(context);
     // TODO restaurant could be null - fix
-    final restaurantStatus = restaurant.acceptingStaffRequests ? '' : 'not ';
-    final restaurantStatusTitle =  'Restaurant ${restaurantStatus}accepting staff requests';
     final restaurantName = restaurant.name == '' ? '(unknown)' : restaurant.name;
     final staffAccessStatus = session.restaurantAccessGranted ? '' : 'not ';
     final staffAccessSubtitle = 'You are ${staffAccessStatus}allowed to access orders';
+    var restaurantStatusTitle = '';
+    if (!session.restaurantAccessGranted) {
+      restaurantStatusTitle =  restaurant.acceptingStaffRequests
+          ? 'Tap to request access'
+          : 'Restaurant is not accepting staff requests at the moment';
+    }
     return [
       Container(
         width: screenWidth / 4,
@@ -152,21 +156,27 @@ class _AccountPageState extends State<AccountPage> {
           sectionTitle: 'Restaurant status',
           cardTitle: staffAccessSubtitle,
           cardSubtitle: restaurantStatusTitle,
-          onPressed: () {
-            database.setMessageDetails(UserMessage(
-              id: documentIdFromCurrentDate(),
-              fromUid: database.userId,
-              toUid: session.nearestRestaurant.managerId,
-              restaurantId: session.userDetails.nearestRestaurantId,
-              fromRole: ROLE_STAFF,
-              toRole: ROLE_MANAGER,
-              fromName: session.userDetails.name,
-              delivered: false,
-              type: 'Staff access request'
-            ));
-          },
+          onPressed: session.nearestRestaurant.acceptingStaffRequests
+              ? _requestRestaurantAccess
+              : null,
         ),
     ];
+  }
+
+  void _requestRestaurantAccess() {
+    final double timestamp = dateFromCurrentDate() / 1.0;
+    database.setMessageDetails(UserMessage(
+        id: documentIdFromCurrentDate(),
+        timestamp: timestamp,
+        fromUid: database.userId,
+        toUid: session.nearestRestaurant.managerId,
+        restaurantId: session.userDetails.nearestRestaurantId,
+        fromRole: ROLE_STAFF,
+        toRole: ROLE_MANAGER,
+        fromName: session.userDetails.name,
+        delivered: false,
+        type: 'Access request to ${session.nearestRestaurant.name}'
+    ));
   }
 
   Widget _userDetailsSection(
