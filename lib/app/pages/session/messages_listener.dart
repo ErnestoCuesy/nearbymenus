@@ -68,6 +68,7 @@ class _MessagesListenerState extends State<MessagesListener> {
                 _notifyUser(message);
                 UserMessage readMessage = UserMessage(
                   id: message.id,
+                  timestamp: message.timestamp,
                   fromUid: message.fromUid,
                   toUid: message.toUid,
                   restaurantId: message.restaurantId,
