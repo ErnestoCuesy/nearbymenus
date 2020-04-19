@@ -4,6 +4,7 @@ import 'package:nearbymenus/app/models/authorizations.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
 import 'package:nearbymenus/app/services/database.dart';
+import 'package:nearbymenus/app/utilities/format.dart';
 import 'package:provider/provider.dart';
 
 class MessagesPage extends StatefulWidget {
@@ -60,7 +61,9 @@ class _MessagesPageState extends State<MessagesPage> {
                   ),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[Text(message.id)],
+                    children: <Widget>[
+                      Text(Format.formatDateTime(message.timestamp.toInt())),
+                    ],
                   ),
                   trailing: Icon(Icons.traffic),
                   onTap: () {
