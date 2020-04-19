@@ -63,13 +63,13 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     try {
       await database.setRestaurantDetails(
         Restaurant(
-            id: id,
-            managerId: database.userId,
-            name: name,
-            restaurantLocation: restaurantLocation,
-            typeOfFood: typeOfFood,
-            coordinates: useCurrentLocation ? session.position : coordinates,
-            deliveryRadius: deliveryRadius,
+          id: id,
+          managerId: database.userId,
+          name: name,
+          restaurantLocation: restaurantLocation,
+          typeOfFood: typeOfFood,
+          coordinates: useCurrentLocation ? session.position : coordinates,
+          deliveryRadius: deliveryRadius,
           workingHoursFrom: workingHoursFrom,
           workingHoursTo: workingHoursTo,
           telephoneNumber: telephoneNumber,
@@ -80,6 +80,16 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
           acceptCash: acceptCash,
           acceptCard: acceptCard,
           acceptZapper: acceptZapper,
+          restaurantFlags: {
+            'open': open,
+            'active': active,
+            'acceptingStaffRequests': acceptingStaffRequests,
+          },
+          paymentFlags: {
+            'acceptCash': acceptCash,
+            'acceptCard': acceptCard,
+            'acceptZapper': acceptZapper,
+          }
         ),
       );
       session.userDetails.nearestRestaurantId = id;
@@ -100,7 +110,8 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
         typeOfFoodValidator.isValid(typeOfFood) &&
         deliveryRadiusValidator.isValid(deliveryRadius) &&
         telephoneNumberValidator.isValid(telephoneNumber) &&
-        workingHoursFrom != null && workingHoursTo != null &&
+        workingHoursFrom != null &&
+        workingHoursTo != null &&
         !isLoading) {
       canSubmitFlag = true;
     }
@@ -113,7 +124,8 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
   }
 
   String get restaurantLocationErrorText {
-    bool showErrorText = !restaurantLocationValidator.isValid(restaurantLocation);
+    bool showErrorText =
+        !restaurantLocationValidator.isValid(restaurantLocation);
     return showErrorText ? invalidRestaurantLocationErrorText : null;
   }
 
@@ -155,23 +167,18 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
   void updateTelephoneNumber(String telephoneNumber) =>
       updateWith(telephoneNumber: telephoneNumber);
 
-  void updateNotes(String notes) =>
-      updateWith(notes: notes);
+  void updateNotes(String notes) => updateWith(notes: notes);
 
-  void updateActive(bool active) =>
-      updateWith(active: active);
+  void updateActive(bool active) => updateWith(active: active);
 
-  void updateOpen(bool open) =>
-      updateWith(open: open);
+  void updateOpen(bool open) => updateWith(open: open);
 
   void updateAcceptingStaffRequests(bool acceptingStaffRequests) =>
       updateWith(acceptingStaffRequests: acceptingStaffRequests);
 
-  void updateAcceptCash(bool acceptCash) =>
-      updateWith(acceptCash: acceptCash);
+  void updateAcceptCash(bool acceptCash) => updateWith(acceptCash: acceptCash);
 
-  void updateAcceptCard(bool acceptCard) =>
-      updateWith(acceptCard: acceptCard);
+  void updateAcceptCard(bool acceptCard) => updateWith(acceptCard: acceptCard);
 
   void updateAcceptZapper(bool acceptZapper) =>
       updateWith(acceptZapper: acceptZapper);
@@ -206,7 +213,8 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     this.notes = notes ?? this.notes;
     this.active = active ?? this.active;
     this.open = open ?? this.open;
-    this.acceptingStaffRequests = acceptingStaffRequests ?? this.acceptingStaffRequests;
+    this.acceptingStaffRequests =
+        acceptingStaffRequests ?? this.acceptingStaffRequests;
     this.acceptCash = acceptCash ?? this.acceptCash;
     this.acceptCard = acceptCard ?? this.acceptCard;
     this.acceptZapper = acceptZapper ?? this.acceptZapper;
