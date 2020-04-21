@@ -62,7 +62,7 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
       id = documentIdFromCurrentDate();
     }
     try {
-      await database.setRestaurantDetails(
+      await database.setRestaurant(
         Restaurant(
           id: id,
           managerId: database.userId,
