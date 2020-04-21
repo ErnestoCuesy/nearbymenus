@@ -114,8 +114,8 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
     try {
       // await Future.delayed(Duration(seconds: 3)); // Simulate slow network
       final useCurrentLocation = await PlatformAlertDialog(
-        title: 'Restaurant location',
-        content: 'Is your current location where the restaurant actually is?',
+        title: 'Confirm restaurant location',
+        content: 'Are you currently at the restaurant? If not, previously saved location, if any, will be preserved.',
         cancelActionText: 'No',
         defaultActionText: 'Yes',
       ).show(context);
@@ -123,7 +123,7 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       Navigator.of(context).pop();
     } on PlatformException catch (e) {
       PlatformExceptionAlertDialog(
-        title: 'Save User Details',
+        title: 'Restaurant Details',
         exception: e,
       ).show(context);
     }
@@ -280,9 +280,6 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       ),
     ];
   }
-
-  // TODO add use current location checkbox
-  // TODO allow recalculation of current location
 
   TextField _buildRestaurantNameTextField() {
     return TextField(
