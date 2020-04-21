@@ -37,6 +37,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
           snapshot: snapshot,
           itemBuilder: (context, restaurant) {
             return Card(
+              margin: EdgeInsets.all(12.0),
               child: ListTile(
                 isThreeLine: true,
                 leading: Icon(Icons.restaurant),
@@ -92,16 +93,15 @@ class _RestaurantPageState extends State<RestaurantPage> {
             .appBarTheme
             .color),
         ),
-        actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.add, color: Theme.of(context).appBarTheme.color,),
-              iconSize: 32.0,
-              padding: const EdgeInsets.only(right: 16.0),
-              onPressed: () => _createRestaurantDetailsPage(context, Restaurant()),
-            ),
-        ],
       ),
       body: _buildContents(context),
+      floatingActionButton: FloatingActionButton(
+        tooltip: 'Add new restaurant',
+        child: Icon(
+          Icons.add,
+        ),
+        onPressed: () => _createRestaurantDetailsPage(context, Restaurant()),
+      ),
     );
   }
 
