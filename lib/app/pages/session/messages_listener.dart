@@ -76,6 +76,7 @@ class _MessagesListenerState extends State<MessagesListener> {
                   toRole: message.toRole,
                   fromName: message.fromName,
                   type: message.type,
+                  authFlag: message.authFlag,
                   delivered: true,
                 );
                 database.setMessageDetails(readMessage);
