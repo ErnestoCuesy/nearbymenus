@@ -25,7 +25,7 @@ abstract class Database {
   Stream<List<Restaurant>> managerRestaurants(String restaurantId);
   Stream<List<Restaurant>> userRestaurant(String restaurantId);
   Future<List<Restaurant>> patronRestaurants();
-  Future<void> setRestaurantDetails(Restaurant restaurant);
+  Future<void> setRestaurant(Restaurant restaurant);
   Future<void> setMessageDetails(UserMessage roleNotification);
   Stream<UserMessage> userMessage(String uid);
   Stream<List<UserMessage>> userMessages(String restaurantId, String uid, String toRole);
@@ -33,6 +33,7 @@ abstract class Database {
   Future<void> setAuthorization(String restaurantId, Authorizations authorizations);
   Future<List<Authorizations>> authorizationsSnapshot();
   Future<void> deleteMessage(String id);
+  Future<void> deleteRestaurant(Restaurant restaurant);
 }
 
 String documentIdFromCurrentDate() => DateTime.now().toIso8601String();
@@ -177,7 +178,7 @@ class FirestoreDatabase implements Database {
 
   // Used when saving restaurant details
   @override
-  Future<void> setRestaurantDetails(Restaurant restaurant) async => await _service
+  Future<void> setRestaurant(Restaurant restaurant) async => await _service
       .setData(path: APIPath.restaurant(restaurant.id), data: restaurant.toMap());
 
   // Used when saving message details
@@ -194,4 +195,10 @@ class FirestoreDatabase implements Database {
   Future<void> deleteMessage(String id) async =>
       await _service.deleteData(path: APIPath.message(id));
 
-}
+  @override
+  Future<void> deleteRestaurant(Restaurant restaurant) async {
+    await _service.deleteData(path: APIPath.restaurant(restaurant.id));
+    await _service.deleteData(path: APIPath.authorization(restaurant.id));
+  }
+
+  }
