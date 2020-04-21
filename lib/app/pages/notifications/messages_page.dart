@@ -19,7 +19,8 @@ class MessagesPage extends StatefulWidget {
 class _MessagesPageState extends State<MessagesPage> {
   Session session;
   Database database;
-  Authorizations authorizations = Authorizations(authorizedRoles: {}, authorizedNames: {});
+  Authorizations authorizations =
+      Authorizations(authorizedRoles: {}, authorizedNames: {});
 
   void _getAuthorizations() async {
     await database.authorizationsSnapshot().then((authorizationsList) {
@@ -44,6 +45,17 @@ class _MessagesPageState extends State<MessagesPage> {
     }
   }
 
+  Future<bool> _confirmDismiss(BuildContext context, UserMessage message) async {
+    if (message.authFlag) {
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Disable access first to delete'),
+        ),
+      );
+    }
+    return !message.authFlag;
+  }
+
   Widget _buildContents(BuildContext context) {
     return StreamBuilder<List<UserMessage>>(
       stream: database.userMessages(
@@ -59,6 +71,7 @@ class _MessagesPageState extends State<MessagesPage> {
                 background: Container(color: Colors.red),
                 key: Key('msg-${message.id}'),
                 direction: DismissDirection.endToStart,
+                confirmDismiss: (_) => _confirmDismiss(context, message),
                 onDismissed: (direction) => _deleteMessage(context, message),
                 child: Card(
                   margin: EdgeInsets.all(12.0),
@@ -71,20 +84,23 @@ class _MessagesPageState extends State<MessagesPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Padding(
-                            padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
+                            padding:
+                                const EdgeInsets.only(top: 8.0, bottom: 4.0),
                             child: Text(
                               message.type,
                               style: Theme.of(context).textTheme.headline6,
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
+                            padding:
+                                const EdgeInsets.only(top: 4.0, bottom: 4.0),
                             child: Text(
                               'Requested by: ${message.fromName}',
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
+                            padding:
+                                const EdgeInsets.only(top: 4.0, bottom: 4.0),
                             child: Text(
                               'Slide the switch to grant or deny',
                             ),
@@ -101,7 +117,7 @@ class _MessagesPageState extends State<MessagesPage> {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 8.0),
                           child: Text(
-                              Format.formatDateTime(message.timestamp.toInt()),
+                            Format.formatDateTime(message.timestamp.toInt()),
                           ),
                         ),
                       ],
@@ -110,7 +126,8 @@ class _MessagesPageState extends State<MessagesPage> {
                       children: [
                         CupertinoSwitch(
                           value: message.authFlag,
-                          onChanged: (flag) => _changeAuthorization(message, flag),
+                          onChanged: (flag) =>
+                              _changeAuthorization(message, flag),
                         ),
                       ],
                     ),
@@ -127,8 +144,10 @@ class _MessagesPageState extends State<MessagesPage> {
       message.authFlag = flag;
     });
     if (flag) {
-      authorizations.authorizedRoles.putIfAbsent(message.fromUid, () => ROLE_STAFF);
-      authorizations.authorizedNames.putIfAbsent(message.fromUid, () => message.fromName);
+      authorizations.authorizedRoles
+          .putIfAbsent(message.fromUid, () => ROLE_STAFF);
+      authorizations.authorizedNames
+          .putIfAbsent(message.fromUid, () => message.fromName);
     } else {
       authorizations.authorizedRoles.remove(message.fromUid);
       authorizations.authorizedNames.remove(message.fromUid);
