@@ -33,6 +33,7 @@ class _AccountPageState extends State<AccountPage> {
   Auth get auth => widget.auth;
   Session get session => widget.session;
   Database get database => widget.database;
+  bool staffRequestPending = false;
 
   Future<void> _signOut() async {
     try {
@@ -66,9 +67,13 @@ class _AccountPageState extends State<AccountPage> {
     final staffAccessSubtitle = 'You are ${staffAccessStatus}allowed to access orders';
     var restaurantStatusTitle = '';
     if (!session.restaurantAccessGranted) {
-      restaurantStatusTitle =  restaurant.acceptingStaffRequests
-          ? 'Tap to request access'
-          : 'Restaurant is not accepting staff requests at the moment';
+      if (staffRequestPending) {
+        restaurantStatusTitle = 'Access request sent, pending approval.';
+      } else {
+        restaurantStatusTitle = restaurant.acceptingStaffRequests
+            ? 'Tap to request access'
+            : 'Restaurant is not accepting staff requests at the moment';
+      }
     }
     return [
       Container(
@@ -156,7 +161,9 @@ class _AccountPageState extends State<AccountPage> {
           sectionTitle: 'Restaurant status',
           cardTitle: staffAccessSubtitle,
           cardSubtitle: restaurantStatusTitle,
-          onPressed: session.nearestRestaurant.acceptingStaffRequests
+          onPressed: session.nearestRestaurant.acceptingStaffRequests &&
+              !staffRequestPending &&
+              !session.restaurantAccessGranted
               ? _requestRestaurantAccess
               : null,
         ),
@@ -175,8 +182,12 @@ class _AccountPageState extends State<AccountPage> {
         toRole: ROLE_MANAGER,
         fromName: session.userDetails.name,
         delivered: false,
-        type: 'Access request to ${session.nearestRestaurant.name}'
+        type: 'Access to ${session.nearestRestaurant.name}',
+        authFlag: false,
     ));
+    setState(() {
+      staffRequestPending = true;
+    });
   }
 
   Widget _userDetailsSection(
