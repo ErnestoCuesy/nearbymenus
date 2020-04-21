@@ -32,9 +32,11 @@ abstract class Database {
   Stream<Authorizations> authorizationsStream(String restaurantId);
   Future<void> setAuthorization(String restaurantId, Authorizations authorizations);
   Future<List<Authorizations>> authorizationsSnapshot();
+  Future<void> deleteMessage(String id);
 }
 
 String documentIdFromCurrentDate() => DateTime.now().toIso8601String();
+int dateFromCurrentDate() => DateTime.now().millisecondsSinceEpoch;
 
 class FirestoreDatabase implements Database {
 
@@ -187,5 +189,9 @@ class FirestoreDatabase implements Database {
   @override
   Future<void> setAuthorization(String restaurantId, Authorizations authorizations) async => await _service
       .setData(path: APIPath.authorization(restaurantId), data: authorizations.toMap());
+
+  @override
+  Future<void> deleteMessage(String id) async =>
+      await _service.deleteData(path: APIPath.message(id));
 
 }
