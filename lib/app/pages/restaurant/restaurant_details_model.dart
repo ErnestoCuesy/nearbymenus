@@ -30,6 +30,7 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
   bool acceptZapper;
   bool isLoading;
   bool submitted;
+  bool dataHasChanged = false;
 
   RestaurantDetailsModel({
     @required this.database,
@@ -101,7 +102,7 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     }
   }
 
-  String get primaryButtonText => 'Save';
+  String get primaryButtonText => dataHasChanged ? 'Save' : 'Select as Current';
 
   bool get canSave {
     bool canSubmitFlag = false;
@@ -220,6 +221,7 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     this.acceptZapper = acceptZapper ?? this.acceptZapper;
     this.isLoading = isLoading ?? this.isLoading;
     this.submitted = this.submitted;
+    dataHasChanged = true;
     notifyListeners();
   }
 }
