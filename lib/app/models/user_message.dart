@@ -11,6 +11,7 @@ class UserMessage {
   final String fromName;
   final bool delivered;
   final String type;
+  bool authFlag;
 
   UserMessage({
     @required this.id,
@@ -23,6 +24,7 @@ class UserMessage {
     @required this.fromName,
     @required this.delivered,
     @required this.type,
+    @required this.authFlag,
   });
 
   factory UserMessage.fromMap(
@@ -40,7 +42,9 @@ class UserMessage {
         toRole: data['toRole'],
         fromName: data['fromName'],
         delivered: data['delivered'],
-        type: data['type']);
+        type: data['type'],
+        authFlag: data['authFlag'],
+    );
   }
 
   Map<String, dynamic> toMap() {
@@ -54,12 +58,13 @@ class UserMessage {
       'toRole': toRole,
       'fromName': fromName,
       'delivered': delivered,
-      'type': type
+      'type': type,
+      'authFlag': authFlag,
     };
   }
 
   @override
   String toString() {
-    return 'id: $id, fromUid: $fromUid, toUid: $toUid, restaurantId: $restaurantId, fromRole: $fromRole, toRole: $toRole, fromName: $fromName, delivered: $delivered, type: $type';
+    return 'id: $id, fromUid: $fromUid, toUid: $toUid, restaurantId: $restaurantId, fromRole: $fromRole, toRole: $toRole, fromName: $fromName, delivered: $delivered, type: $type, authFlag: $authFlag';
   }
 }
