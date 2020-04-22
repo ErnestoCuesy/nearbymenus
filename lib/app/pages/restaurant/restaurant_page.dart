@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -124,24 +126,46 @@ class _RestaurantPageState extends State<RestaurantPage> {
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Your managed restaurants', style: TextStyle(color: Theme
-            .of(context)
-            .appBarTheme
-            .color),
+    if (Platform.isAndroid) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Your managed restaurants', style: TextStyle(color: Theme
+              .of(context)
+              .appBarTheme
+              .color),
+          ),
         ),
-      ),
-      body: _buildContents(context),
-      floatingActionButton: FloatingActionButton(
-        tooltip: 'Add new restaurant',
-        child: Icon(
-          Icons.add,
+        body: _buildContents(context),
+        floatingActionButton: FloatingActionButton(
+          tooltip: 'Add new restaurant',
+          child: Icon(
+            Icons.add,
+          ),
+          onPressed: () => _createRestaurantDetailsPage(context, Restaurant()),
         ),
-        onPressed: () => _createRestaurantDetailsPage(context, Restaurant()),
-      ),
-    );
+      );
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Your managed restaurants', style: TextStyle(color: Theme
+              .of(context)
+              .appBarTheme
+              .color),
+          ),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.add, color: Theme.of(context).appBarTheme.color,),
+              iconSize: 32.0,
+              padding: const EdgeInsets.only(right: 16.0),
+              onPressed: () => _createRestaurantDetailsPage(context, Restaurant()),
+            ),
+          ],
+        ),
+        body: _buildContents(context),
+      );
+    }
   }
 
 }
