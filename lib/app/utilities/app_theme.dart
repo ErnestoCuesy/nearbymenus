@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/utilities/brown_theme.dart';
 import 'package:nearbymenus/app/utilities/greenish_theme.dart';
+import 'package:nearbymenus/app/utilities/orange_theme.dart';
 import 'package:nearbymenus/app/utilities/purple_theme.dart';
 
 class AppTheme {
@@ -18,6 +19,10 @@ class AppTheme {
       break;
       case ColorTheme.GREENISH: {
         theme = GreenishTheme.theme;
+      }
+      break;
+      case ColorTheme.ORANGE: {
+        theme = OrangeTheme.theme;
       }
       break;
     }
