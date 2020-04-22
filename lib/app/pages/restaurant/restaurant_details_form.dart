@@ -312,7 +312,7 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       textCapitalization: TextCapitalization.words,
       cursorColor: Colors.black,
       decoration: InputDecoration(
-        labelText: 'Type of food',
+        labelText: 'Type of cuisine',
         hintText: 'i.e: Mexican',
         errorText: model.typeOfFoodErrorText,
         enabled: model.isLoading == false,
