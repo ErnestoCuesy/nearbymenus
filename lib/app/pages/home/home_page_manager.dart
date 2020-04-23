@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/pages/account/account_page.dart';
 import 'package:nearbymenus/app/pages/home/tab_item.dart';
+import 'package:nearbymenus/app/pages/menu_builder/menu/menu_page.dart';
 import 'package:nearbymenus/app/pages/notifications/messages_page.dart';
 import 'package:nearbymenus/app/pages/restaurant/restaurant_page.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:provider/provider.dart';
-import 'cupertino_home_scaffold_admin.dart';
+import 'cupertino_home_scaffold_manager.dart';
 
 class HomePageManager extends StatefulWidget {
   final String role;
@@ -29,8 +30,8 @@ class _HomePageManagerState extends State<HomePageManager> {
 
   final Map<TabItem, GlobalKey<NavigatorState>> navigatorKeys = {
     TabItem.restaurantDetails: GlobalKey<NavigatorState>(),
-    TabItem.foodMenu: GlobalKey<NavigatorState>(),
-    TabItem.drinksMenu: GlobalKey<NavigatorState>(),
+    TabItem.menuBuilder: GlobalKey<NavigatorState>(),
+    TabItem.menu: GlobalKey<NavigatorState>(),
     TabItem.manageOrders: GlobalKey<NavigatorState>(),
     TabItem.messages: GlobalKey<NavigatorState>(),
     TabItem.userAccount: GlobalKey<NavigatorState>()
@@ -39,8 +40,8 @@ class _HomePageManagerState extends State<HomePageManager> {
   Map<TabItem, WidgetBuilder> get widgetBuilders {
     return {
       TabItem.restaurantDetails: (_) => RestaurantPage(),
-      TabItem.foodMenu: (_) => Placeholder(),
-      TabItem.drinksMenu: (_) => Placeholder(),
+      TabItem.menuBuilder: (_) => MenuPage(),
+      TabItem.menu: (_) => Placeholder(),
       TabItem.manageOrders: (_) => Placeholder(),
       TabItem.messages: (_) => MessagesPage(),
       TabItem.userAccount: (_) => AccountPage(auth: auth, session: session, database: database,)
@@ -62,7 +63,7 @@ class _HomePageManagerState extends State<HomePageManager> {
     database = Provider.of<Database>(context, listen: true);
     return WillPopScope(
       onWillPop: () async =>  !await navigatorKeys[_currentTab].currentState.maybePop(),
-      child: CupertinoHomeScaffoldAdmin(
+      child: CupertinoHomeScaffoldManager(
         currentTab: _currentTab,
         onSelectTab: _select,
         widgetBuilders: widgetBuilders,
