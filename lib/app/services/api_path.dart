@@ -13,4 +13,10 @@ class APIPath {
   static String message(String id) => 'messages/$id';
   static String authorization(String restaurantId) => 'authorizations/$restaurantId';
   static String authorizations() => 'authorizations';
+  static String menu(String menuId) => 'menus/$menuId';
+  static String menus() => 'menus';
+  static String section(String sectionId) => 'sections/$sectionId';
+  static String sections() => 'sections';
+  static String item(String itemId) => 'items/$itemId';
+  static String items() => 'items';
 }
