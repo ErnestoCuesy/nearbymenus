@@ -57,7 +57,7 @@ class _AccountPageState extends State<AccountPage> {
     }
   }
 
-  List<Widget> _buildAccountDetails() {
+  List<Widget> _buildAccountDetails(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final imageAsset = Provider.of<LogoImageAsset>(context);
@@ -67,13 +67,9 @@ class _AccountPageState extends State<AccountPage> {
     final staffAccessSubtitle = 'You are ${staffAccessStatus}allowed to access orders';
     var restaurantStatusTitle = '';
     if (!session.restaurantAccessGranted) {
-      if (staffRequestPending) {
-        restaurantStatusTitle = 'Access request sent, pending approval.';
-      } else {
-        restaurantStatusTitle = restaurant.acceptingStaffRequests
-            ? 'Tap to request access'
-            : 'Restaurant is not accepting staff requests at the moment';
-      }
+      restaurantStatusTitle = restaurant.acceptingStaffRequests
+          ? 'Tap to request access'
+          : 'Restaurant is not accepting staff requests at the moment';
     }
     return [
       Container(
@@ -88,7 +84,7 @@ class _AccountPageState extends State<AccountPage> {
       if (session.userDetails.role == ROLE_PATRON ||
           session.userDetails.role == ROLE_STAFF)
         _restaurantDetailsSection(
-          sectionTitle: 'Restaurant details',
+          sectionTitle: 'Current restaurant',
           restaurantListTile: RestaurantListTile(
             restaurant: restaurant,
             restaurantFound: restaurantFound,
@@ -164,13 +160,13 @@ class _AccountPageState extends State<AccountPage> {
           onPressed: session.nearestRestaurant.acceptingStaffRequests &&
               !staffRequestPending &&
               !session.restaurantAccessGranted
-              ? _requestRestaurantAccess
+              ? () => _requestRestaurantAccess(context)
               : null,
         ),
     ];
   }
 
-  void _requestRestaurantAccess() {
+  void _requestRestaurantAccess(BuildContext context) {
     final double timestamp = dateFromCurrentDate() / 1.0;
     database.setMessageDetails(UserMessage(
         id: documentIdFromCurrentDate(),
@@ -185,9 +181,11 @@ class _AccountPageState extends State<AccountPage> {
         type: 'Access to ${session.nearestRestaurant.name}',
         authFlag: false,
     ));
-    setState(() {
-      staffRequestPending = true;
-    });
+    Scaffold.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Access request sent, pending approval... please wait'),
+      ),
+    );
   }
 
   Widget _userDetailsSection(
@@ -272,7 +270,7 @@ class _AccountPageState extends State<AccountPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
-                children: _buildAccountDetails(),
+                children: _buildAccountDetails(context),
               ),
             ),
           );
@@ -287,7 +285,7 @@ class _AccountPageState extends State<AccountPage> {
 
   @override
   Widget build(BuildContext context) {
-    var accountText = 'Account Details';
+    var accountText = 'Your profile';
     return Scaffold(
       appBar: AppBar(
         title: Text(
