@@ -1,11 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 
 enum TabItem {
   restaurantDetails,
-  foodMenu,
-  drinksMenu,
+  menuBuilder,
+  menu,
   manageOrders,
   myOrders,
   messages,
@@ -64,8 +66,8 @@ abstract class RoleEnumBase {
 
 class PatronRoleEnum extends RoleEnumBase {
   List<TabItem> roleEnumList = const [
-    TabItem.foodMenu,
-    TabItem.drinksMenu,
+    TabItem.menuBuilder,
+    TabItem.menu,
     TabItem.myOrders,
     TabItem.messages,
     TabItem.userAccount
@@ -75,8 +77,8 @@ class PatronRoleEnum extends RoleEnumBase {
 class ManagerRoleEnum extends RoleEnumBase {
   final List<TabItem> roleEnumList = const [
     TabItem.restaurantDetails,
-    TabItem.foodMenu,
-    TabItem.drinksMenu,
+    TabItem.menuBuilder,
+    TabItem.menu,
     TabItem.manageOrders,
     TabItem.messages,
     TabItem.userAccount
@@ -94,8 +96,8 @@ class StaffRoleEnum extends RoleEnumBase {
 class DevRoleEnum extends RoleEnumBase {
   final List<TabItem> roleEnumList = const [
     TabItem.restaurantDetails,
-    TabItem.foodMenu,
-    TabItem.drinksMenu,
+    TabItem.menuBuilder,
+    TabItem.menu,
     TabItem.manageOrders,
     TabItem.myOrders,
     TabItem.messages,
@@ -112,10 +114,10 @@ class TabItemData {
   static const Map<TabItem, TabItemData> allTabs = {
     TabItem.restaurantDetails:
     TabItemData(title: 'Restaurant', icon: Icons.home),
-    TabItem.foodMenu:
-    TabItemData(title: 'Food Menu', icon: Icons.fastfood),
-    TabItem.drinksMenu:
-    TabItemData(title: 'Drinks Menu', icon: Icons.local_bar),
+    TabItem.menuBuilder:
+    TabItemData(title: 'Menu Builder', icon: Icons.build),
+    TabItem.menu:
+    TabItemData(title: 'Menu', icon: Icons.fastfood),
     TabItem.manageOrders:
     TabItemData(title: 'Orders', icon: Icons.assignment),
     TabItem.myOrders:
@@ -123,6 +125,7 @@ class TabItemData {
     TabItem.messages:
     TabItemData(title: 'Messages', icon: Icons.message),
     TabItem.userAccount:
-    TabItemData(title: 'My Account', icon: Icons.person),
+    TabItemData(title: 'Profile', icon: Icons.account_circle),
   };
+
 }
