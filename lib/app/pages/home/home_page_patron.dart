@@ -24,11 +24,11 @@ class _HomePagePatronState extends State<HomePagePatron> {
   Database database;
 
   String get role => widget.role;
-  TabItem _currentTab = TabItem.foodMenu;
+  TabItem _currentTab = TabItem.menuBuilder;
 
   final Map<TabItem, GlobalKey<NavigatorState>> navigatorKeys = {
-    TabItem.foodMenu: GlobalKey<NavigatorState>(),
-    TabItem.drinksMenu: GlobalKey<NavigatorState>(),
+    TabItem.menuBuilder: GlobalKey<NavigatorState>(),
+    TabItem.menu: GlobalKey<NavigatorState>(),
     TabItem.myOrders: GlobalKey<NavigatorState>(),
     TabItem.messages: GlobalKey<NavigatorState>(),
     TabItem.userAccount: GlobalKey<NavigatorState>()
@@ -36,8 +36,8 @@ class _HomePagePatronState extends State<HomePagePatron> {
 
   Map<TabItem, WidgetBuilder> get widgetBuilders {
     return {
-      TabItem.foodMenu: (_) => Placeholder(),
-      TabItem.drinksMenu: (_) => Placeholder(),
+      TabItem.menuBuilder: (_) => Placeholder(),
+      TabItem.menu: (_) => Placeholder(),
       TabItem.myOrders: (_) => Placeholder(),
       TabItem.messages: (_) => MessagesPage(),
       TabItem.userAccount: (_) => AccountPage(auth: auth, session: session, database: database,)
