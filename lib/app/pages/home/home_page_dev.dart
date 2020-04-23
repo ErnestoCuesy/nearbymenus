@@ -27,8 +27,8 @@ class _HomePageDevState extends State<HomePageDev> {
   
   final Map<TabItem, GlobalKey<NavigatorState>> navigatorKeys = {
     TabItem.restaurantDetails: GlobalKey<NavigatorState>(),
-    TabItem.foodMenu: GlobalKey<NavigatorState>(),
-    TabItem.drinksMenu: GlobalKey<NavigatorState>(),
+    TabItem.menuBuilder: GlobalKey<NavigatorState>(),
+    TabItem.menu: GlobalKey<NavigatorState>(),
     TabItem.myOrders: GlobalKey<NavigatorState>(),
     TabItem.manageOrders: GlobalKey<NavigatorState>(),
     TabItem.userAccount: GlobalKey<NavigatorState>()
@@ -37,8 +37,8 @@ class _HomePageDevState extends State<HomePageDev> {
   Map<TabItem, WidgetBuilder> get widgetBuilders {
     return {
       TabItem.restaurantDetails: (_) => Placeholder(),
-      TabItem.foodMenu: (_) => Placeholder(),
-      TabItem.drinksMenu: (_) => Placeholder(),
+      TabItem.menuBuilder: (_) => Placeholder(),
+      TabItem.menu: (_) => Placeholder(),
       TabItem.myOrders: (_) => Placeholder(),
       TabItem.manageOrders: (_) => Placeholder(),
       TabItem.userAccount: (_) => AccountPage(auth: auth, session: session, database: database,)
