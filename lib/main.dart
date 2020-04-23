@@ -7,7 +7,7 @@ void main() {
   var flavour = Flavour.DEV;
   FlavourConfig(
     flavour: flavour,
-    colorTheme: ColorTheme.BROWN,
+    colorTheme: ColorTheme.ORANGE,
     bannerColor: Colors.blue,
   );
 
