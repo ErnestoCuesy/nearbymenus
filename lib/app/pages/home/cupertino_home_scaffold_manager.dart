@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/pages/home/tab_item.dart';
 
-class CupertinoHomeScaffoldAdmin extends StatelessWidget {
-  const CupertinoHomeScaffoldAdmin({
+class CupertinoHomeScaffoldManager extends StatelessWidget {
+  const CupertinoHomeScaffoldManager({
     Key key,
     @required this.currentTab,
     @required this.onSelectTab,
