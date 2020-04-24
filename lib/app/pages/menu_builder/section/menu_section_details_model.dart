@@ -11,6 +11,7 @@ class MenuSectionDetailsModel with MenuSectionValidators, ChangeNotifier {
   String id;
   String menuId;
   String name;
+  String notes;
   bool isLoading;
   bool submitted;
 
@@ -20,6 +21,7 @@ class MenuSectionDetailsModel with MenuSectionValidators, ChangeNotifier {
         this.id,
         this.menuId,
         this.name,
+        this.notes,
         this.isLoading = false,
         this.submitted = false,
       });
@@ -35,6 +37,7 @@ class MenuSectionDetailsModel with MenuSectionValidators, ChangeNotifier {
           id: id,
           menuId: menuId,
           name: name,
+          notes: notes,
         ),
       );
     } catch (e) {
@@ -55,12 +58,16 @@ class MenuSectionDetailsModel with MenuSectionValidators, ChangeNotifier {
 
   void updateMenuSectionName(String name) => updateWith(name: name);
 
+  void updateMenuSectionNotes(String notes) => updateWith(notes: notes);
+
   void updateWith({
     String name,
+    String notes,
     bool isLoading,
     bool submitted,
   }) {
     this.name = name ?? this.name;
+    this.notes = notes ?? this.notes;
     this.isLoading = isLoading ?? this.isLoading;
     this.submitted = this.submitted;
     notifyListeners();
