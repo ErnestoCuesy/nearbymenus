@@ -20,7 +20,8 @@ class MenuSectionDetailsForm extends StatefulWidget {
           session: session,
           id: section.id ?? '',
           menuId: section.menuId ?? '',
-          name: section.name ?? ''
+          name: section.name ?? '',
+          notes: section.notes ?? ''
       ),
       child: Consumer<MenuSectionDetailsModel>(
         builder: (context, model, _) => MenuSectionDetailsForm(
@@ -36,7 +37,9 @@ class MenuSectionDetailsForm extends StatefulWidget {
 
 class _MenuSectionDetailsFormState extends State<MenuSectionDetailsForm> {
   final TextEditingController _menuSectionNameController = TextEditingController();
+  final TextEditingController _menuSectionNotesController = TextEditingController();
   final FocusNode _menuSectionNameFocusNode = FocusNode();
+  final FocusNode _menuSectionNotesFocusNode = FocusNode();
 
   MenuSectionDetailsModel get model => widget.model;
 
@@ -45,13 +48,16 @@ class _MenuSectionDetailsFormState extends State<MenuSectionDetailsForm> {
     super.initState();
     if (model != null) {
       _menuSectionNameController.text = model.name ?? null;
+      _menuSectionNotesController.text = model.notes ?? null;
     }
   }
 
   @override
   void dispose() {
     _menuSectionNameController.dispose();
+    _menuSectionNotesController.dispose();
     _menuSectionNameFocusNode.dispose();
+    _menuSectionNotesFocusNode.dispose();
     super.dispose();
   }
 
@@ -74,9 +80,18 @@ class _MenuSectionDetailsFormState extends State<MenuSectionDetailsForm> {
     FocusScope.of(context).requestFocus(newFocus);
   }
 
+  void _menuSectionNotesEditingComplete() {
+    final newFocus = _menuSectionNotesFocusNode;
+    FocusScope.of(context).requestFocus(newFocus);
+  }
+
   List<Widget> _buildChildren() {
     return [
       _buildMenuSectionNameTextField(),
+      SizedBox(
+        height: 8.0,
+      ),
+      _buildMenuSectionNotesTextField(),
       SizedBox(
         height: 16.0,
       ),
@@ -114,6 +129,28 @@ class _MenuSectionDetailsFormState extends State<MenuSectionDetailsForm> {
       textInputAction: TextInputAction.done,
       onChanged: model.updateMenuSectionName,
       onEditingComplete: () => _menuSectionNameEditingComplete(),
+    );
+  }
+
+  TextField _buildMenuSectionNotesTextField() {
+    return TextField(
+      style: Theme.of(context).inputDecorationTheme.labelStyle,
+      controller: _menuSectionNotesController,
+      focusNode: _menuSectionNotesFocusNode,
+      textCapitalization: TextCapitalization.sentences,
+      cursorColor: Colors.black,
+      decoration: InputDecoration(
+        labelText: 'Notes (optional)',
+        hintText: 'i.e.: All dishes served with salad or chips',
+        enabled: model.isLoading == false,
+      ),
+      autocorrect: false,
+      enableSuggestions: false,
+      enableInteractiveSelection: false,
+      keyboardType: TextInputType.text,
+      textInputAction: TextInputAction.done,
+      onChanged: model.updateMenuSectionNotes,
+      onEditingComplete: () => _menuSectionNotesEditingComplete(),
     );
   }
 
