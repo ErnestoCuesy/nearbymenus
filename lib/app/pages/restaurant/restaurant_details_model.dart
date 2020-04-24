@@ -102,7 +102,7 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     }
   }
 
-  String get primaryButtonText => dataHasChanged ? 'Save' : 'Select as Current';
+  String get primaryButtonText => 'Save';
 
   bool get canSave {
     bool canSubmitFlag = false;
