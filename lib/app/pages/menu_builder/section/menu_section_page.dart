@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:nearbymenus/app/common_widgets/list_items_builder.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
+import 'package:nearbymenus/app/common_widgets/platform_trailing_icon.dart';
 import 'package:nearbymenus/app/models/section.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_builder/item/menu_item_page.dart';
@@ -15,8 +16,10 @@ import 'package:provider/provider.dart';
 
 class MenuSectionPage extends StatefulWidget {
   final String menuId;
+  final String menuName;
 
-  const MenuSectionPage({Key key, this.menuId}) : super(key: key);
+  const MenuSectionPage({Key key, this.menuId, this.menuName})
+      : super(key: key);
 
   @override
   _MenuSectionPageState createState() => _MenuSectionPageState();
@@ -86,22 +89,24 @@ class _MenuSectionPageState extends State<MenuSectionPage> {
                         ),
                       ],
                     ),
+                    subtitle: Text(section.notes ?? ''),
                     trailing: IconButton(
                       onPressed: () => Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (BuildContext context) => MenuItemPage(sectionId: section.id,),
+                          builder: (BuildContext context) => MenuItemPage(
+                            sectionId: section.id,
+                            sectionName: section.name,
+                          ),
                         ),
                       ),
-                      icon: Icon(
-                        Icons.arrow_forward_ios,
-                      ),
+                      icon: PlatformTrailingIcon(),
                     ),
-                    onTap: () => _createMenuSectionDetailsPage(context, section),
+                    onTap: () =>
+                        _createMenuSectionDetailsPage(context, section),
                   ),
                 ),
               );
-            }
-        );
+            });
       },
     );
   }
@@ -114,10 +119,8 @@ class _MenuSectionPageState extends State<MenuSectionPage> {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            'Menu sections', style: TextStyle(color: Theme
-              .of(context)
-              .appBarTheme
-              .color),
+            '${widget.menuName} menu sections',
+            style: TextStyle(color: Theme.of(context).appBarTheme.color),
           ),
         ),
         body: _buildContents(context),
@@ -126,24 +129,27 @@ class _MenuSectionPageState extends State<MenuSectionPage> {
           child: Icon(
             Icons.add,
           ),
-          onPressed: () => _createMenuSectionDetailsPage(context, Section(menuId: widget.menuId)),
+          onPressed: () => _createMenuSectionDetailsPage(
+              context, Section(menuId: widget.menuId)),
         ),
       );
     } else {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            'Menu sections', style: TextStyle(color: Theme
-              .of(context)
-              .appBarTheme
-              .color),
+            '${widget.menuName} menu sections',
+            style: TextStyle(color: Theme.of(context).appBarTheme.color),
           ),
           actions: <Widget>[
             IconButton(
-              icon: Icon(Icons.add, color: Theme.of(context).appBarTheme.color,),
+              icon: Icon(
+                Icons.add,
+                color: Theme.of(context).appBarTheme.color,
+              ),
               iconSize: 32.0,
               padding: const EdgeInsets.only(right: 16.0),
-              onPressed: () => _createMenuSectionDetailsPage(context, Section(menuId: widget.menuId)),
+              onPressed: () => _createMenuSectionDetailsPage(
+                  context, Section(menuId: widget.menuId)),
             ),
           ],
         ),
@@ -151,5 +157,4 @@ class _MenuSectionPageState extends State<MenuSectionPage> {
       );
     }
   }
-
 }
