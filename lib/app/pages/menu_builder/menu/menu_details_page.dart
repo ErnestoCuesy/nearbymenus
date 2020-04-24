@@ -8,8 +8,9 @@ class MenuDetailsPage extends StatelessWidget {
   final Session session;
   final Database database;
   final Menu menu;
+  final String restaurantId;
 
-  const MenuDetailsPage({Key key, this.session, this.database, this.menu}) : super(key: key);
+  const MenuDetailsPage({Key key, this.session, this.database, this.menu, this.restaurantId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +24,7 @@ class MenuDetailsPage extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Card(
             child: MenuDetailsForm.create(
-              context, session, database, menu),
+              context, session, database, menu, restaurantId),
             ),
           ),
         ),
