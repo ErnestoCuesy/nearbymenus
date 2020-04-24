@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:nearbymenus/app/common_widgets/list_items_builder.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
+import 'package:nearbymenus/app/common_widgets/platform_trailing_icon.dart';
 import 'package:nearbymenus/app/models/menu.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_builder/menu/menu_details_page.dart';
@@ -14,6 +15,12 @@ import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
 class MenuPage extends StatefulWidget {
+  final String restaurantId;
+  final String restaurantName;
+
+  const MenuPage({Key key, this.restaurantId, this.restaurantName})
+      : super(key: key);
+
   @override
   _MenuPageState createState() => _MenuPageState();
 }
@@ -30,6 +37,7 @@ class _MenuPageState extends State<MenuPage> {
           session: session,
           database: database,
           menu: menu,
+          restaurantId: widget.restaurantId,
         ),
       ),
     );
@@ -57,7 +65,7 @@ class _MenuPageState extends State<MenuPage> {
 
   Widget _buildContents(BuildContext context) {
     return StreamBuilder<List<Menu>>(
-      stream: database.restaurantMenus(session.nearestRestaurant.id),
+      stream: database.restaurantMenus(widget.restaurantId),
       builder: (context, snapshot) {
         return ListItemsBuilder<Menu>(
             snapshot: snapshot,
@@ -72,7 +80,7 @@ class _MenuPageState extends State<MenuPage> {
                   margin: EdgeInsets.all(12.0),
                   child: ListTile(
                     isThreeLine: false,
-                    leading: Icon(Icons.menu),
+                    leading: Icon(Icons.link),
                     title: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
@@ -82,15 +90,17 @@ class _MenuPageState extends State<MenuPage> {
                         ),
                       ],
                     ),
+                    subtitle: Text(menu.notes ?? ''),
                     trailing: IconButton(
                       onPressed: () => Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (BuildContext context) => MenuSectionPage(menuId: menu.id,),
+                          builder: (BuildContext context) => MenuSectionPage(
+                            menuId: menu.id,
+                            menuName: menu.name,
+                          ),
                         ),
                       ),
-                      icon: Icon(
-                        Icons.arrow_forward_ios,
-                      ),
+                      icon: PlatformTrailingIcon(),
                     ),
                     onTap: () => _createMenuDetailsPage(context, menu),
                   ),
@@ -109,7 +119,7 @@ class _MenuPageState extends State<MenuPage> {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            'Your menus',
+            '${widget.restaurantName} menus',
             style: TextStyle(color: Theme.of(context).appBarTheme.color),
           ),
         ),
@@ -126,7 +136,7 @@ class _MenuPageState extends State<MenuPage> {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            'Your menus',
+            '${widget.restaurantName} menus',
             style: TextStyle(color: Theme.of(context).appBarTheme.color),
           ),
           actions: <Widget>[
