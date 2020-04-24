@@ -13,13 +13,15 @@ class MenuDetailsForm extends StatefulWidget {
 
   const MenuDetailsForm({Key key, this.model}) : super(key: key);
 
-  static Widget create(BuildContext context, Session session, Database database, Menu menu) {
+  static Widget create(BuildContext context, Session session, Database database, Menu menu, String restaurantId) {
     return ChangeNotifierProvider<MenuDetailsModel>(
       create: (context) => MenuDetailsModel(
         database: database,
         session: session,
         id: menu.id ?? '',
-        name: menu.name ?? ''
+        name: menu.name ?? '',
+        notes: menu.notes ?? '',
+        restaurantId: restaurantId
       ),
       child: Consumer<MenuDetailsModel>(
         builder: (context, model, _) => MenuDetailsForm(
@@ -35,7 +37,9 @@ class MenuDetailsForm extends StatefulWidget {
 
 class _MenuDetailsFormState extends State<MenuDetailsForm> {
   final TextEditingController _menuNameController = TextEditingController();
+  final TextEditingController _menuNotesController = TextEditingController();
   final FocusNode _menuNameFocusNode = FocusNode();
+  final FocusNode _menuNotesFocusNode = FocusNode();
 
   MenuDetailsModel get model => widget.model;
 
@@ -44,13 +48,16 @@ class _MenuDetailsFormState extends State<MenuDetailsForm> {
     super.initState();
     if (model != null) {
       _menuNameController.text = model.name ?? null;
+      _menuNotesController.text = model.notes ?? null;
     }
   }
 
   @override
   void dispose() {
     _menuNameController.dispose();
+    _menuNotesController.dispose();
     _menuNameFocusNode.dispose();
+    _menuNotesFocusNode.dispose();
     super.dispose();
   }
 
@@ -68,14 +75,23 @@ class _MenuDetailsFormState extends State<MenuDetailsForm> {
 
   void _menuNameEditingComplete() {
     final newFocus = model.menuNameValidator.isValid(model.name)
-        ? _menuNameFocusNode
+        ? _menuNotesFocusNode
         : _menuNameFocusNode;
+    FocusScope.of(context).requestFocus(newFocus);
+  }
+
+  void _menuNotesEditingComplete() {
+    final newFocus = _menuNotesFocusNode;
     FocusScope.of(context).requestFocus(newFocus);
   }
 
   List<Widget> _buildChildren() {
     return [
       _buildMenuNameTextField(),
+      SizedBox(
+        height: 8.0,
+      ),
+      _buildMenuNotesTextField(),
       SizedBox(
         height: 16.0,
       ),
@@ -113,6 +129,28 @@ class _MenuDetailsFormState extends State<MenuDetailsForm> {
       textInputAction: TextInputAction.done,
       onChanged: model.updateMenuName,
       onEditingComplete: () => _menuNameEditingComplete(),
+    );
+  }
+
+  TextField _buildMenuNotesTextField() {
+    return TextField(
+      style: Theme.of(context).inputDecorationTheme.labelStyle,
+      controller: _menuNotesController,
+      focusNode: _menuNotesFocusNode,
+      textCapitalization: TextCapitalization.sentences,
+      cursorColor: Colors.black,
+      decoration: InputDecoration(
+        labelText: 'Notes (optional)',
+        hintText: 'i.e.: From 8 am to 12 pm only',
+        enabled: model.isLoading == false,
+      ),
+      autocorrect: false,
+      enableSuggestions: false,
+      enableInteractiveSelection: false,
+      keyboardType: TextInputType.text,
+      textInputAction: TextInputAction.done,
+      onChanged: model.updateMenuNotes,
+      onEditingComplete: () => _menuNotesEditingComplete(),
     );
   }
 
