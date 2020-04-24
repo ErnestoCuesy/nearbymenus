@@ -15,8 +15,9 @@ import 'package:provider/provider.dart';
 
 class MenuItemPage extends StatefulWidget {
   final String sectionId;
+  final String sectionName;
 
-  const MenuItemPage({Key key, this.sectionId}) : super(key: key);
+  const MenuItemPage({Key key, this.sectionId, this.sectionName}) : super(key: key);
 
   @override
   _MenuItemPageState createState() => _MenuItemPageState();
@@ -125,7 +126,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            'Menu items', style: TextStyle(color: Theme
+            '${widget.sectionName} section items', style: TextStyle(color: Theme
               .of(context)
               .appBarTheme
               .color),
@@ -133,7 +134,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
         ),
         body: _buildContents(context),
         floatingActionButton: FloatingActionButton(
-          tooltip: 'Add new menu item',
+          tooltip: 'Add new item',
           child: Icon(
             Icons.add,
           ),
@@ -144,7 +145,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            'Menu items', style: TextStyle(color: Theme
+            '${widget.sectionName} section items', style: TextStyle(color: Theme
               .of(context)
               .appBarTheme
               .color),
