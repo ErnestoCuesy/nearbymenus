@@ -11,6 +11,7 @@ class MenuDetailsModel with RestaurantMenuValidators, ChangeNotifier {
   String id;
   String restaurantId;
   String name;
+  String notes;
   bool isLoading;
   bool submitted;
 
@@ -20,6 +21,7 @@ class MenuDetailsModel with RestaurantMenuValidators, ChangeNotifier {
       this.id,
       this.restaurantId,
       this.name,
+      this.notes,
       this.isLoading = false,
       this.submitted = false,
   });
@@ -33,8 +35,9 @@ class MenuDetailsModel with RestaurantMenuValidators, ChangeNotifier {
       await database.setMenu(
         Menu(
             id: id,
-            restaurantId: session.nearestRestaurant.id,
+            restaurantId: restaurantId,
             name: name,
+            notes: notes,
         ),
       );
     } catch (e) {
@@ -55,12 +58,16 @@ class MenuDetailsModel with RestaurantMenuValidators, ChangeNotifier {
 
   void updateMenuName(String name) => updateWith(name: name);
 
+  void updateMenuNotes(String notes) => updateWith(notes: notes);
+
   void updateWith({
     String name,
+    String notes,
     bool isLoading,
     bool submitted,
   }) {
     this.name = name ?? this.name;
+    this.notes = notes ?? this.notes;
     this.isLoading = isLoading ?? this.isLoading;
     this.submitted = this.submitted;
     notifyListeners();
