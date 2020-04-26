@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:nearbymenus/app/services/database.dart';
 
 class Restaurant {
   final String id;
@@ -22,6 +23,7 @@ class Restaurant {
   final bool acceptZapper;
   final Map<String, dynamic> restaurantFlags;
   final Map<String, dynamic> paymentFlags;
+  final Map<dynamic, dynamic> restaurantMenus;
 
   Restaurant({
     this.id,
@@ -43,6 +45,7 @@ class Restaurant {
     this.acceptZapper,
     this.restaurantFlags,
     this.paymentFlags,
+    this.restaurantMenus,
   });
 
   factory Restaurant.fromMap(Map<dynamic, dynamic> value, String documentId) {
@@ -76,6 +79,7 @@ class Restaurant {
         acceptZapper: value['paymentFlags']['acceptZapper'],
         restaurantFlags: value['restaurantFlags'],
         paymentFlags: value['paymentFlags'],
+        restaurantMenus: value['restaurantMenus'] ?? {},
     );
   }
 
@@ -96,14 +100,13 @@ class Restaurant {
       'hoursToMinutes': workingHoursTo.minute,
       'telephoneNumber': telephoneNumber,
       'notes': notes,
-//      'active': active,
-//      'open': open,
-//      'acceptingStaffRequests': acceptingStaffRequests,
-//      'acceptCash': acceptCash,
-//      'acceptCard': acceptCard,
-//      'acceptZapper': acceptZapper,
       'restaurantFlags': restaurantFlags,
       'paymentFlags': paymentFlags,
+      'restaurantMenus': restaurantMenus ?? {},
     };
+  }
+
+  static Future<void> setRestaurant(Database database, Restaurant restaurant) async {
+    await database.setRestaurant(restaurant);
   }
 }
