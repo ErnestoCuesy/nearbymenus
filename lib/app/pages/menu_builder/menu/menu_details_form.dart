@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/models/menu.dart';
+import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_builder/menu/menu_details_model.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -13,16 +14,21 @@ class MenuDetailsForm extends StatefulWidget {
 
   const MenuDetailsForm({Key key, this.model}) : super(key: key);
 
-  static Widget create(BuildContext context, Session session, Database database, Menu menu, String restaurantId) {
+  static Widget create({
+    BuildContext context,
+    Session session,
+    Database database,
+    Menu menu,
+    Restaurant restaurant,
+  }) {
     return ChangeNotifierProvider<MenuDetailsModel>(
       create: (context) => MenuDetailsModel(
-        database: database,
-        session: session,
-        id: menu.id ?? '',
-        name: menu.name ?? '',
-        notes: menu.notes ?? '',
-        restaurantId: restaurantId
-      ),
+          database: database,
+          session: session,
+          id: menu.id ?? '',
+          name: menu.name ?? '',
+          notes: menu.notes ?? '',
+          restaurant: restaurant),
       child: Consumer<MenuDetailsModel>(
         builder: (context, model, _) => MenuDetailsForm(
           model: model,

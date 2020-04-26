@@ -3,6 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/models/item.dart';
+import 'package:nearbymenus/app/models/menu.dart';
+import 'package:nearbymenus/app/models/restaurant.dart';
+import 'package:nearbymenus/app/models/section.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
@@ -14,17 +17,27 @@ class MenuItemDetailsForm extends StatefulWidget {
 
   const MenuItemDetailsForm({Key key, this.model}) : super(key: key);
 
-  static Widget create(BuildContext context, Session session, Database database, Item item) {
+  static Widget create({
+    BuildContext context,
+    Session session,
+    Database database,
+    Restaurant restaurant,
+    Menu menu,
+    Section section,
+    Item item,
+  }) {
     return ChangeNotifierProvider<MenuItemDetailsModel>(
       create: (context) => MenuItemDetailsModel(
-          database: database,
-          session: session,
-          id: item.id ?? '',
-          sectionId: item.sectionId ?? '',
-          name: item.name ?? '',
-          description: item.description ?? '',
-          price: item.price ?? 0.0,
-          isExtra: item.isExtra ?? false,
+        database: database,
+        session: session,
+        restaurant: restaurant,
+        menu: menu,
+        section: section,
+        id: item.id ?? '',
+        name: item.name ?? '',
+        description: item.description ?? '',
+        price: item.price ?? 0.0,
+        isExtra: item.isExtra ?? false,
       ),
       child: Consumer<MenuItemDetailsModel>(
         builder: (context, model, _) => MenuItemDetailsForm(
@@ -40,8 +53,10 @@ class MenuItemDetailsForm extends StatefulWidget {
 
 class _MenuItemDetailsFormState extends State<MenuItemDetailsForm> {
   final TextEditingController _menuItemNameController = TextEditingController();
-  final TextEditingController _menuItemDescriptionController = TextEditingController();
-  final TextEditingController _menuItemPriceController = TextEditingController();
+  final TextEditingController _menuItemDescriptionController =
+      TextEditingController();
+  final TextEditingController _menuItemPriceController =
+      TextEditingController();
   final FocusNode _menuItemNameFocusNode = FocusNode();
   final FocusNode _menuItemDescriptionFocusNode = FocusNode();
   final FocusNode _menuItemPriceFocusNode = FocusNode();
@@ -89,9 +104,10 @@ class _MenuItemDetailsFormState extends State<MenuItemDetailsForm> {
   }
 
   void _menuItemDescriptionEditingComplete() {
-    final newFocus = model.menuItemDescriptionValidator.isValid(model.description)
-        ? _menuItemDescriptionFocusNode
-        : _menuItemNameFocusNode;
+    final newFocus =
+        model.menuItemDescriptionValidator.isValid(model.description)
+            ? _menuItemDescriptionFocusNode
+            : _menuItemNameFocusNode;
     FocusScope.of(context).requestFocus(newFocus);
   }
 
@@ -195,7 +211,7 @@ class _MenuItemDetailsFormState extends State<MenuItemDetailsForm> {
       autocorrect: false,
       enableSuggestions: false,
       enableInteractiveSelection: false,
-      keyboardType: TextInputType.number,
+      keyboardType: TextInputType.numberWithOptions(decimal: true),
       textInputAction: TextInputAction.done,
       onChanged: (value) => model.updateMenuItemPrice(double.tryParse(value)),
       onEditingComplete: () => _menuItemPriceEditingComplete(),

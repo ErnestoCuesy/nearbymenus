@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/models/menu.dart';
+import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/sign_in/validators.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -8,8 +9,8 @@ import 'package:nearbymenus/app/services/database.dart';
 class MenuDetailsModel with RestaurantMenuValidators, ChangeNotifier {
   final Database database;
   final Session session;
+  Restaurant restaurant;
   String id;
-  String restaurantId;
   String name;
   String notes;
   bool isLoading;
@@ -17,9 +18,9 @@ class MenuDetailsModel with RestaurantMenuValidators, ChangeNotifier {
 
   MenuDetailsModel(
       {@required this.database,
-      this.session,
+       @required this.session,
+      this.restaurant,
       this.id,
-      this.restaurantId,
       this.name,
       this.notes,
       this.isLoading = false,
@@ -31,15 +32,20 @@ class MenuDetailsModel with RestaurantMenuValidators, ChangeNotifier {
     if (id == null || id == '') {
       id = documentIdFromCurrentDate();
     }
+    final menu = Menu(
+      id: id,
+      restaurantId: restaurant.id,
+      name: name,
+      notes: notes,
+    );
     try {
-      await database.setMenu(
-        Menu(
-            id: id,
-            restaurantId: restaurantId,
-            name: name,
-            notes: notes,
-        ),
-      );
+      await database.setMenu(menu);
+      if (restaurant.restaurantMenus.containsKey(id)) {
+        restaurant.restaurantMenus.update(id, (_) => menu.toMap());
+      } else {
+        restaurant.restaurantMenus.putIfAbsent(id, () => menu.toMap());
+      }
+      Restaurant.setRestaurant(database, restaurant);
     } catch (e) {
       print(e);
       updateWith(isLoading: false);

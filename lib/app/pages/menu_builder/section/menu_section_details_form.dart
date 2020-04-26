@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
+import 'package:nearbymenus/app/models/menu.dart';
+import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/section.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_builder/section/menu_section_details_model.dart';
@@ -13,15 +15,23 @@ class MenuSectionDetailsForm extends StatefulWidget {
 
   const MenuSectionDetailsForm({Key key, this.model}) : super(key: key);
 
-  static Widget create(BuildContext context, Session session, Database database, Section section) {
+  static Widget create({
+    BuildContext context,
+    Session session,
+    Database database,
+    Restaurant restaurant,
+    Menu menu,
+    Section section,
+  }) {
     return ChangeNotifierProvider<MenuSectionDetailsModel>(
       create: (context) => MenuSectionDetailsModel(
-          database: database,
-          session: session,
-          id: section.id ?? '',
-          menuId: section.menuId ?? '',
-          name: section.name ?? '',
-          notes: section.notes ?? ''
+        database: database,
+        session: session,
+        restaurant: restaurant,
+        menu: menu,
+        id: section.id ?? '',
+        name: section.name ?? '',
+        notes: section.notes ?? '',
       ),
       child: Consumer<MenuSectionDetailsModel>(
         builder: (context, model, _) => MenuSectionDetailsForm(
@@ -36,8 +46,10 @@ class MenuSectionDetailsForm extends StatefulWidget {
 }
 
 class _MenuSectionDetailsFormState extends State<MenuSectionDetailsForm> {
-  final TextEditingController _menuSectionNameController = TextEditingController();
-  final TextEditingController _menuSectionNotesController = TextEditingController();
+  final TextEditingController _menuSectionNameController =
+      TextEditingController();
+  final TextEditingController _menuSectionNotesController =
+      TextEditingController();
   final FocusNode _menuSectionNameFocusNode = FocusNode();
   final FocusNode _menuSectionNotesFocusNode = FocusNode();
 

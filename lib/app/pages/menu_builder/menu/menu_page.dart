@@ -8,6 +8,7 @@ import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_trailing_icon.dart';
 import 'package:nearbymenus/app/models/menu.dart';
+import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_builder/menu/menu_details_page.dart';
 import 'package:nearbymenus/app/pages/menu_builder/section/menu_section_page.dart';
@@ -15,10 +16,9 @@ import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
 class MenuPage extends StatefulWidget {
-  final String restaurantId;
-  final String restaurantName;
+  final Restaurant restaurant;
 
-  const MenuPage({Key key, this.restaurantId, this.restaurantName})
+  const MenuPage({Key key, this.restaurant,})
       : super(key: key);
 
   @override
@@ -36,8 +36,8 @@ class _MenuPageState extends State<MenuPage> {
         builder: (context) => MenuDetailsPage(
           session: session,
           database: database,
+          restaurant: widget.restaurant,
           menu: menu,
-          restaurantId: widget.restaurantId,
         ),
       ),
     );
@@ -65,7 +65,7 @@ class _MenuPageState extends State<MenuPage> {
 
   Widget _buildContents(BuildContext context) {
     return StreamBuilder<List<Menu>>(
-      stream: database.restaurantMenus(widget.restaurantId),
+      stream: database.restaurantMenus(widget.restaurant.id),
       builder: (context, snapshot) {
         return ListItemsBuilder<Menu>(
             snapshot: snapshot,
@@ -95,8 +95,8 @@ class _MenuPageState extends State<MenuPage> {
                       onPressed: () => Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (BuildContext context) => MenuSectionPage(
-                            menuId: menu.id,
-                            menuName: menu.name,
+                            restaurant: widget.restaurant,
+                            menu: menu,
                           ),
                         ),
                       ),
@@ -119,7 +119,7 @@ class _MenuPageState extends State<MenuPage> {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            '${widget.restaurantName} menus',
+            '${widget.restaurant.name}',
             style: TextStyle(color: Theme.of(context).appBarTheme.color),
           ),
         ),
@@ -136,7 +136,7 @@ class _MenuPageState extends State<MenuPage> {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            '${widget.restaurantName} menus',
+            '${widget.restaurant.name}',
             style: TextStyle(color: Theme.of(context).appBarTheme.color),
           ),
           actions: <Widget>[

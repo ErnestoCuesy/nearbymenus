@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:nearbymenus/app/models/menu.dart';
+import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/section.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/sign_in/validators.dart';
@@ -8,8 +10,9 @@ import 'package:nearbymenus/app/services/database.dart';
 class MenuSectionDetailsModel with MenuSectionValidators, ChangeNotifier {
   final Database database;
   final Session session;
+  final Menu menu;
+  Restaurant restaurant;
   String id;
-  String menuId;
   String name;
   String notes;
   bool isLoading;
@@ -17,9 +20,10 @@ class MenuSectionDetailsModel with MenuSectionValidators, ChangeNotifier {
 
   MenuSectionDetailsModel(
       {@required this.database,
-        this.session,
+       @required this.session,
+       @required this.menu,
+       @required this.restaurant,
         this.id,
-        this.menuId,
         this.name,
         this.notes,
         this.isLoading = false,
@@ -31,15 +35,21 @@ class MenuSectionDetailsModel with MenuSectionValidators, ChangeNotifier {
     if (id == null || id == '') {
       id = documentIdFromCurrentDate();
     }
+    final section = Section(
+      id: id,
+      menuId: menu.id,
+      name: name,
+      notes: notes,
+    );
     try {
-      await database.setSection(
-        Section(
-          id: id,
-          menuId: menuId,
-          name: name,
-          notes: notes,
-        ),
-      );
+      await database.setSection(section);
+      final Map<dynamic, dynamic> sections = restaurant.restaurantMenus[menu.id];
+      if (sections.containsKey(id)) {
+        restaurant.restaurantMenus[menu.id].update(id, (_) => section.toMap());
+      } else {
+        restaurant.restaurantMenus[menu.id].putIfAbsent(id, () => section.toMap());
+      }
+      await Restaurant.setRestaurant(database, restaurant);
     } catch (e) {
       print(e);
       updateWith(isLoading: false);

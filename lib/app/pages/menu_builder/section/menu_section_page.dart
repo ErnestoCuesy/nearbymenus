@@ -7,6 +7,8 @@ import 'package:nearbymenus/app/common_widgets/list_items_builder.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_trailing_icon.dart';
+import 'package:nearbymenus/app/models/menu.dart';
+import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/section.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_builder/item/menu_item_page.dart';
@@ -15,10 +17,10 @@ import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
 class MenuSectionPage extends StatefulWidget {
-  final String menuId;
-  final String menuName;
+  final Restaurant restaurant;
+  final Menu menu;
 
-  const MenuSectionPage({Key key, this.menuId, this.menuName})
+  const MenuSectionPage({Key key, this.restaurant, this.menu,})
       : super(key: key);
 
   @override
@@ -36,6 +38,8 @@ class _MenuSectionPageState extends State<MenuSectionPage> {
         builder: (context) => MenuSectionDetailsPage(
           session: session,
           database: database,
+          restaurant: widget.restaurant,
+          menu: widget.menu,
           section: section,
         ),
       ),
@@ -64,7 +68,7 @@ class _MenuSectionPageState extends State<MenuSectionPage> {
 
   Widget _buildContents(BuildContext context) {
     return StreamBuilder<List<Section>>(
-      stream: database.menuSections(widget.menuId),
+      stream: database.menuSections(widget.menu.id),
       builder: (context, snapshot) {
         return ListItemsBuilder<Section>(
             snapshot: snapshot,
@@ -94,8 +98,9 @@ class _MenuSectionPageState extends State<MenuSectionPage> {
                       onPressed: () => Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (BuildContext context) => MenuItemPage(
-                            sectionId: section.id,
-                            sectionName: section.name,
+                            restaurant: widget.restaurant,
+                            menu: widget.menu,
+                            section: section,
                           ),
                         ),
                       ),
@@ -119,7 +124,7 @@ class _MenuSectionPageState extends State<MenuSectionPage> {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            '${widget.menuName} menu sections',
+            '${widget.menu.name}',
             style: TextStyle(color: Theme.of(context).appBarTheme.color),
           ),
         ),
@@ -130,14 +135,14 @@ class _MenuSectionPageState extends State<MenuSectionPage> {
             Icons.add,
           ),
           onPressed: () => _createMenuSectionDetailsPage(
-              context, Section(menuId: widget.menuId)),
+              context, Section(menuId: widget.menu.id)),
         ),
       );
     } else {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            '${widget.menuName} menu sections',
+            '${widget.menu.name}',
             style: TextStyle(color: Theme.of(context).appBarTheme.color),
           ),
           actions: <Widget>[
@@ -149,7 +154,7 @@ class _MenuSectionPageState extends State<MenuSectionPage> {
               iconSize: 32.0,
               padding: const EdgeInsets.only(right: 16.0),
               onPressed: () => _createMenuSectionDetailsPage(
-                  context, Section(menuId: widget.menuId)),
+                  context, Section(menuId: widget.menu.id)),
             ),
           ],
         ),
