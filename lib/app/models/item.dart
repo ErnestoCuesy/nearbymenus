@@ -5,6 +5,7 @@ class Item {
   final String description;
   final double price;
   final bool isExtra;
+  final bool isSide;
 
   Item({
     this.id,
@@ -13,6 +14,7 @@ class Item {
     this.description,
     this.price,
     this.isExtra,
+    this.isSide,
   });
 
   factory Item.fromMap(Map<String, dynamic> data, String documentID) {
@@ -26,6 +28,7 @@ class Item {
       description: data['description'],
       price: data['price'],
       isExtra: data['isExtra'],
+      isSide: data['isSide'],
     );
   }
 
@@ -37,12 +40,13 @@ class Item {
       'description': description,
       'price': price,
       'isExtra': isExtra,
+      'isSide': isSide,
     };
   }
 
   @override
   String toString() {
-    return 'id: $id, sectionId: $sectionId, name: $name, description: $description, price: $price, isExtra: $isExtra';
+    return 'id: $id, sectionId: $sectionId, name: $name, description: $description, price: $price, isExtra: $isExtra, isSide: $isSide';
   }
 
 }
