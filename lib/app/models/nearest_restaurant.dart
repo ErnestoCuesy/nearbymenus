@@ -21,22 +21,12 @@ class NearRestaurantBloc {
     List<Restaurant> resList = List<Restaurant>();
     source.then((rest) {
       rest.forEach((res) async {
-        if (useStaffFilter) {
-          if (res.acceptingStaffRequests) {
-            await Geolocator().distanceBetween(userCoordinates.latitude, userCoordinates.longitude, res.coordinates.latitude, res.coordinates.longitude).then((distance) {
-              if (res.active && distance < res.deliveryRadius) {
-                resList.add(res);
-              }
-            });
+        await Geolocator().distanceBetween(userCoordinates.latitude, userCoordinates.longitude, res.coordinates.latitude, res.coordinates.longitude).then((distance) {
+          if (res.active && distance < res.deliveryRadius) {
+            resList.add(res);
           }
-        } else {
-          await Geolocator().distanceBetween(userCoordinates.latitude, userCoordinates.longitude, res.coordinates.latitude, res.coordinates.longitude).then((distance) {
-            if (res.active && distance < res.deliveryRadius) {
-              resList.add(res);
-            }
-          });
-        }
-        _stream.add(resList);
+        });
+      _stream.add(resList);
       });
     });
   }
