@@ -6,6 +6,10 @@ abstract class NumberValidator {
   bool isValid(int value);
 }
 
+abstract class DoubleNumberValidator {
+  bool isValid(double value);
+}
+
 class NonEmptyStringValidator implements StringValidator {
   @override
   bool isValid(String value) {
@@ -20,7 +24,14 @@ class NumericFieldValidator implements NumberValidator{
     if (value == null || value.isNaN) return false;
     return true;
   }
+}
 
+class DoubleNumericFieldValidator implements DoubleNumberValidator{
+  @override
+  bool isValid(double value) {
+    if (value == null || value.isNaN) return false;
+    return true;
+  }
 }
 
 class UserCredentialsValidators {
@@ -59,3 +70,21 @@ class JobNameAndRatePerHourValidators {
   final String invalidRatePerHourText = 'Rate per hour must be a number';
 }
 
+class RestaurantMenuValidators {
+  final StringValidator menuNameValidator = NonEmptyStringValidator();
+  final String invalidMenuNameText = 'Menu name can\'t be empty';
+}
+
+class MenuSectionValidators {
+  final StringValidator menuSectionNameValidator = NonEmptyStringValidator();
+  final String invalidMenuSectionNameText = 'Section name can\'t be empty';
+}
+
+class MenuItemValidators {
+  final StringValidator menuItemNameValidator = NonEmptyStringValidator();
+  final StringValidator menuItemDescriptionValidator = NonEmptyStringValidator();
+  final DoubleNumberValidator menuItemPriceValidator = DoubleNumericFieldValidator();
+  final String invalidMenuItemNameText = 'Item name can\'t be empty';
+  final String invalidMenuItemDescriptionText = 'Description can\'t be empty';
+  final String invalidMenuItemPriceText = 'Price must be a number';
+}
