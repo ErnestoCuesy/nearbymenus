@@ -49,6 +49,8 @@ class _MenuSectionPageState extends State<MenuSectionPage> {
   Future<void> _deleteSection(BuildContext context, Section section) async {
     try {
       await database.deleteSection(section);
+      widget.restaurant.restaurantMenus[widget.menu.id].remove(section.id);
+      Restaurant.setRestaurant(database, widget.restaurant);
     } on PlatformException catch (e) {
       PlatformExceptionAlertDialog(
         title: 'Operation failed',
@@ -58,12 +60,29 @@ class _MenuSectionPageState extends State<MenuSectionPage> {
   }
 
   Future<bool> _confirmDismiss(BuildContext context, Section section) async {
-    return await PlatformAlertDialog(
-      title: 'Confirm menu section deletion',
-      content: 'Do you really want to delete this menu section?',
-      cancelActionText: 'No',
-      defaultActionText: 'Yes',
-    ).show(context);
+    var hasStuff = false;
+    widget.restaurant.restaurantMenus[widget.menu.id][section.id].forEach((key, value) {
+      if (key.toString().length > 20){
+        hasStuff = true;
+      }
+    });
+    if (hasStuff) {
+      return !await PlatformExceptionAlertDialog(
+        title: 'Section is not empty',
+        exception: PlatformException(
+          code: 'SECTION_IS_NOT_EMPTY',
+          message:  'Please delete all the items first.',
+          details:  'Please delete all the items first.',
+        ),
+      ).show(context);
+    } else {
+      return await PlatformAlertDialog(
+        title: 'Confirm menu section deletion',
+        content: 'Do you really want to delete this menu section?',
+        cancelActionText: 'No',
+        defaultActionText: 'Yes',
+      ).show(context);
+    }
   }
 
   Widget _buildContents(BuildContext context) {
