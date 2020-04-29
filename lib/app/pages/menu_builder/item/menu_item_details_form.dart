@@ -213,7 +213,7 @@ class _MenuItemDetailsFormState extends State<MenuItemDetailsForm> {
       enableInteractiveSelection: false,
       keyboardType: TextInputType.numberWithOptions(decimal: true),
       textInputAction: TextInputAction.done,
-      onChanged: (value) => model.updateMenuItemPrice(double.tryParse(value)),
+      onChanged: (value) => model.updateMenuItemPrice(value),
       onEditingComplete: () => _menuItemPriceEditingComplete(),
     );
   }
