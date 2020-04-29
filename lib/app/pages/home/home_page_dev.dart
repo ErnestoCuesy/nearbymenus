@@ -23,11 +23,10 @@ class _HomePageDevState extends State<HomePageDev> {
   Database database;
 
   String get role => widget.role;
-  TabItem _currentTab = TabItem.restaurantDetails;
+  TabItem _currentTab = TabItem.restaurant;
   
   final Map<TabItem, GlobalKey<NavigatorState>> navigatorKeys = {
-    TabItem.restaurantDetails: GlobalKey<NavigatorState>(),
-    TabItem.menuBuilder: GlobalKey<NavigatorState>(),
+    TabItem.restaurant: GlobalKey<NavigatorState>(),
     TabItem.menu: GlobalKey<NavigatorState>(),
     TabItem.myOrders: GlobalKey<NavigatorState>(),
     TabItem.manageOrders: GlobalKey<NavigatorState>(),
@@ -36,8 +35,7 @@ class _HomePageDevState extends State<HomePageDev> {
 
   Map<TabItem, WidgetBuilder> get widgetBuilders {
     return {
-      TabItem.restaurantDetails: (_) => Placeholder(),
-      TabItem.menuBuilder: (_) => Placeholder(),
+      TabItem.restaurant: (_) => Placeholder(),
       TabItem.menu: (_) => Placeholder(),
       TabItem.myOrders: (_) => Placeholder(),
       TabItem.manageOrders: (_) => Placeholder(),
