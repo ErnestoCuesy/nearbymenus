@@ -31,7 +31,7 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
         this.id,
         this.name,
         this.description,
-        this.price,
+        this.price = 0.00,
         this.isExtra,
         this.isLoading = false,
         this.submitted = false,
@@ -91,7 +91,10 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
 
   void updateMenuItemDescription(String description) => updateWith(description: description);
 
-  void updateMenuItemPrice(double price) => updateWith(price: price);
+  void updateMenuItemPrice(String price) {
+   var amount = price.replaceAll(RegExp(r','), '.');
+   updateWith(price: double.tryParse(amount));
+  }
 
   void updateMenuItemIsExtra(bool isExtra) => updateWith(isExtra: isExtra);
 
