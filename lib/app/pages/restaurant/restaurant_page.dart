@@ -123,8 +123,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
                       onPressed: () => Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (BuildContext context) => MenuPage(
-                            restaurantId: restaurant.id,
-                            restaurantName: restaurant.name,
+                            restaurant: restaurant,
                           ),
                         ),
                       ),
