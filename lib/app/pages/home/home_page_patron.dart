@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/pages/account/account_page.dart';
 import 'package:nearbymenus/app/pages/home/cupertino_home_scaffold_patron.dart';
 import 'package:nearbymenus/app/pages/home/tab_item.dart';
+import 'package:nearbymenus/app/pages/menu_browser/menu_browser.dart';
 import 'package:nearbymenus/app/pages/notifications/messages_page.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -24,10 +25,9 @@ class _HomePagePatronState extends State<HomePagePatron> {
   Database database;
 
   String get role => widget.role;
-  TabItem _currentTab = TabItem.menuBuilder;
+  TabItem _currentTab = TabItem.menu;
 
   final Map<TabItem, GlobalKey<NavigatorState>> navigatorKeys = {
-    TabItem.menuBuilder: GlobalKey<NavigatorState>(),
     TabItem.menu: GlobalKey<NavigatorState>(),
     TabItem.myOrders: GlobalKey<NavigatorState>(),
     TabItem.messages: GlobalKey<NavigatorState>(),
@@ -36,8 +36,7 @@ class _HomePagePatronState extends State<HomePagePatron> {
 
   Map<TabItem, WidgetBuilder> get widgetBuilders {
     return {
-      TabItem.menuBuilder: (_) => Placeholder(),
-      TabItem.menu: (_) => Placeholder(),
+      TabItem.menu: (_) => MenuBrowser(),
       TabItem.myOrders: (_) => Placeholder(),
       TabItem.messages: (_) => MessagesPage(),
       TabItem.userAccount: (_) => AccountPage(auth: auth, session: session, database: database,)
