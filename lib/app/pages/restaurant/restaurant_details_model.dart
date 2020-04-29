@@ -28,6 +28,7 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
   bool acceptCash;
   bool acceptCard;
   bool acceptZapper;
+  Map<dynamic, dynamic> restaurantMenus;
   bool isLoading;
   bool submitted;
   bool dataHasChanged = false;
@@ -52,6 +53,7 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     this.acceptCash = false,
     this.acceptCard = false,
     this.acceptZapper = false,
+    this.restaurantMenus,
     this.isLoading = false,
     this.submitted = false,
   });
@@ -90,7 +92,8 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
             'acceptCash': acceptCash,
             'acceptCard': acceptCard,
             'acceptZapper': acceptZapper,
-          }
+          },
+          restaurantMenus: restaurantMenus,
         ),
       );
       session.userDetails.nearestRestaurantId = id;
