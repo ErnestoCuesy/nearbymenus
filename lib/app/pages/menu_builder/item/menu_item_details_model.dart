@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/models/item.dart';
 import 'package:nearbymenus/app/models/menu.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
-import 'package:nearbymenus/app/models/section.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/sign_in/validators.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -12,7 +11,6 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
   final Database database;
   final Session session;
   final Menu menu;
-  final Section section;
   Restaurant restaurant;
   String id;
   String name;
@@ -26,7 +24,6 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
       {@required this.database,
        @required this.session,
        @required this.menu,
-       @required this.section,
        @required this.restaurant,
         this.id,
         this.name,
@@ -44,7 +41,7 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
     }
     final item = Item(
       id: id,
-      sectionId: section.id,
+      menuId: menu.id,
       name: name,
       description: description,
       price: price,
@@ -52,11 +49,11 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
     );
     try {
       await database.setItem(item);
-      final Map<dynamic, dynamic> items = restaurant.restaurantMenus[menu.id][section.id];
+      final Map<dynamic, dynamic> items = restaurant.restaurantMenus[menu.id];
       if (items.containsKey(id)) {
-        restaurant.restaurantMenus[menu.id][section.id].update(id, (_) => item.toMap());
+        restaurant.restaurantMenus[menu.id].update(id, (_) => item.toMap());
       } else {
-        restaurant.restaurantMenus[menu.id][section.id].putIfAbsent(id, () => item.toMap());
+        restaurant.restaurantMenus[menu.id].putIfAbsent(id, () => item.toMap());
       }
       await Restaurant.setRestaurant(database, restaurant);
     } catch (e) {

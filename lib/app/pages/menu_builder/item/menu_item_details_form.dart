@@ -5,7 +5,6 @@ import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.d
 import 'package:nearbymenus/app/models/item.dart';
 import 'package:nearbymenus/app/models/menu.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
-import 'package:nearbymenus/app/models/section.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +22,6 @@ class MenuItemDetailsForm extends StatefulWidget {
     Database database,
     Restaurant restaurant,
     Menu menu,
-    Section section,
     Item item,
   }) {
     return ChangeNotifierProvider<MenuItemDetailsModel>(
@@ -32,7 +30,6 @@ class MenuItemDetailsForm extends StatefulWidget {
         session: session,
         restaurant: restaurant,
         menu: menu,
-        section: section,
         id: item.id ?? '',
         name: item.name ?? '',
         description: item.description ?? '',

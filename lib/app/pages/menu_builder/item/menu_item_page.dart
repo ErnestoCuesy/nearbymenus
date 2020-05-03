@@ -10,7 +10,6 @@ import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.d
 import 'package:nearbymenus/app/models/item.dart';
 import 'package:nearbymenus/app/models/menu.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
-import 'package:nearbymenus/app/models/section.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_builder/item/menu_item_details_page.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -19,9 +18,8 @@ import 'package:provider/provider.dart';
 class MenuItemPage extends StatefulWidget {
   final Restaurant restaurant;
   final Menu menu;
-  final Section section;
 
-  const MenuItemPage({Key key, this.restaurant, this.menu, this.section}) : super(key: key);
+  const MenuItemPage({Key key, this.restaurant, this.menu}) : super(key: key);
 
   @override
   _MenuItemPageState createState() => _MenuItemPageState();
@@ -32,7 +30,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
   Database database;
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
 
-  void _createMenuSectionDetailsPage(BuildContext context, Item item) {
+  void _createMenuItemDetailsPage(BuildContext context, Item item) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         fullscreenDialog: false,
@@ -41,7 +39,6 @@ class _MenuItemPageState extends State<MenuItemPage> {
           database: database,
           restaurant: widget.restaurant,
           menu: widget.menu,
-          section: widget.section,
           item: item,
         ),
       ),
@@ -51,7 +48,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
   Future<void> _deleteItem(BuildContext context, Item item) async {
     try {
       await database.deleteItem(item);
-      widget.restaurant.restaurantMenus[widget.menu.id][widget.section.id].remove(item.id);
+      widget.restaurant.restaurantMenus[widget.menu.id].remove(item.id);
       Restaurant.setRestaurant(database, widget.restaurant);
     } on PlatformException catch (e) {
       PlatformExceptionAlertDialog(
@@ -72,7 +69,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
 
   Widget _buildContents(BuildContext context) {
     return StreamBuilder<List<Item>>(
-      stream: database.menuItems(widget.section.id),
+      stream: database.menuItems(widget.menu.id),
       builder: (context, snapshot) {
         return ListItemsBuilder<Item>(
             snapshot: snapshot,
@@ -117,7 +114,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
                       f.format(item.price),
                       style: Theme.of(context).textTheme.headline6,
                     ),
-                    onTap: () => _createMenuSectionDetailsPage(context, item),
+                    onTap: () => _createMenuItemDetailsPage(context, item),
                   ),
                 ),
               );
@@ -135,7 +132,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            '${widget.section.name}', style: TextStyle(color: Theme
+            '${widget.menu.name}', style: TextStyle(color: Theme
               .of(context)
               .appBarTheme
               .color),
@@ -147,14 +144,14 @@ class _MenuItemPageState extends State<MenuItemPage> {
           child: Icon(
             Icons.add,
           ),
-          onPressed: () => _createMenuSectionDetailsPage(context, Item(sectionId: widget.section.id)),
+          onPressed: () => _createMenuItemDetailsPage(context, Item(menuId: widget.menu.id)),
         ),
       );
     } else {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            '${widget.section.name}', style: TextStyle(color: Theme
+            '${widget.menu.name}', style: TextStyle(color: Theme
               .of(context)
               .appBarTheme
               .color),
@@ -164,7 +161,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
               icon: Icon(Icons.add, color: Theme.of(context).appBarTheme.color,),
               iconSize: 32.0,
               padding: const EdgeInsets.only(right: 16.0),
-              onPressed: () => _createMenuSectionDetailsPage(context, Item(sectionId: widget.section.id)),
+              onPressed: () => _createMenuItemDetailsPage(context, Item(menuId: widget.menu.id)),
             ),
           ],
         ),

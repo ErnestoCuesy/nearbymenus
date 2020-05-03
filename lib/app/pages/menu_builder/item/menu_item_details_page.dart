@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/models/item.dart';
 import 'package:nearbymenus/app/models/menu.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
-import 'package:nearbymenus/app/models/section.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_builder/item/menu_item_details_form.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -12,14 +11,12 @@ class MenuItemDetailsPage extends StatelessWidget {
   final Database database;
   final Restaurant restaurant;
   final Menu menu;
-  final Section section;
   final Item item;
 
   const MenuItemDetailsPage({
     Key key,
     this.restaurant,
     this.menu,
-    this.section,
     this.session,
     this.database,
     this.item,
@@ -41,7 +38,6 @@ class MenuItemDetailsPage extends StatelessWidget {
               session: session,
               database: database,
               menu: menu,
-              section: section,
               restaurant: restaurant,
               item: item,
             ),
