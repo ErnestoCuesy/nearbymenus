@@ -1,6 +1,6 @@
 class Item {
   final String id;
-  final String sectionId;
+  final String menuId;
   final String name;
   final String description;
   final double price;
@@ -9,7 +9,7 @@ class Item {
 
   Item({
     this.id,
-    this.sectionId,
+    this.menuId,
     this.name,
     this.description,
     this.price,
@@ -23,7 +23,7 @@ class Item {
     }
     return Item(
       id: data['id'],
-      sectionId: data['sectionId'],
+      menuId: data['menuId'],
       name: data['name'],
       description: data['description'],
       price: data['price'],
@@ -35,7 +35,7 @@ class Item {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'sectionId': sectionId,
+      'menuId': menuId,
       'name': name,
       'description': description,
       'price': price,
@@ -46,7 +46,7 @@ class Item {
 
   @override
   String toString() {
-    return 'id: $id, sectionId: $sectionId, name: $name, description: $description, price: $price, isExtra: $isExtra, isSide: $isSide';
+    return 'id: $id, menuId: $menuId, name: $name, description: $description, price: $price, isExtra: $isExtra, isSide: $isSide';
   }
 
 }
