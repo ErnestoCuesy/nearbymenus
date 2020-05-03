@@ -3,8 +3,19 @@ class Menu {
   final String restaurantId;
   final String name;
   final String notes;
+  final bool hidden;
+  final bool onlyForExtras;
+  final bool onlyForSides;
 
-  Menu({this.id, this.restaurantId, this.name, this.notes});
+  Menu({
+    this.id,
+    this.restaurantId,
+    this.name,
+    this.notes,
+    this.hidden,
+    this.onlyForExtras,
+    this.onlyForSides,
+  });
 
   factory Menu.fromMap(Map<String, dynamic> data, String documentID) {
     if (data == null) {
@@ -15,6 +26,9 @@ class Menu {
       restaurantId: data['restaurantId'],
       name: data['name'],
       notes: data['notes'],
+      hidden: data['hidden'],
+      onlyForExtras: data['onlyForExtras'],
+      onlyForSides: data['onlyForSides'],
     );
   }
 
@@ -24,6 +38,9 @@ class Menu {
       'restaurantId': restaurantId,
       'name': name,
       'notes': notes,
+      'hidden': hidden,
+      'onlyForExtras': onlyForExtras,
+      'onlyForSides': onlyForSides,
     };
   }
 
@@ -31,5 +48,4 @@ class Menu {
   String toString() {
     return 'id: $id, restaurantId: $restaurantId, name: $name, notes: $notes';
   }
-
 }
