@@ -10,8 +10,8 @@ import 'package:nearbymenus/app/common_widgets/platform_trailing_icon.dart';
 import 'package:nearbymenus/app/models/menu.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
+import 'package:nearbymenus/app/pages/menu_builder/item/menu_item_page.dart';
 import 'package:nearbymenus/app/pages/menu_builder/menu/menu_details_page.dart';
-import 'package:nearbymenus/app/pages/menu_builder/section/menu_section_page.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
@@ -113,7 +113,7 @@ class _MenuPageState extends State<MenuPage> {
                     trailing: IconButton(
                       onPressed: () => Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (BuildContext context) => MenuSectionPage(
+                          builder: (BuildContext context) => MenuItemPage(
                             restaurant: widget.restaurant,
                             menu: menu,
                           ),
