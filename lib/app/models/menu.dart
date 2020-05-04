@@ -3,6 +3,7 @@ class Menu {
   final String restaurantId;
   final String name;
   final String notes;
+  final int sequence;
   final bool hidden;
   final bool onlyForExtras;
   final bool onlyForSides;
@@ -12,6 +13,7 @@ class Menu {
     this.restaurantId,
     this.name,
     this.notes,
+    this.sequence,
     this.hidden,
     this.onlyForExtras,
     this.onlyForSides,
@@ -26,6 +28,7 @@ class Menu {
       restaurantId: data['restaurantId'],
       name: data['name'],
       notes: data['notes'],
+      sequence: data['sequence'],
       hidden: data['hidden'],
       onlyForExtras: data['onlyForExtras'],
       onlyForSides: data['onlyForSides'],
@@ -38,6 +41,7 @@ class Menu {
       'restaurantId': restaurantId,
       'name': name,
       'notes': notes,
+      'sequence': sequence,
       'hidden': hidden,
       'onlyForExtras': onlyForExtras,
       'onlyForSides': onlyForSides,
@@ -46,6 +50,6 @@ class Menu {
 
   @override
   String toString() {
-    return 'id: $id, restaurantId: $restaurantId, name: $name, notes: $notes';
+    return 'id: $id, restaurantId: $restaurantId, name: $name, notes: $notes, sequence: $sequence';
   }
 }
