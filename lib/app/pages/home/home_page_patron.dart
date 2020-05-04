@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/pages/account/account_page.dart';
 import 'package:nearbymenus/app/pages/home/cupertino_home_scaffold_patron.dart';
 import 'package:nearbymenus/app/pages/home/tab_item.dart';
-import 'package:nearbymenus/app/pages/menu_browser/menu_browser.dart';
+import 'package:nearbymenus/app/pages/menu_browser/expandable_menu_browser.dart';
 import 'package:nearbymenus/app/pages/notifications/messages_page.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -36,7 +36,7 @@ class _HomePagePatronState extends State<HomePagePatron> {
 
   Map<TabItem, WidgetBuilder> get widgetBuilders {
     return {
-      TabItem.menu: (_) => MenuBrowser(),
+      TabItem.menu: (_) => ExpandableMenuBrowser(),
       TabItem.myOrders: (_) => Placeholder(),
       TabItem.messages: (_) => MessagesPage(),
       TabItem.userAccount: (_) => AccountPage(auth: auth, session: session, database: database,)
