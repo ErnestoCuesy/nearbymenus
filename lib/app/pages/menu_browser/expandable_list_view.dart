@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_container.dart';
 
 class ExpandableListView extends StatefulWidget {
@@ -15,11 +16,14 @@ class _ExpandableListViewState extends State<ExpandableListView> {
   bool expandItemsFlag = false;
   var itemList;
   List<String> itemKeys = List<String>();
+  final f = NumberFormat.simpleCurrency(locale: "en_ZA");
 
   Map<String, dynamic> get menu => widget.menu;
 
-  int get itemCount {
-    final count =  menu.entries.where((element) {
+  @override
+  Widget build(BuildContext context) {
+    itemKeys.clear();
+    final itemCount = menu.entries.where((element) {
       if (element.key.toString().length > 20) {
         itemKeys.add(element.key.toString());
         return true;
@@ -27,79 +31,90 @@ class _ExpandableListViewState extends State<ExpandableListView> {
         return false;
       }
     }).toList().length;
-    return count;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final itemsKey = menu.keys.firstWhere((element) => element.toString().length > 20);
-    items = menu[itemsKey];
-    print('>>>>>> Menu: ${menu['name']}');
-    print('>>> Item: ${items['name']}');
+    if (itemCount == 0) {
+      return Container();
+    }
+    final key = menu.keys.firstWhere((element) => element.toString().length > 20);
+    items = menu[key];
     return Container(
       margin: EdgeInsets.symmetric(vertical: 1.0),
       child: Column(
         children: <Widget>[
           Card(
+            color: Theme.of(context).backgroundColor,
             margin: EdgeInsets.all(12.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  menu['name'],
-                  style: TextStyle(fontWeight: FontWeight.bold,),
+            child: ListTile(
+              isThreeLine: false,
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    menu['name'],
+                    style: Theme.of(context).textTheme.headline4,
+                  ),
+                ],
+              ),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                child: Text(
+                  menu['notes'],
                 ),
-                IconButton(
-                    icon: Container(
-                      height: 50.0,
-                      width: 50.0,
-                      decoration: BoxDecoration(
-                        color: Colors.orange,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Icon(
-                          expandItemsFlag ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                          color: Colors.white,
-                          size: 30.0,
-                        ),
-                      ),
+              ),
+              trailing: IconButton(
+                icon: Container(
+                  height: 50.0,
+                  width: 50.0,
+                  decoration: BoxDecoration(
+                    color: Colors.orange,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Icon(
+                      expandItemsFlag ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                      color: Colors.white,
+                      size: 30.0,
                     ),
-                    onPressed: () {
-                      setState(() {
-                        expandItemsFlag = !expandItemsFlag;
-                      });
-                    }),
-              ],
+                  ),
+                ),
+                onPressed: () {
+                  setState(() {
+                    expandItemsFlag = !expandItemsFlag;
+                  });
+                }),
             ),
           ),
           ExpandableContainer(
             expanded: expandItemsFlag,
-            expandedHeight: 75.0 * itemCount,
+            expandedHeight: 90.0 * itemCount,
             child: ListView.builder(
               itemCount: itemCount,
               itemBuilder: (BuildContext context, int index) {
                 return Container(
-                  decoration:
-                  BoxDecoration(border: Border.all(
-                      width: 1.0, color: Colors.black),
-                      color: Colors.grey),
+                  height: 90.0,
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                      width: 0.5,
+                      color: Colors.orangeAccent,
+                      ),
+                      //color: Colors.grey,
+                  ),
                   child: ListTile(
-                    title: Text(
-                      '${menu[itemKeys[index]]['name']}',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
-                    ),
-                    subtitle: Text(
-                      '${menu[itemKeys[index]]['description']}',
-                      style: TextStyle(
-                          color: Colors.white
+                    title: Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Text(
+                        '${menu[itemKeys[index]]['name']}',
+                        style: Theme.of(context).textTheme.headline6,
                       ),
                     ),
-                    leading: Icon(
-                      Icons.fastfood,
-                      color: Colors.white,
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(left: 8.0, top: 8.0, bottom: 8.0),
+                      child: Text(
+                        '${menu[itemKeys[index]]['description']}',
+                      ),
+                    ),
+                    trailing: Text(
+                      f.format(menu[itemKeys[index]]['price']),
+                      style: Theme.of(context).textTheme.headline6,
                     ),
                   ),
                 );
