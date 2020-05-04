@@ -140,7 +140,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
         ),
         body: _buildContents(context),
         floatingActionButton: FloatingActionButton(
-          tooltip: 'Add new item',
+          tooltip: 'Add new menu item',
           child: Icon(
             Icons.add,
           ),
