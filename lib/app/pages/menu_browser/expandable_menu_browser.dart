@@ -18,12 +18,15 @@ class ExpandableMenuBrowser extends StatefulWidget {
 class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
 
-  Widget _buildContents(BuildContext context, Map<String, dynamic> menus) {
+  Widget _buildContents(BuildContext context, Map<String, dynamic> menus, dynamic sortedKeys) {
     return ListView.builder(
-      itemCount: menus.length,
+      itemCount: sortedKeys.length,
       itemBuilder: (BuildContext context, int index) {
-        String key = menus.keys.elementAt(index);
-        final menu = menus[key];
+        // String key = menus.keys.elementAt(index);
+        // final menu = menus[key];
+        print(sortedKeys[index]);
+        final menu = menus[sortedKeys[index]];
+        print(menu);
         return ExpandableListView(menu: menu,);
       },
     );
@@ -32,10 +35,10 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
   @override
   Widget build(BuildContext context) {
     final session = Provider.of<Session>(context);
-    final database = Provider.of<Database>(context);
-    //final restaurant = session.nearestRestaurant;
+    final database = Provider.of<Database>(context, listen: true);
     Restaurant restaurant;
     Map<String, dynamic> menus;
+    Map<String, dynamic> sortedMenus = Map<String, dynamic>();
     return StreamBuilder<List<Restaurant>>(
       stream: database.userRestaurant(session.userDetails.nearestRestaurantId),
       builder: (context, snapshot) {
@@ -46,25 +49,31 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
             menus = restaurant.restaurantMenus;
             print(menus);
           }
+          sortedMenus.clear();
+          menus.forEach((key, value) {
+            sortedMenus.putIfAbsent(value['sequence'].toString(), () => value);
+          });
+          var sortedKeys = sortedMenus.keys.toList()..sort();
+          print(sortedKeys);
           if (Platform.isAndroid) {
             return Scaffold(
               appBar: AppBar(
                 title: Text(
-                  '${restaurant.name} menus',
+                  '${restaurant.name}',
                   style: TextStyle(color: Theme.of(context).appBarTheme.color),
                 ),
               ),
-              body: _buildContents(context, menus),
+              body: _buildContents(context, sortedMenus, sortedKeys),
             );
           } else {
             return Scaffold(
               appBar: AppBar(
                 title: Text(
-                  '${restaurant.name} menus',
+                  '${restaurant.name}',
                   style: TextStyle(color: Theme.of(context).appBarTheme.color),
                 ),
               ),
-              body: _buildContents(context, menus),
+              body: _buildContents(context, sortedMenus, sortedKeys),
             );
           }
         } else {
