@@ -1,4 +1,3 @@
-import 'package:nearbymenus/app/config/flavour_config.dart';
 
 class APIPath {
   static String job(String uid, String jobId) => 'users/$uid/jobs/$jobId';
@@ -15,8 +14,6 @@ class APIPath {
   static String authorizations() => 'authorizations';
   static String menu(String menuId) => 'menus/$menuId';
   static String menus() => 'menus';
-  static String section(String sectionId) => 'sections/$sectionId';
-  static String sections() => 'sections';
   static String item(String itemId) => 'items/$itemId';
   static String items() => 'items';
 }
