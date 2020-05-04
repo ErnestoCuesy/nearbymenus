@@ -68,8 +68,8 @@ class _MenuPageState extends State<MenuPage> {
         title: 'Menu is not empty',
         exception: PlatformException(
           code: 'MAP_IS_NOT_EMPTY',
-          message:  'Please delete all the sections first.',
-          details:  'Please delete all the sections first.',
+          message:  'Please delete all the menu items first.',
+          details:  'Please delete all the menu items first.',
         ),
       ).show(context);
     } else {
