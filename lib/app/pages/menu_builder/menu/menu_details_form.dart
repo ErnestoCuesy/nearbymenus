@@ -28,6 +28,7 @@ class MenuDetailsForm extends StatefulWidget {
           id: menu.id ?? '',
           name: menu.name ?? '',
           notes: menu.notes ?? '',
+          sequence: menu.sequence ?? 0,
           restaurant: restaurant),
       child: Consumer<MenuDetailsModel>(
         builder: (context, model, _) => MenuDetailsForm(
@@ -44,8 +45,10 @@ class MenuDetailsForm extends StatefulWidget {
 class _MenuDetailsFormState extends State<MenuDetailsForm> {
   final TextEditingController _menuNameController = TextEditingController();
   final TextEditingController _menuNotesController = TextEditingController();
+  final TextEditingController _sequenceController = TextEditingController();
   final FocusNode _menuNameFocusNode = FocusNode();
   final FocusNode _menuNotesFocusNode = FocusNode();
+  final FocusNode _sequenceFocusNode = FocusNode();
 
   MenuDetailsModel get model => widget.model;
 
@@ -55,6 +58,7 @@ class _MenuDetailsFormState extends State<MenuDetailsForm> {
     if (model != null) {
       _menuNameController.text = model.name ?? null;
       _menuNotesController.text = model.notes ?? null;
+      _sequenceController.text = model.sequence.toString() ?? null;
     }
   }
 
@@ -62,8 +66,10 @@ class _MenuDetailsFormState extends State<MenuDetailsForm> {
   void dispose() {
     _menuNameController.dispose();
     _menuNotesController.dispose();
+    _sequenceController.dispose();
     _menuNameFocusNode.dispose();
     _menuNotesFocusNode.dispose();
+    _sequenceFocusNode.dispose();
     super.dispose();
   }
 
@@ -87,7 +93,12 @@ class _MenuDetailsFormState extends State<MenuDetailsForm> {
   }
 
   void _menuNotesEditingComplete() {
-    final newFocus = _menuNotesFocusNode;
+    final newFocus = _sequenceFocusNode;
+    FocusScope.of(context).requestFocus(newFocus);
+  }
+
+  void _sequenceEditingComplete() {
+    final newFocus = _sequenceFocusNode;
     FocusScope.of(context).requestFocus(newFocus);
   }
 
@@ -98,6 +109,10 @@ class _MenuDetailsFormState extends State<MenuDetailsForm> {
         height: 8.0,
       ),
       _buildMenuNotesTextField(),
+      SizedBox(
+        height: 8.0,
+      ),
+      _sequenceTextField(),
       SizedBox(
         height: 16.0,
       ),
@@ -154,9 +169,31 @@ class _MenuDetailsFormState extends State<MenuDetailsForm> {
       enableSuggestions: false,
       enableInteractiveSelection: false,
       keyboardType: TextInputType.text,
-      textInputAction: TextInputAction.done,
+      textInputAction: TextInputAction.next,
       onChanged: model.updateMenuNotes,
       onEditingComplete: () => _menuNotesEditingComplete(),
+    );
+  }
+
+  TextField _sequenceTextField() {
+    return TextField(
+      style: Theme.of(context).inputDecorationTheme.labelStyle,
+      controller: _sequenceController,
+      focusNode: _sequenceFocusNode,
+      cursorColor: Colors.black,
+      decoration: InputDecoration(
+        labelText: 'Sequence of appearance',
+        hintText: 'i.e.: 0, 1, 2, 3, 4',
+        errorText: model.sequenceErrorText,
+        enabled: model.isLoading == false,
+      ),
+      autocorrect: false,
+      enableSuggestions: false,
+      enableInteractiveSelection: false,
+      keyboardType: TextInputType.number,
+      textInputAction: TextInputAction.done,
+      onChanged: (value) => model.updateSequence(int.tryParse(value)),
+      onEditingComplete: () => _sequenceEditingComplete(),
     );
   }
 
