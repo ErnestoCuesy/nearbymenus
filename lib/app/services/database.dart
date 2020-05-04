@@ -3,7 +3,6 @@ import 'package:meta/meta.dart';
 import 'package:nearbymenus/app/models/authorizations.dart';
 import 'package:nearbymenus/app/models/item.dart';
 import 'package:nearbymenus/app/models/menu.dart';
-import 'package:nearbymenus/app/models/section.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
 import 'package:nearbymenus/app/models/job.dart';
 import 'package:nearbymenus/app/models/entry.dart';
@@ -40,9 +39,6 @@ abstract class Database {
   Future<void> setMenu(Menu menu);
   Stream<List<Menu>> restaurantMenus(String restaurantId);
   Future<void> deleteMenu(Menu menu);
-  Future<void> setSection(Section section);
-  Stream<List<Section>> menuSections(String menuId);
-  Future<void> deleteSection(Section section);
   Future<void> setItem(Item item);
   Stream<List<Item>> menuItems(String itemId);
   Future<void> deleteItem(Item item);
@@ -233,34 +229,15 @@ class FirestoreDatabase implements Database {
   }
 
   @override
-  Future<void> setSection(Section section) async => await _service
-      .setData(path: APIPath.section(section.id), data: section.toMap());
-
-  // Used by menu details page
-  @override
-  Stream<List<Section>> menuSections(String menuId) => _service.collectionStream(
-    path: APIPath.sections(),
-    queryBuilder: menuId != null
-        ? (query) => query.where('menuId', isEqualTo: menuId)
-        : null,
-    builder: (data, documentId) => Section.fromMap(data, documentId),
-  );
-
-  @override
-  Future<void> deleteSection(Section section) async {
-    await _service.deleteData(path: APIPath.section(section.id));
-  }
-
-  @override
   Future<void> setItem(Item item) async => await _service
       .setData(path: APIPath.item(item.id), data: item.toMap());
 
   // Used by menu details page
   @override
-  Stream<List<Item>> menuItems(String sectionId) => _service.collectionStream(
+  Stream<List<Item>> menuItems(String menuId) => _service.collectionStream(
     path: APIPath.items(),
-    queryBuilder: sectionId != null
-        ? (query) => query.where('sectionId', isEqualTo: sectionId)
+    queryBuilder: menuId != null
+        ? (query) => query.where('menuId', isEqualTo: menuId)
         : null,
     builder: (data, documentId) => Item.fromMap(data, documentId),
   );
