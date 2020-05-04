@@ -13,6 +13,7 @@ class MenuDetailsModel with RestaurantMenuValidators, ChangeNotifier {
   String id;
   String name;
   String notes;
+  int sequence;
   bool isLoading;
   bool submitted;
 
@@ -23,6 +24,7 @@ class MenuDetailsModel with RestaurantMenuValidators, ChangeNotifier {
       this.id,
       this.name,
       this.notes,
+      this.sequence,
       this.isLoading = false,
       this.submitted = false,
   });
@@ -37,11 +39,19 @@ class MenuDetailsModel with RestaurantMenuValidators, ChangeNotifier {
       restaurantId: restaurant.id,
       name: name,
       notes: notes,
+      sequence: sequence,
     );
     try {
       await database.setMenu(menu);
       if (restaurant.restaurantMenus.containsKey(id)) {
-        restaurant.restaurantMenus.update(id, (_) => menu.toMap());
+        final stageMenu = restaurant.restaurantMenus[id];
+        print('Staged menu: $stageMenu');
+        stageMenu['id'] = id;
+        stageMenu['restaurantId'] = restaurant.id;
+        stageMenu['name'] = name;
+        stageMenu['notes'] = notes;
+        stageMenu['sequence'] = sequence;
+        restaurant.restaurantMenus.update(id, (_) => stageMenu);
       } else {
         restaurant.restaurantMenus.putIfAbsent(id, () => menu.toMap());
       }
@@ -55,25 +65,35 @@ class MenuDetailsModel with RestaurantMenuValidators, ChangeNotifier {
 
   String get primaryButtonText => 'Save';
 
-  bool get canSave => menuNameValidator.isValid(name);
+  bool get canSave => menuNameValidator.isValid(name) &&
+                      sequenceValidator.isValid(sequence);
 
   String get menuNameErrorText {
     bool showErrorText = !menuNameValidator.isValid(name);
     return showErrorText ? invalidMenuNameText : null;
   }
 
+  String get sequenceErrorText {
+    bool showErrorText = !sequenceValidator.isValid(sequence);
+    return showErrorText ? invalidSequenceText : null;
+  }
+
   void updateMenuName(String name) => updateWith(name: name);
 
   void updateMenuNotes(String notes) => updateWith(notes: notes);
 
+  void updateSequence(int sequence) => updateWith(sequence: sequence);
+
   void updateWith({
     String name,
     String notes,
+    int sequence,
     bool isLoading,
     bool submitted,
   }) {
     this.name = name ?? this.name;
     this.notes = notes ?? this.notes;
+    this.sequence = sequence ?? this.sequence;
     this.isLoading = isLoading ?? this.isLoading;
     this.submitted = this.submitted;
     notifyListeners();
