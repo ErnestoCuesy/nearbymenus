@@ -73,6 +73,8 @@ class JobNameAndRatePerHourValidators {
 class RestaurantMenuValidators {
   final StringValidator menuNameValidator = NonEmptyStringValidator();
   final String invalidMenuNameText = 'Menu name can\'t be empty';
+  final NumberValidator sequenceValidator = NumericFieldValidator();
+  final String invalidSequenceText = 'Sequence can\'t be empty and must be greater than zero';
 }
 
 class MenuSectionValidators {
