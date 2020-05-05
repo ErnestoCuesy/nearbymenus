@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
-import 'package:nearbymenus/app/models/item.dart';
+import 'package:nearbymenus/app/models/menu_item.dart';
 import 'package:nearbymenus/app/models/menu.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
@@ -22,7 +22,7 @@ class MenuItemDetailsForm extends StatefulWidget {
     Database database,
     Restaurant restaurant,
     Menu menu,
-    Item item,
+    MenuItem item,
   }) {
     return ChangeNotifierProvider<MenuItemDetailsModel>(
       create: (context) => MenuItemDetailsModel(

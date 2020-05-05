@@ -7,11 +7,11 @@ import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/common_widgets/list_items_builder.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
-import 'package:nearbymenus/app/models/item.dart';
+import 'package:nearbymenus/app/models/menu_item.dart';
 import 'package:nearbymenus/app/models/menu.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
-import 'package:nearbymenus/app/pages/menu_builder/item/menu_item_details_page.dart';
+import 'package:nearbymenus/app/pages/menu_builder/menu_item/menu_item_details_page.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
@@ -30,7 +30,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
   Database database;
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
 
-  void _createMenuItemDetailsPage(BuildContext context, Item item) {
+  void _createMenuItemDetailsPage(BuildContext context, MenuItem item) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         fullscreenDialog: false,
@@ -45,9 +45,9 @@ class _MenuItemPageState extends State<MenuItemPage> {
     );
   }
 
-  Future<void> _deleteItem(BuildContext context, Item item) async {
+  Future<void> _deleteItem(BuildContext context, MenuItem item) async {
     try {
-      await database.deleteItem(item);
+      await database.deleteMenuItem(item);
       widget.restaurant.restaurantMenus[widget.menu.id].remove(item.id);
       Restaurant.setRestaurant(database, widget.restaurant);
     } on PlatformException catch (e) {
@@ -58,7 +58,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
     }
   }
 
-  Future<bool> _confirmDismiss(BuildContext context, Item item) async {
+  Future<bool> _confirmDismiss(BuildContext context, MenuItem item) async {
     return await PlatformAlertDialog(
       title: 'Confirm menu item deletion',
       content: 'Do you really want to delete this menu item?',
@@ -68,10 +68,10 @@ class _MenuItemPageState extends State<MenuItemPage> {
   }
 
   Widget _buildContents(BuildContext context) {
-    return StreamBuilder<List<Item>>(
+    return StreamBuilder<List<MenuItem>>(
       stream: database.menuItems(widget.menu.id),
       builder: (context, snapshot) {
-        return ListItemsBuilder<Item>(
+        return ListItemsBuilder<MenuItem>(
             snapshot: snapshot,
             itemBuilder: (context, item) {
               return Dismissible(
@@ -144,7 +144,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
           child: Icon(
             Icons.add,
           ),
-          onPressed: () => _createMenuItemDetailsPage(context, Item(menuId: widget.menu.id)),
+          onPressed: () => _createMenuItemDetailsPage(context, MenuItem(menuId: widget.menu.id)),
         ),
       );
     } else {
@@ -161,7 +161,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
               icon: Icon(Icons.add, color: Theme.of(context).appBarTheme.color,),
               iconSize: 32.0,
               padding: const EdgeInsets.only(right: 16.0),
-              onPressed: () => _createMenuItemDetailsPage(context, Item(menuId: widget.menu.id)),
+              onPressed: () => _createMenuItemDetailsPage(context, MenuItem(menuId: widget.menu.id)),
             ),
           ],
         ),

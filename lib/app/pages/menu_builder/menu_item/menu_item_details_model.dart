@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:nearbymenus/app/models/item.dart';
+import 'package:nearbymenus/app/models/menu_item.dart';
 import 'package:nearbymenus/app/models/menu.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
@@ -39,7 +39,7 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
     if (id == null || id == '') {
       id = documentIdFromCurrentDate();
     }
-    final item = Item(
+    final item = MenuItem(
       id: id,
       menuId: menu.id,
       name: name,
@@ -48,7 +48,7 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
       isExtra: isExtra,
     );
     try {
-      await database.setItem(item);
+      await database.setMenuItem(item);
       final Map<dynamic, dynamic> items = restaurant.restaurantMenus[menu.id];
       if (items.containsKey(id)) {
         restaurant.restaurantMenus[menu.id].update(id, (_) => item.toMap());

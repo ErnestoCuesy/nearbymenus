@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:nearbymenus/app/models/item.dart';
+import 'package:nearbymenus/app/models/menu_item.dart';
 import 'package:nearbymenus/app/models/menu.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
-import 'package:nearbymenus/app/pages/menu_builder/item/menu_item_details_form.dart';
+import 'package:nearbymenus/app/pages/menu_builder/menu_item/menu_item_details_form.dart';
 import 'package:nearbymenus/app/services/database.dart';
 
 class MenuItemDetailsPage extends StatelessWidget {
@@ -11,7 +11,7 @@ class MenuItemDetailsPage extends StatelessWidget {
   final Database database;
   final Restaurant restaurant;
   final Menu menu;
-  final Item item;
+  final MenuItem item;
 
   const MenuItemDetailsPage({
     Key key,
