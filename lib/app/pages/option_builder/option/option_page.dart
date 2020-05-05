@@ -7,49 +7,46 @@ import 'package:nearbymenus/app/common_widgets/list_items_builder.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_trailing_icon.dart';
-import 'package:nearbymenus/app/models/menu.dart';
+import 'package:nearbymenus/app/models/option.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
-import 'package:nearbymenus/app/models/section.dart';
 import 'package:nearbymenus/app/models/session.dart';
-import 'package:nearbymenus/app/pages/menu_builder/item/menu_item_page.dart';
-import 'package:nearbymenus/app/pages/menu_builder/section/menu_section_details_page.dart';
+import 'package:nearbymenus/app/pages/option_builder/option/option_details_page.dart';
+import 'package:nearbymenus/app/pages/option_builder/option_item/option_item_page.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
-class MenuSectionPage extends StatefulWidget {
+class OptionPage extends StatefulWidget {
   final Restaurant restaurant;
-  final Menu menu;
 
-  const MenuSectionPage({Key key, this.restaurant, this.menu,})
+  const OptionPage({Key key, this.restaurant,})
       : super(key: key);
 
   @override
-  _MenuSectionPageState createState() => _MenuSectionPageState();
+  _OptionPageState createState() => _OptionPageState();
 }
 
-class _MenuSectionPageState extends State<MenuSectionPage> {
+class _OptionPageState extends State<OptionPage> {
   Session session;
   Database database;
 
-  void _createMenuSectionDetailsPage(BuildContext context, Section section) {
+  void _createOptionDetailsPage(BuildContext context, Option option) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         fullscreenDialog: false,
-        builder: (context) => MenuSectionDetailsPage(
+        builder: (context) => OptionDetailsPage(
           session: session,
           database: database,
           restaurant: widget.restaurant,
-          menu: widget.menu,
-          section: section,
+          option: option,
         ),
       ),
     );
   }
 
-  Future<void> _deleteSection(BuildContext context, Section section) async {
+  Future<void> _deleteOption(BuildContext context, Option option) async {
     try {
-      await database.deleteSection(section);
-      widget.restaurant.restaurantMenus[widget.menu.id].remove(section.id);
+      await database.deleteOption(option);
+      widget.restaurant.restaurantOptions.remove(option.id);
       Restaurant.setRestaurant(database, widget.restaurant);
     } on PlatformException catch (e) {
       PlatformExceptionAlertDialog(
@@ -59,26 +56,26 @@ class _MenuSectionPageState extends State<MenuSectionPage> {
     }
   }
 
-  Future<bool> _confirmDismiss(BuildContext context, Section section) async {
+  Future<bool> _confirmDismiss(BuildContext context, Option option) async {
     var hasStuff = false;
-    widget.restaurant.restaurantMenus[widget.menu.id][section.id].forEach((key, value) {
+    widget.restaurant.restaurantOptions[option.id].forEach((key, value) {
       if (key.toString().length > 20){
         hasStuff = true;
       }
     });
     if (hasStuff) {
       return !await PlatformExceptionAlertDialog(
-        title: 'Section is not empty',
+        title: 'Option is not empty',
         exception: PlatformException(
-          code: 'SECTION_IS_NOT_EMPTY',
-          message:  'Please delete all the items first.',
-          details:  'Please delete all the items first.',
+          code: 'MAP_IS_NOT_EMPTY',
+          message:  'Please delete all the option items first.',
+          details:  'Please delete all the option items first.',
         ),
       ).show(context);
     } else {
       return await PlatformAlertDialog(
-        title: 'Confirm menu section deletion',
-        content: 'Do you really want to delete this menu section?',
+        title: 'Confirm option deletion',
+        content: 'Do you really want to delete this option?',
         cancelActionText: 'No',
         defaultActionText: 'Yes',
       ).show(context);
@@ -86,18 +83,18 @@ class _MenuSectionPageState extends State<MenuSectionPage> {
   }
 
   Widget _buildContents(BuildContext context) {
-    return StreamBuilder<List<Section>>(
-      stream: database.menuSections(widget.menu.id),
+    return StreamBuilder<List<Option>>(
+      stream: database.restaurantOptions(widget.restaurant.id),
       builder: (context, snapshot) {
-        return ListItemsBuilder<Section>(
+        return ListItemsBuilder<Option>(
             snapshot: snapshot,
-            itemBuilder: (context, section) {
+            itemBuilder: (context, option) {
               return Dismissible(
                 background: Container(color: Colors.red),
-                key: Key('section-${section.id}'),
+                key: Key('option-${option.id}'),
                 direction: DismissDirection.endToStart,
-                confirmDismiss: (_) => _confirmDismiss(context, section),
-                onDismissed: (direction) => _deleteSection(context, section),
+                confirmDismiss: (_) => _confirmDismiss(context, option),
+                onDismissed: (direction) => _deleteOption(context, option),
                 child: Card(
                   margin: EdgeInsets.all(12.0),
                   child: ListTile(
@@ -107,26 +104,23 @@ class _MenuSectionPageState extends State<MenuSectionPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          section.name,
+                          option.name,
                           style: Theme.of(context).textTheme.headline6,
                         ),
                       ],
                     ),
-                    subtitle: Text(section.notes ?? ''),
                     trailing: IconButton(
                       onPressed: () => Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (BuildContext context) => MenuItemPage(
+                          builder: (BuildContext context) => OptionItemPage(
                             restaurant: widget.restaurant,
-                            menu: widget.menu,
-                            section: section,
+                            option: option,
                           ),
                         ),
                       ),
                       icon: PlatformTrailingIcon(),
                     ),
-                    onTap: () =>
-                        _createMenuSectionDetailsPage(context, section),
+                    onTap: () => _createOptionDetailsPage(context, option),
                   ),
                 ),
               );
@@ -143,25 +137,24 @@ class _MenuSectionPageState extends State<MenuSectionPage> {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            '${widget.menu.name}',
+            '${widget.restaurant.name}',
             style: TextStyle(color: Theme.of(context).appBarTheme.color),
           ),
         ),
         body: _buildContents(context),
         floatingActionButton: FloatingActionButton(
-          tooltip: 'Add new menu section',
+          tooltip: 'Add new option',
           child: Icon(
             Icons.add,
           ),
-          onPressed: () => _createMenuSectionDetailsPage(
-              context, Section(menuId: widget.menu.id)),
+          onPressed: () => _createOptionDetailsPage(context, Option()),
         ),
       );
     } else {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            '${widget.menu.name}',
+            '${widget.restaurant.name}',
             style: TextStyle(color: Theme.of(context).appBarTheme.color),
           ),
           actions: <Widget>[
@@ -172,8 +165,7 @@ class _MenuSectionPageState extends State<MenuSectionPage> {
               ),
               iconSize: 32.0,
               padding: const EdgeInsets.only(right: 16.0),
-              onPressed: () => _createMenuSectionDetailsPage(
-                  context, Section(menuId: widget.menu.id)),
+              onPressed: () => _createOptionDetailsPage(context, Option()),
             ),
           ],
         ),
