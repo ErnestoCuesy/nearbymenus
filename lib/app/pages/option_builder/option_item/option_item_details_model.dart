@@ -1,31 +1,29 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:nearbymenus/app/models/menu.dart';
+import 'package:nearbymenus/app/models/option.dart';
+import 'package:nearbymenus/app/models/option_item.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
-import 'package:nearbymenus/app/models/section.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/sign_in/validators.dart';
 import 'package:nearbymenus/app/services/database.dart';
 
-class MenuSectionDetailsModel with MenuSectionValidators, ChangeNotifier {
+class OptionItemDetailsModel with OptionItemValidators, ChangeNotifier {
   final Database database;
   final Session session;
-  final Menu menu;
+  final Option option;
   Restaurant restaurant;
   String id;
   String name;
-  String notes;
   bool isLoading;
   bool submitted;
 
-  MenuSectionDetailsModel(
+  OptionItemDetailsModel(
       {@required this.database,
        @required this.session,
-       @required this.menu,
+       @required this.option,
        @required this.restaurant,
         this.id,
         this.name,
-        this.notes,
         this.isLoading = false,
         this.submitted = false,
       });
@@ -35,19 +33,18 @@ class MenuSectionDetailsModel with MenuSectionValidators, ChangeNotifier {
     if (id == null || id == '') {
       id = documentIdFromCurrentDate();
     }
-    final section = Section(
+    final item = OptionItem(
       id: id,
-      menuId: menu.id,
+      optionId: option.id,
       name: name,
-      notes: notes,
     );
     try {
-      await database.setSection(section);
-      final Map<dynamic, dynamic> sections = restaurant.restaurantMenus[menu.id];
-      if (sections.containsKey(id)) {
-        restaurant.restaurantMenus[menu.id].update(id, (_) => section.toMap());
+      await database.setOptionItem(item);
+      final Map<dynamic, dynamic> items = restaurant.restaurantOptions[option.id];
+      if (items.containsKey(id)) {
+        restaurant.restaurantOptions[option.id].update(id, (_) => item.toMap());
       } else {
-        restaurant.restaurantMenus[menu.id].putIfAbsent(id, () => section.toMap());
+        restaurant.restaurantOptions[option.id].putIfAbsent(id, () => item.toMap());
       }
       await Restaurant.setRestaurant(database, restaurant);
     } catch (e) {
@@ -59,25 +56,21 @@ class MenuSectionDetailsModel with MenuSectionValidators, ChangeNotifier {
 
   String get primaryButtonText => 'Save';
 
-  bool get canSave => menuSectionNameValidator.isValid(name);
+  bool get canSave => optionItemNameValidator.isValid(name);
 
-  String get menuSectionNameErrorText {
-    bool showErrorText = !menuSectionNameValidator.isValid(name);
-    return showErrorText ? invalidMenuSectionNameText : null;
+  String get optionItemNameErrorText {
+    bool showErrorText = !optionItemNameValidator.isValid(name);
+    return showErrorText ? invalidOptionItemNameText : null;
   }
 
-  void updateMenuSectionName(String name) => updateWith(name: name);
-
-  void updateMenuSectionNotes(String notes) => updateWith(notes: notes);
+  void updateOptionItemName(String name) => updateWith(name: name);
 
   void updateWith({
     String name,
-    String notes,
     bool isLoading,
     bool submitted,
   }) {
     this.name = name ?? this.name;
-    this.notes = notes ?? this.notes;
     this.isLoading = isLoading ?? this.isLoading;
     this.submitted = this.submitted;
     notifyListeners();

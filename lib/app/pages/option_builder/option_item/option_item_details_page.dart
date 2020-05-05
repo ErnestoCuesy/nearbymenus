@@ -1,45 +1,45 @@
 import 'package:flutter/material.dart';
-import 'package:nearbymenus/app/models/menu.dart';
+import 'package:nearbymenus/app/models/option.dart';
+import 'package:nearbymenus/app/models/option_item.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
-import 'package:nearbymenus/app/models/section.dart';
 import 'package:nearbymenus/app/models/session.dart';
-import 'package:nearbymenus/app/pages/menu_builder/section/menu_section_details_form.dart';
+import 'package:nearbymenus/app/pages/option_builder/option_item/option_item_details_form.dart';
 import 'package:nearbymenus/app/services/database.dart';
 
-class MenuSectionDetailsPage extends StatelessWidget {
+class OptionItemDetailsPage extends StatelessWidget {
   final Session session;
   final Database database;
   final Restaurant restaurant;
-  final Menu menu;
-  final Section section;
+  final Option option;
+  final OptionItem optionItem;
 
-  const MenuSectionDetailsPage(
-      {Key key,
-      this.session,
-      this.database,
-      this.restaurant,
-      this.menu,
-      this.section})
-      : super(key: key);
+  const OptionItemDetailsPage({
+    Key key,
+    this.restaurant,
+    this.option,
+    this.session,
+    this.database,
+    this.optionItem,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Enter menu section details'),
+        title: Text('Enter option item details'),
         elevation: 2.0,
       ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Card(
-            child: MenuSectionDetailsForm.create(
+            child: OptionItemDetailsForm.create(
               context: context,
               session: session,
               database: database,
+              option: option,
               restaurant: restaurant,
-              menu: menu,
-              section: section,
+              item: optionItem,
             ),
           ),
         ),
