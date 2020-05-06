@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_container.dart';
+import 'package:nearbymenus/app/pages/orders/place_order_dialog.dart';
 
 class ExpandableListView extends StatefulWidget {
   final Map<String, dynamic> menu;
+  final Map<String, dynamic> options;
 
-  const ExpandableListView({Key key, this.menu}) : super(key: key);
+  const ExpandableListView({Key key, this.menu, this.options}) : super(key: key);
 
   @override
   _ExpandableListViewState createState() => _ExpandableListViewState();
@@ -116,6 +118,17 @@ class _ExpandableListViewState extends State<ExpandableListView> {
                       f.format(menu[itemKeys[index]]['price']),
                       style: Theme.of(context).textTheme.headline6,
                     ),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          fullscreenDialog: false,
+                          builder: (context) => PlaceOrderDialog(
+                            item: menu[itemKeys[index]],
+                            options: widget.options,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 );
               },
