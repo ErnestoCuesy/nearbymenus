@@ -18,7 +18,7 @@ class ExpandableMenuBrowser extends StatefulWidget {
 class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
 
-  Widget _buildContents(BuildContext context, Map<String, dynamic> menus, dynamic sortedKeys) {
+  Widget _buildContents(BuildContext context, Map<String, dynamic> menus, Map<String, dynamic> options, dynamic sortedKeys) {
     return ListView.builder(
       itemCount: sortedKeys.length,
       itemBuilder: (BuildContext context, int index) {
@@ -27,7 +27,7 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
         print(sortedKeys[index]);
         final menu = menus[sortedKeys[index]];
         print(menu);
-        return ExpandableListView(menu: menu,);
+        return ExpandableListView(menu: menu, options: options,);
       },
     );
   }
@@ -38,6 +38,7 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
     final database = Provider.of<Database>(context, listen: true);
     Restaurant restaurant;
     Map<String, dynamic> menus;
+    Map<String, dynamic> options;
     Map<String, dynamic> sortedMenus = Map<String, dynamic>();
     return StreamBuilder<List<Restaurant>>(
       stream: database.userRestaurant(session.userDetails.nearestRestaurantId),
@@ -47,6 +48,7 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
             restaurant = snapshot.data.elementAt(0);
             session.nearestRestaurant = restaurant;
             menus = restaurant.restaurantMenus;
+            options = restaurant.restaurantOptions;
             print(menus);
           }
           sortedMenus.clear();
@@ -63,7 +65,7 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
                   style: TextStyle(color: Theme.of(context).appBarTheme.color),
                 ),
               ),
-              body: _buildContents(context, sortedMenus, sortedKeys),
+              body: _buildContents(context, sortedMenus, options, sortedKeys),
             );
           } else {
             return Scaffold(
@@ -73,7 +75,7 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
                   style: TextStyle(color: Theme.of(context).appBarTheme.color),
                 ),
               ),
-              body: _buildContents(context, sortedMenus, sortedKeys),
+              body: _buildContents(context, sortedMenus, options, sortedKeys),
             );
           }
         } else {
