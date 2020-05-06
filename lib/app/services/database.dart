@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:meta/meta.dart';
 import 'package:nearbymenus/app/models/authorizations.dart';
-import 'package:nearbymenus/app/models/item.dart';
+import 'package:nearbymenus/app/models/menu_item.dart';
 import 'package:nearbymenus/app/models/menu.dart';
+import 'package:nearbymenus/app/models/option.dart';
+import 'package:nearbymenus/app/models/option_item.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
 import 'package:nearbymenus/app/models/job.dart';
 import 'package:nearbymenus/app/models/entry.dart';
@@ -39,9 +41,15 @@ abstract class Database {
   Future<void> setMenu(Menu menu);
   Stream<List<Menu>> restaurantMenus(String restaurantId);
   Future<void> deleteMenu(Menu menu);
-  Future<void> setItem(Item item);
-  Stream<List<Item>> menuItems(String itemId);
-  Future<void> deleteItem(Item item);
+  Future<void> setMenuItem(MenuItem menuItem);
+  Stream<List<MenuItem>> menuItems(String menuItemId);
+  Future<void> deleteMenuItem(MenuItem menuItem);
+  Future<void> setOption(Option option);
+  Stream<List<Option>> restaurantOptions(String restaurantId);
+  Future<void> deleteOption(Option option);
+  Future<void> setOptionItem(OptionItem optionItem);
+  Stream<List<OptionItem>> optionItems(String optionId);
+  Future<void> deleteOptionItem(OptionItem optionItem);
 }
 
 String documentIdFromCurrentDate() => DateTime.now().toIso8601String();
@@ -229,21 +237,59 @@ class FirestoreDatabase implements Database {
   }
 
   @override
-  Future<void> setItem(Item item) async => await _service
-      .setData(path: APIPath.item(item.id), data: item.toMap());
+  Future<void> setMenuItem(MenuItem item) async => await _service
+      .setData(path: APIPath.menuItem(item.id), data: item.toMap());
 
   // Used by menu details page
   @override
-  Stream<List<Item>> menuItems(String menuId) => _service.collectionStream(
-    path: APIPath.items(),
+  Stream<List<MenuItem>> menuItems(String menuId) => _service.collectionStream(
+    path: APIPath.menuItems(),
     queryBuilder: menuId != null
         ? (query) => query.where('menuId', isEqualTo: menuId)
         : null,
-    builder: (data, documentId) => Item.fromMap(data, documentId),
+    builder: (data, documentId) => MenuItem.fromMap(data, documentId),
   );
 
   @override
-  Future<void> deleteItem(Item item) async {
-    await _service.deleteData(path: APIPath.item(item.id));
+  Future<void> deleteMenuItem(MenuItem item) async {
+    await _service.deleteData(path: APIPath.menuItem(item.id));
+  }
+
+  @override
+  Future<void> setOption(Option option) async => await _service
+      .setData(path: APIPath.option(option.id), data: option.toMap());
+
+  // Used by option details page
+  @override
+  Stream<List<Option>> restaurantOptions(String restaurantId) => _service.collectionStream(
+    path: APIPath.options(),
+    queryBuilder: restaurantId != null
+        ? (query) => query.where('restaurantId', isEqualTo: restaurantId)
+        : null,
+    builder: (data, documentId) => Option.fromMap(data, documentId),
+  );
+
+  @override
+  Future<void> deleteOption(Option option) async {
+    await _service.deleteData(path: APIPath.option(option.id));
+  }
+
+  @override
+  Future<void> setOptionItem(OptionItem optionItem) async => await _service
+      .setData(path: APIPath.optionItem(optionItem.id), data: optionItem.toMap());
+
+  // Used by option details page
+  @override
+  Stream<List<OptionItem>> optionItems(String optionId) => _service.collectionStream(
+    path: APIPath.optionItems(),
+    queryBuilder: optionId != null
+        ? (query) => query.where('optionId', isEqualTo: optionId)
+        : null,
+    builder: (data, documentId) => OptionItem.fromMap(data, documentId),
+  );
+
+  @override
+  Future<void> deleteOptionItem(OptionItem optionItem) async {
+    await _service.deleteData(path: APIPath.optionItem(optionItem.id));
   }
 }
