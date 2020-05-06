@@ -102,13 +102,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
                       ],
                     ),
                     subtitle: Column(
-                      children: <Widget>[
-                        CheckboxListTile(
-                          title: Text('Is extra or side dish'),
-                          value: item.isExtra,
-                          onChanged: null,
-                        ),
-                      ],
+                      children: _buildOptions(item),
                     ),
                     trailing: Text(
                       f.format(item.price),
@@ -122,6 +116,20 @@ class _MenuItemPageState extends State<MenuItemPage> {
         );
       },
     );
+  }
+
+  List<Widget> _buildOptions(MenuItem item) {
+    List<Widget> optionList = List<Widget>();
+    item.options.forEach((key) {
+      final value = widget.restaurant.restaurantOptions[key];
+      print('Adding: ${value['name']}');
+      optionList.add(CheckboxListTile(
+        title: Text('${value['name']}'),
+        value: true,
+        onChanged: null,
+      ));
+    });
+    return optionList;
   }
 
   @override
