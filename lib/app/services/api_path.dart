@@ -14,6 +14,10 @@ class APIPath {
   static String authorizations() => 'authorizations';
   static String menu(String menuId) => 'menus/$menuId';
   static String menus() => 'menus';
-  static String item(String itemId) => 'items/$itemId';
-  static String items() => 'items';
+  static String menuItem(String menuItemId) => 'menuItems/$menuItemId';
+  static String menuItems() => 'menuItems';
+  static String option(String optionId) => 'options/$optionId';
+  static String options() => 'options';
+  static String optionItem(String optionId) => 'optionItems/$optionId';
+  static String optionItems() => 'optionItems';
 }
