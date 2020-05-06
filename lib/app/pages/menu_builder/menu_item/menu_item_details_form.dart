@@ -13,8 +13,9 @@ import 'menu_item_details_model.dart';
 
 class MenuItemDetailsForm extends StatefulWidget {
   final MenuItemDetailsModel model;
+  final Map<String, dynamic> optionsMap;
 
-  const MenuItemDetailsForm({Key key, this.model}) : super(key: key);
+  const MenuItemDetailsForm({Key key, this.model, this.optionsMap}) : super(key: key);
 
   static Widget create({
     BuildContext context,
@@ -24,6 +25,7 @@ class MenuItemDetailsForm extends StatefulWidget {
     Menu menu,
     MenuItem item,
   }) {
+    final optionsMap = restaurant.restaurantOptions;
     return ChangeNotifierProvider<MenuItemDetailsModel>(
       create: (context) => MenuItemDetailsModel(
         database: database,
@@ -35,10 +37,12 @@ class MenuItemDetailsForm extends StatefulWidget {
         description: item.description ?? '',
         price: item.price ?? 0.0,
         isExtra: item.isExtra ?? false,
+        optionIdList: item.options ?? [],
       ),
       child: Consumer<MenuItemDetailsModel>(
         builder: (context, model, _) => MenuItemDetailsForm(
           model: model,
+          optionsMap: optionsMap,
         ),
       ),
     );
@@ -129,7 +133,18 @@ class _MenuItemDetailsFormState extends State<MenuItemDetailsForm> {
       SizedBox(
         height: 8.0,
       ),
-      _buildMenuItemIsExtraTextField(),
+      Center(
+        child: Text(
+          'Tick all the options that apply',
+          style: Theme.of(context).accentTextTheme.subtitle1,
+        ),
+      ),
+      SizedBox(
+        height: 8.0,
+      ),
+      Column(
+        children: _buildOptions(),
+      ),
       SizedBox(
         height: 16.0,
       ),
@@ -145,6 +160,21 @@ class _MenuItemDetailsFormState extends State<MenuItemDetailsForm> {
         height: 8.0,
       ),
     ];
+  }
+
+  List<Widget> _buildOptions() {
+    List<Widget> optionList = List<Widget>();
+    widget.optionsMap.forEach((key, value) {
+      print('Adding: ${value['name']}');
+      optionList.add(CheckboxListTile(
+        title: Text('${value['name']}'),
+        value: model.optionCheck(key),
+        onChanged: (value) {
+          model.updateOptionIdList(key, value);
+        },
+      ));
+    });
+    return optionList;
   }
 
   TextField _buildMenuItemNameTextField() {
@@ -212,15 +242,6 @@ class _MenuItemDetailsFormState extends State<MenuItemDetailsForm> {
       textInputAction: TextInputAction.done,
       onChanged: (value) => model.updateMenuItemPrice(value),
       onEditingComplete: () => _menuItemPriceEditingComplete(),
-    );
-  }
-
-  Widget _buildMenuItemIsExtraTextField() {
-    return CheckboxListTile(
-      title: const Text('Is extra or side dish'),
-      value: model.isExtra,
-      onChanged: model.updateMenuItemIsExtra,
-      secondary: const Icon(Icons.note_add),
     );
   }
 
