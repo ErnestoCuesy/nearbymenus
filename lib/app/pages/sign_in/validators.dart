@@ -86,7 +86,19 @@ class MenuItemValidators {
   final StringValidator menuItemNameValidator = NonEmptyStringValidator();
   final StringValidator menuItemDescriptionValidator = NonEmptyStringValidator();
   final DoubleNumberValidator menuItemPriceValidator = DoubleNumericFieldValidator();
-  final String invalidMenuItemNameText = 'Item name can\'t be empty';
+  final String invalidMenuItemNameText = 'Menu item name can\'t be empty';
   final String invalidMenuItemDescriptionText = 'Description can\'t be empty';
   final String invalidMenuItemPriceText = 'Price must be a number';
+}
+
+class OptionItemValidators {
+  final StringValidator optionItemNameValidator = NonEmptyStringValidator();
+  final String invalidOptionItemNameText = 'Option item name can\'t be empty';
+}
+
+class RestaurantOptionValidators {
+  final StringValidator optionNameValidator = NonEmptyStringValidator();
+  final String invalidOptionNameText = 'Option name can\'t be empty';
+  final NumberValidator numberAllowedValidator = NumericFieldValidator();
+  final String invalidNumberAllowedText = 'Must be greater than zero and less or equal to number of options.';
 }
