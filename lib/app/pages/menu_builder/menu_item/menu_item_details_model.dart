@@ -15,6 +15,7 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
   String id;
   String name;
   String description;
+  List<String> optionIdList;
   double price;
   bool isExtra;
   bool isLoading;
@@ -29,11 +30,12 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
         this.name,
         this.description,
         this.price = 0.00,
+        this.optionIdList,
         this.isExtra,
         this.isLoading = false,
         this.submitted = false,
       });
-
+  
   Future<void> save() async {
     updateWith(isLoading: true, submitted: true);
     if (id == null || id == '') {
@@ -45,6 +47,7 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
       name: name,
       description: description,
       price: price,
+      options: optionIdList,
       isExtra: isExtra,
     );
     try {
@@ -95,10 +98,23 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
 
   void updateMenuItemIsExtra(bool isExtra) => updateWith(isExtra: isExtra);
 
+  bool optionCheck(String key) => optionIdList.contains(key);
+
+  void updateOptionIdList(String key, bool value) {
+    final newOptionIdList = optionIdList;
+    if (value) {
+      newOptionIdList.add(key);
+    } else {
+      newOptionIdList.remove(key);
+    }
+    updateWith(optionIdList: newOptionIdList);
+  }
+
   void updateWith({
     String name,
     String description,
     double price,
+    List<String> optionIdList,
     bool isExtra,
     bool isLoading,
     bool submitted,
@@ -106,6 +122,7 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
     this.name = name ?? this.name;
     this.description = description ?? this.description;
     this.price = price ?? this.price;
+    this.optionIdList = optionIdList ?? this.optionIdList;
     this.isExtra = isExtra ?? this.isExtra;
     this.isLoading = isLoading ?? this.isLoading;
     this.submitted = this.submitted;
