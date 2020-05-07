@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/models/menu_item.dart';
 import 'package:nearbymenus/app/models/menu.dart';
+import 'package:nearbymenus/app/models/option.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/sign_in/validators.dart';
@@ -21,6 +22,9 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
   bool isLoading;
   bool submitted;
 
+  Map<String, dynamic> restaurantObjectStagedOptions;
+  Map<String, Option> stagedOptions = {};
+
   MenuItemDetailsModel(
       {@required this.database,
        @required this.session,
@@ -34,13 +38,15 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
         this.isExtra,
         this.isLoading = false,
         this.submitted = false,
-      });
-  
-  Future<void> save() async {
-    updateWith(isLoading: true, submitted: true);
+      }) {
+    restaurantObjectStagedOptions = restaurant.restaurantOptions;
     if (id == null || id == '') {
       id = documentIdFromCurrentDate();
     }
+  }
+  
+  Future<void> save() async {
+    updateWith(isLoading: true, submitted: true);
     final item = MenuItem(
       id: id,
       menuId: menu.id,
@@ -58,7 +64,13 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
       } else {
         restaurant.restaurantMenus[menu.id].putIfAbsent(id, () => item.toMap());
       }
+      restaurant.restaurantOptions = restaurantObjectStagedOptions;
       await Restaurant.setRestaurant(database, restaurant);
+      if (stagedOptions != null) {
+        stagedOptions.forEach((key, value) async {
+          await database.setOption(value);
+        });
+      }
     } catch (e) {
       print(e);
       updateWith(isLoading: false);
@@ -102,11 +114,18 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
 
   void updateOptionIdList(String key, bool value) {
     final newOptionIdList = optionIdList;
+    Map<String, dynamic> option = restaurantObjectStagedOptions[key];
+    stagedOptions[key] = Option.fromMap(option, null);
+    List<dynamic> usedByMenuItems = option['usedByMenuItems'] ?? [];
     if (value) {
       newOptionIdList.add(key);
+      usedByMenuItems.add(id);
     } else {
       newOptionIdList.remove(key);
+      usedByMenuItems.remove(id);
     }
+    restaurantObjectStagedOptions[key]['usedByMenuItems'] = usedByMenuItems;
+    stagedOptions[key].usedByMenuItems = usedByMenuItems;
     updateWith(optionIdList: newOptionIdList);
   }
 
