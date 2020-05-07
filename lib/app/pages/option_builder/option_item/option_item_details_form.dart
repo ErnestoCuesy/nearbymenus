@@ -112,7 +112,7 @@ class _OptionItemDetailsFormState extends State<OptionItemDetailsForm> {
       cursorColor: Colors.black,
       decoration: InputDecoration(
         labelText: 'Option item name',
-        hintText: 'i.e.: Pasta, Bread, Eggs',
+        hintText: 'i.e.: Spaghetti, Penne or Medium, Rare, etc.',
         errorText: model.optionItemNameErrorText,
         enabled: model.isLoading == false,
       ),
