@@ -59,12 +59,23 @@ class _MenuItemPageState extends State<MenuItemPage> {
   }
 
   Future<bool> _confirmDismiss(BuildContext context, MenuItem item) async {
-    return await PlatformAlertDialog(
-      title: 'Confirm menu item deletion',
-      content: 'Do you really want to delete this menu item?',
-      cancelActionText: 'No',
-      defaultActionText: 'Yes',
-    ).show(context);
+    if (item.options.length > 0) {
+      return !await PlatformExceptionAlertDialog(
+        title: 'Menu item has options',
+        exception: PlatformException(
+          code: 'MAP_IS_NOT_EMPTY',
+          message: 'Please first unselect the options in this menu item.',
+          details: 'Please first unselect the options in this menu item.',
+        ),
+      ).show(context);
+    } else {
+      return await PlatformAlertDialog(
+        title: 'Confirm menu item deletion',
+        content: 'Do you really want to delete this menu item?',
+        cancelActionText: 'No',
+        defaultActionText: 'Yes',
+      ).show(context);
+    }
   }
 
   Widget _buildContents(BuildContext context) {
