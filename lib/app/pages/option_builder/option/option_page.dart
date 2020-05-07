@@ -57,19 +57,28 @@ class _OptionPageState extends State<OptionPage> {
   }
 
   Future<bool> _confirmDismiss(BuildContext context, Option option) async {
-    var hasStuff = false;
-    widget.restaurant.restaurantOptions[option.id].forEach((key, value) {
-      if (key.toString().length > 20){
-        hasStuff = true;
-      }
-    });
-    if (hasStuff) {
+    var message = '';
+    var inUse = false;
+    var hasChildren = false;
+    if (widget.restaurant.restaurantOptions[option.id]['usedByMenuItems'].length > 0) {
+      inUse = true;
+      message = 'Please first unselect this option from the menu items that are using it.';
+    }
+    if (!inUse) {
+      widget.restaurant.restaurantOptions[option.id].forEach((key, value) {
+        if (key.toString().length > 20) {
+          hasChildren = true;
+          message = 'Please delete all the option items first.';
+        }
+      });
+    }
+    if (inUse || hasChildren) {
       return !await PlatformExceptionAlertDialog(
-        title: 'Option is not empty',
+        title: 'Option is in use or is not empty',
         exception: PlatformException(
           code: 'MAP_IS_NOT_EMPTY',
-          message:  'Please delete all the option items first.',
-          details:  'Please delete all the option items first.',
+          message: message,
+          details: message,
         ),
       ).show(context);
     } else {
