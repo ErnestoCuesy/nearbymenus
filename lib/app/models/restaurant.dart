@@ -24,7 +24,7 @@ class Restaurant {
   final Map<String, dynamic> restaurantFlags;
   final Map<String, dynamic> paymentFlags;
   final Map<dynamic, dynamic> restaurantMenus;
-  final Map<dynamic, dynamic> restaurantOptions;
+  Map<dynamic, dynamic> restaurantOptions;
 
   Restaurant({
     this.id,
