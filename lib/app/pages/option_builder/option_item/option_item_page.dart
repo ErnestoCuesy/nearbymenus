@@ -46,7 +46,7 @@ class _OptionItemPageState extends State<OptionItemPage> {
   Future<void> _deleteItem(BuildContext context, OptionItem item) async {
     try {
       await database.deleteOptionItem(item);
-      widget.restaurant.restaurantMenus[widget.option.id].remove(item.id);
+      widget.restaurant.restaurantOptions[widget.option.id].remove(item.id);
       Restaurant.setRestaurant(database, widget.restaurant);
     } on PlatformException catch (e) {
       PlatformExceptionAlertDialog(
@@ -81,7 +81,7 @@ class _OptionItemPageState extends State<OptionItemPage> {
                 child: Card(
                   margin: EdgeInsets.all(12.0),
                   child: ListTile(
-                    isThreeLine: true,
+                    isThreeLine: false,
                     leading: Icon(Icons.link),
                     title: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
