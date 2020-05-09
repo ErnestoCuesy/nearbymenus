@@ -16,9 +16,10 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
   String id;
   String name;
   String description;
+  int sequence;
+  bool hidden;
   List<String> optionIdList;
   double price;
-  bool isExtra;
   bool isLoading;
   bool submitted;
 
@@ -33,9 +34,10 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
         this.id,
         this.name,
         this.description,
+        this.sequence,
+        this.hidden,
         this.price = 0.00,
         this.optionIdList,
-        this.isExtra,
         this.isLoading = false,
         this.submitted = false,
       }) {
@@ -52,9 +54,10 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
       menuId: menu.id,
       name: name,
       description: description,
+      sequence: sequence,
+      hidden: hidden,
       price: price,
       options: optionIdList,
-      isExtra: isExtra,
     );
     try {
       await database.setMenuItem(item);
@@ -99,6 +102,11 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
     return showErrorText ? invalidMenuItemPriceText : null;
   }
 
+  String get sequenceErrorText {
+    bool showErrorText = !sequenceValidator.isValid(sequence);
+    return showErrorText ? invalidSequenceText : null;
+  }
+
   void updateMenuItemName(String name) => updateWith(name: name);
 
   void updateMenuItemDescription(String description) => updateWith(description: description);
@@ -108,7 +116,7 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
    updateWith(price: double.tryParse(amount));
   }
 
-  void updateMenuItemIsExtra(bool isExtra) => updateWith(isExtra: isExtra);
+  void updateSequence(int sequence) => updateWith(sequence: sequence);
 
   bool optionCheck(String key) => optionIdList.contains(key);
 
@@ -129,20 +137,24 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
     updateWith(optionIdList: newOptionIdList);
   }
 
+  void updateHidden(bool hidden) => updateWith(hidden: hidden);
+
   void updateWith({
     String name,
     String description,
+    int sequence,
+    bool hidden,
     double price,
     List<String> optionIdList,
-    bool isExtra,
     bool isLoading,
     bool submitted,
   }) {
     this.name = name ?? this.name;
     this.description = description ?? this.description;
+    this.sequence = sequence ?? this.sequence;
+    this.hidden = hidden ?? this.hidden;
     this.price = price ?? this.price;
     this.optionIdList = optionIdList ?? this.optionIdList;
-    this.isExtra = isExtra ?? this.isExtra;
     this.isLoading = isLoading ?? this.isLoading;
     this.submitted = this.submitted;
     notifyListeners();
