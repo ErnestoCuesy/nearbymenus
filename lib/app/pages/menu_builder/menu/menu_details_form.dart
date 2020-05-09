@@ -29,6 +29,7 @@ class MenuDetailsForm extends StatefulWidget {
           name: menu.name ?? '',
           notes: menu.notes ?? '',
           sequence: menu.sequence ?? 0,
+          hidden: menu.hidden ?? false,
           restaurant: restaurant),
       child: Consumer<MenuDetailsModel>(
         builder: (context, model, _) => MenuDetailsForm(
@@ -112,7 +113,11 @@ class _MenuDetailsFormState extends State<MenuDetailsForm> {
       SizedBox(
         height: 8.0,
       ),
-      _sequenceTextField(),
+      _buildSequenceTextField(),
+      SizedBox(
+        height: 8.0,
+      ),
+      _buildHiddenCheckBox(),
       SizedBox(
         height: 16.0,
       ),
@@ -175,7 +180,7 @@ class _MenuDetailsFormState extends State<MenuDetailsForm> {
     );
   }
 
-  TextField _sequenceTextField() {
+  TextField _buildSequenceTextField() {
     return TextField(
       style: Theme.of(context).inputDecorationTheme.labelStyle,
       controller: _sequenceController,
@@ -183,7 +188,7 @@ class _MenuDetailsFormState extends State<MenuDetailsForm> {
       cursorColor: Colors.black,
       decoration: InputDecoration(
         labelText: 'Sequence of appearance',
-        hintText: 'i.e.: 0, 1, 2, 3, 4',
+        hintText: 'i.e.: 0, 10, 20, 30, 40',
         errorText: model.sequenceErrorText,
         enabled: model.isLoading == false,
       ),
@@ -197,6 +202,14 @@ class _MenuDetailsFormState extends State<MenuDetailsForm> {
     );
   }
 
+  Widget _buildHiddenCheckBox() {
+    return CheckboxListTile(
+      title: const Text('Hide this menu'),
+      value: model.hidden,
+      onChanged: model.updateHidden,
+    );
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Container(
