@@ -16,17 +16,16 @@ class ExpandableMenuBrowser extends StatefulWidget {
 }
 
 class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
+  Session session;
+  Database database;
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
+  bool get orderOnHold => session.currentOrder != null;
 
   Widget _buildContents(BuildContext context, Map<String, dynamic> menus, Map<String, dynamic> options, dynamic sortedKeys) {
     return ListView.builder(
       itemCount: sortedKeys.length,
       itemBuilder: (BuildContext context, int index) {
-        // String key = menus.keys.elementAt(index);
-        // final menu = menus[key];
-        print(sortedKeys[index]);
         final menu = menus[sortedKeys[index]];
-        print(menu);
         return ExpandableListView(menu: menu, options: options,);
       },
     );
@@ -34,8 +33,8 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
 
   @override
   Widget build(BuildContext context) {
-    final session = Provider.of<Session>(context);
-    final database = Provider.of<Database>(context, listen: true);
+    session = Provider.of<Session>(context);
+    database = Provider.of<Database>(context, listen: true);
     Restaurant restaurant;
     Map<String, dynamic> menus;
     Map<String, dynamic> options;
@@ -49,14 +48,14 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
             session.nearestRestaurant = restaurant;
             menus = restaurant.restaurantMenus;
             options = restaurant.restaurantOptions;
-            print(menus);
           }
           sortedMenus.clear();
           menus.forEach((key, value) {
-            sortedMenus.putIfAbsent(value['sequence'].toString(), () => value);
+            if (value['hidden'] == false) {
+              sortedMenus.putIfAbsent(value['sequence'].toString(), () => value);
+            }
           });
           var sortedKeys = sortedMenus.keys.toList()..sort();
-          print(sortedKeys);
           if (Platform.isAndroid) {
             return Scaffold(
               appBar: AppBar(
@@ -64,6 +63,16 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
                   '${restaurant.name}',
                   style: TextStyle(color: Theme.of(context).appBarTheme.color),
                 ),
+                actions: [
+                  if (orderOnHold)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 26.0),
+                    child: IconButton(
+                      icon: Icon(Icons.shopping_cart),
+                      onPressed: null,
+                    ),
+                  )
+                ],
               ),
               body: _buildContents(context, sortedMenus, options, sortedKeys),
             );
@@ -74,6 +83,16 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
                   '${restaurant.name}',
                   style: TextStyle(color: Theme.of(context).appBarTheme.color),
                 ),
+                actions: [
+                  if (orderOnHold)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 26.0),
+                      child: IconButton(
+                        icon: Icon(Icons.shopping_cart),
+                        onPressed: null,
+                      ),
+                    )
+                ],
               ),
               body: _buildContents(context, sortedMenus, options, sortedKeys),
             );
