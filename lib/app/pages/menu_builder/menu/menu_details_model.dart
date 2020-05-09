@@ -14,6 +14,7 @@ class MenuDetailsModel with RestaurantMenuValidators, ChangeNotifier {
   String name;
   String notes;
   int sequence;
+  bool hidden;
   bool isLoading;
   bool submitted;
 
@@ -25,6 +26,7 @@ class MenuDetailsModel with RestaurantMenuValidators, ChangeNotifier {
       this.name,
       this.notes,
       this.sequence,
+      this.hidden,
       this.isLoading = false,
       this.submitted = false,
   });
@@ -40,6 +42,7 @@ class MenuDetailsModel with RestaurantMenuValidators, ChangeNotifier {
       name: name,
       notes: notes,
       sequence: sequence,
+      hidden: hidden,
     );
     try {
       await database.setMenu(menu);
@@ -51,6 +54,7 @@ class MenuDetailsModel with RestaurantMenuValidators, ChangeNotifier {
         stageMenu['name'] = name;
         stageMenu['notes'] = notes;
         stageMenu['sequence'] = sequence;
+        stageMenu['hidden'] = hidden;
         restaurant.restaurantMenus.update(id, (_) => stageMenu);
       } else {
         restaurant.restaurantMenus.putIfAbsent(id, () => menu.toMap());
@@ -84,16 +88,20 @@ class MenuDetailsModel with RestaurantMenuValidators, ChangeNotifier {
 
   void updateSequence(int sequence) => updateWith(sequence: sequence);
 
+  void updateHidden(bool hidden) => updateWith(hidden: hidden);
+
   void updateWith({
     String name,
     String notes,
     int sequence,
+    bool hidden,
     bool isLoading,
     bool submitted,
   }) {
     this.name = name ?? this.name;
     this.notes = notes ?? this.notes;
     this.sequence = sequence ?? this.sequence;
+    this.hidden = hidden ?? this.hidden;
     this.isLoading = isLoading ?? this.isLoading;
     this.submitted = this.submitted;
     notifyListeners();
