@@ -95,7 +95,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
                   margin: EdgeInsets.all(12.0),
                   child: ListTile(
                     isThreeLine: true,
-                    leading: Icon(Icons.link),
+                    leading: item.hidden ? Icon(Icons.visibility_off) : Icon(Icons.visibility),
                     title: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
