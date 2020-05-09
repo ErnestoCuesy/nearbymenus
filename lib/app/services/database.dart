@@ -1,13 +1,12 @@
 import 'dart:async';
-import 'package:meta/meta.dart';
 import 'package:nearbymenus/app/models/authorizations.dart';
 import 'package:nearbymenus/app/models/menu_item.dart';
 import 'package:nearbymenus/app/models/menu.dart';
 import 'package:nearbymenus/app/models/option.dart';
 import 'package:nearbymenus/app/models/option_item.dart';
+import 'package:nearbymenus/app/models/order.dart';
+import 'package:nearbymenus/app/models/order_item.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
-import 'package:nearbymenus/app/models/job.dart';
-import 'package:nearbymenus/app/models/entry.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'api_path.dart';
@@ -16,14 +15,6 @@ import 'firestore_service.dart';
 abstract class Database {
   String get userId;
   void setUserId(String uid);
-  Future<void> setJob(Job job);
-  Future<void> deleteJob(Job job);
-  Stream<List<Job>> jobsStream();
-  Stream<Job> jobStream({@required String jobId});
-  Future<void> setEntry(Entry entry);
-  Future<void> deleteEntry(Entry entry);
-  Stream<List<Entry>> entriesStream({Job job});
-  // TODO cleanup unused above definitions
   Future<void> setUserDetails(UserDetails userDetails);
   Stream<UserDetails> userDetailsStream();
   Stream<List<Restaurant>> managerRestaurants(String restaurantId);
@@ -50,6 +41,12 @@ abstract class Database {
   Future<void> setOptionItem(OptionItem optionItem);
   Stream<List<OptionItem>> optionItems(String optionId);
   Future<void> deleteOptionItem(OptionItem optionItem);
+  Future<void> setOrder(Order order);
+  Stream<List<Order>> restaurantOrders(String restaurantId);
+  Future<void> deleteOrder(Order order);
+  Future<void> setOrderItem(OrderItem orderItem);
+  Stream<List<OrderItem>> orderItems(String orderId);
+  Future<void> deleteOrderItem(OrderItem orderItem);
 }
 
 String documentIdFromCurrentDate() => DateTime.now().toIso8601String();
@@ -67,58 +64,6 @@ class FirestoreDatabase implements Database {
   void setUserId(String uid) {
     this.uid = uid;
   }
-
-  @override
-  Future<void> setJob(Job job) async => await _service.setData(
-        path: APIPath.job(uid, job.id),
-        data: job.toMap(),
-      );
-
-  @override
-  Future<void> deleteJob(Job job) async {
-    // delete where entry.jobId == job.jobId
-    final allEntries = await entriesStream(job: job).first;
-    for (Entry entry in allEntries) {
-      if (entry.jobId == job.id) {
-        await deleteEntry(entry);
-      }
-    }
-    // delete job
-    await _service.deleteData(path: APIPath.job(uid, job.id));
-  }
-
-  @override
-  Stream<Job> jobStream({@required String jobId}) => _service.documentStream(
-        path: APIPath.job(uid, jobId),
-        builder: (data, documentId) => Job.fromMap(data, documentId),
-      );
-
-  @override
-  Stream<List<Job>> jobsStream() => _service.collectionStream(
-        path: APIPath.jobs(uid),
-        builder: (data, documentId) => Job.fromMap(data, documentId),
-      );
-
-  @override
-  Future<void> setEntry(Entry entry) async => await _service.setData(
-        path: APIPath.entry(uid, entry.id),
-        data: entry.toMap(),
-      );
-
-  @override
-  Future<void> deleteEntry(Entry entry) async =>
-      await _service.deleteData(path: APIPath.entry(uid, entry.id));
-
-  @override
-  Stream<List<Entry>> entriesStream({Job job}) =>
-      _service.collectionStream<Entry>(
-        path: APIPath.entries(uid),
-        queryBuilder: job != null
-            ? (query) => query.where('jobId', isEqualTo: job.id)
-            : null,
-        builder: (data, documentID) => Entry.fromMap(data, documentID),
-        sort: (lhs, rhs) => rhs.start.compareTo(lhs.start),
-      );
 
   // Used by several widgets
   @override
@@ -291,5 +236,42 @@ class FirestoreDatabase implements Database {
   @override
   Future<void> deleteOptionItem(OptionItem optionItem) async {
     await _service.deleteData(path: APIPath.optionItem(optionItem.id));
+  }
+
+  @override
+  Future<void> setOrder(Order order) async => await _service
+      .setData(path: APIPath.order(order.id), data: order.toMap());
+
+  @override
+  Stream<List<Order>> restaurantOrders(String restaurantId) => _service.collectionStream(
+    path: APIPath.orders(),
+    queryBuilder: restaurantId != null
+        ? (query) => query.where('restaurantId', isEqualTo: restaurantId)
+        : null,
+    builder: (data, documentId) => Order.fromMap(data, documentId),
+  );
+
+  @override
+  Future<void> deleteOrder(Order order) async {
+    await _service.deleteData(path: APIPath.order(order.id));
+  }
+
+  @override
+  Future<void> setOrderItem(OrderItem orderItem) async => await _service
+      .setData(path: APIPath.orderItem(orderItem.id), data: orderItem.toMap());
+
+  // Used by option details page
+  @override
+  Stream<List<OrderItem>> orderItems(String orderId) => _service.collectionStream(
+    path: APIPath.orderItems(),
+    queryBuilder: orderId != null
+        ? (query) => query.where('orderId', isEqualTo: orderId)
+        : null,
+    builder: (data, documentId) => OrderItem.fromMap(data, documentId),
+  );
+
+  @override
+  Future<void> deleteOrderItem(OrderItem orderItem) async {
+    await _service.deleteData(path: APIPath.orderItem(orderItem.id));
   }
 }
