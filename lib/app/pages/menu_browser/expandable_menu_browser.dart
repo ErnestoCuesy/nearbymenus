@@ -6,6 +6,7 @@ import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart'
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_list_view.dart';
+import 'package:nearbymenus/app/pages/orders/place_order.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
@@ -26,9 +27,15 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
       itemCount: sortedKeys.length,
       itemBuilder: (BuildContext context, int index) {
         final menu = menus[sortedKeys[index]];
-        return ExpandableListView(menu: menu, options: options,);
+        return ExpandableListView(callBack: this.callBack, menu: menu, options: options,);
       },
     );
+  }
+
+  void callBack() {
+    setState(() {
+      print('I WAS CALLED');
+    });
   }
 
   @override
@@ -69,9 +76,16 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
                     padding: const EdgeInsets.only(right: 26.0),
                     child: IconButton(
                       icon: Icon(Icons.shopping_cart),
-                      onPressed: null,
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            fullscreenDialog: false,
+                            builder: (context) => PlaceOrder()
+                          ),
+                        );
+                      },
                     ),
-                  )
+                  ),
                 ],
               ),
               body: _buildContents(context, sortedMenus, options, sortedKeys),
