@@ -3,20 +3,20 @@ class MenuItem {
   final String menuId;
   final String name;
   final String description;
+  final int sequence;
+  final bool hidden;
   final double price;
   final List<String> options;
-  final bool isExtra;
-  final bool isSide;
 
   MenuItem({
     this.id,
     this.menuId,
     this.name,
     this.description,
+    this.sequence,
+    this.hidden,
     this.price,
     this.options,
-    this.isExtra,
-    this.isSide,
   });
 
   factory MenuItem.fromMap(Map<String, dynamic> data, String documentID) {
@@ -28,10 +28,10 @@ class MenuItem {
       menuId: data['menuId'],
       name: data['name'],
       description: data['description'],
+      sequence: data['sequence'],
+      hidden: data['hidden'] ?? false,
       price: data['price'],
       options: List.from(data['options']) ?? [],
-      isExtra: data['isExtra'],
-      isSide: data['isSide'],
     );
   }
 
@@ -41,16 +41,16 @@ class MenuItem {
       'menuId': menuId,
       'name': name,
       'description': description,
+      'sequence': sequence,
+      'hidden': hidden ?? false,
       'price': price,
       'options': options,
-      'isExtra': isExtra,
-      'isSide': isSide,
     };
   }
 
   @override
   String toString() {
-    return 'id: $id, menuId: $menuId, name: $name, description: $description, price: $price, options: $options, isExtra: $isExtra, isSide: $isSide';
+    return 'id: $id, menuId: $menuId, name: $name, description: $description, price: $price, options: $options, sequence: $sequence, hidden: $hidden';
   }
 
 }
