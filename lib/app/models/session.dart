@@ -1,4 +1,5 @@
 import 'package:geolocator/geolocator.dart';
+import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/services/iap_manager.dart';
@@ -10,6 +11,7 @@ class Session {
   bool restaurantsFound = false;
   Subscription subscription = Subscription();
   bool restaurantAccessGranted = false;
+  Order currentOrder;
 
   Session({this.position});
 
