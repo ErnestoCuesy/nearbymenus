@@ -5,8 +5,6 @@ class Menu {
   final String notes;
   final int sequence;
   final bool hidden;
-  final bool onlyForExtras;
-  final bool onlyForSides;
 
   Menu({
     this.id,
@@ -15,8 +13,6 @@ class Menu {
     this.notes,
     this.sequence,
     this.hidden,
-    this.onlyForExtras,
-    this.onlyForSides,
   });
 
   factory Menu.fromMap(Map<String, dynamic> data, String documentID) {
@@ -29,9 +25,7 @@ class Menu {
       name: data['name'],
       notes: data['notes'],
       sequence: data['sequence'],
-      hidden: data['hidden'],
-      onlyForExtras: data['onlyForExtras'],
-      onlyForSides: data['onlyForSides'],
+      hidden: data['hidden'] ?? false,
     );
   }
 
@@ -42,14 +36,12 @@ class Menu {
       'name': name,
       'notes': notes,
       'sequence': sequence,
-      'hidden': hidden,
-      'onlyForExtras': onlyForExtras,
-      'onlyForSides': onlyForSides,
+      'hidden': hidden ?? false,
     };
   }
 
   @override
   String toString() {
-    return 'id: $id, restaurantId: $restaurantId, name: $name, notes: $notes, sequence: $sequence';
+    return 'id: $id, restaurantId: $restaurantId, name: $name, notes: $notes, sequence: $sequence, hidden: $hidden';
   }
 }
