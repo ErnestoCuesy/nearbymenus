@@ -2,13 +2,14 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_container.dart';
-import 'package:nearbymenus/app/pages/orders/place_order_dialog.dart';
+import 'package:nearbymenus/app/pages/orders/add_to_order.dart';
 
 class ExpandableListView extends StatefulWidget {
+  final Function callBack;
   final Map<String, dynamic> menu;
   final Map<String, dynamic> options;
 
-  const ExpandableListView({Key key, this.menu, this.options}) : super(key: key);
+  const ExpandableListView({Key key, this.callBack, this.menu, this.options}) : super(key: key);
 
   @override
   _ExpandableListViewState createState() => _ExpandableListViewState();
@@ -23,15 +24,16 @@ class _ExpandableListViewState extends State<ExpandableListView> {
   Map<String, dynamic> get menu => widget.menu;
 
   void _addMenuItemToOrder(Map<String, dynamic> menuItem) {
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          fullscreenDialog: false,
-                          builder: (context) => PlaceOrderDialog(
-                            item: menuItem,
-                            options: widget.options,
-                          ),
-                        ),
-                      );
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        fullscreenDialog: false,
+        builder: (context) => AddToOrder(
+          callBack: widget.callBack,
+          item: menuItem,
+          options: widget.options,
+        ),
+      ),
+    );
   }
 
   @override
