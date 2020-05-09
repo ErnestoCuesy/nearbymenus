@@ -26,7 +26,7 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
       _roleContainer(
         width: 200.0,
         height: 200.0,
-        icon: Icon(Icons.accessibility),
+        icon: Icon(Icons.account_circle),
         roleName: ROLE_PATRON,
         roleDescription: 'Hungry? Browse the restaurant\'s menu and place your order!',
         onPressed: () => _changeRole(ROLE_PATRON),
@@ -35,7 +35,7 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
       _roleContainer(
         width: 200.0,
         height: 200.0,
-        icon: Icon(Icons.account_box),
+        icon: Icon(Icons.account_circle),
         roleName: ROLE_MANAGER,
         roleDescription: 'Open a restaurant, create menus and manage orders! \n(Requires subscription)',
         // onPressed: () => _changeRole(ROLE_CHECK_SUBSCRIPTION),
@@ -62,17 +62,6 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
         roleDescription: 'Request access to the restaurant to manage orders.',
         onPressed: () => _changeRole(ROLE_STAFF),
       ),
-//      if (FlavourConfig.isDevelopment())
-//      SizedBox(height: 16.0,),
-//      if (FlavourConfig.isDevelopment())
-//      _roleContainer(
-//        width: 125.0,
-//        height: 125.0,
-//        icon: Icon(Icons.adb),
-//        roleName: ROLE_DEV,
-//        roleDescription: '',
-//        onPressed: () => _changeRole(ROLE_DEV),
-//      ),
     ];
   }
 
@@ -89,7 +78,7 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
               color: Colors.black,
               onPressed: onPressed,
             ),
-            Text(roleName, style: Theme.of(context).textTheme.title,),
+            Text(roleName, style: Theme.of(context).textTheme.headline6,),
             SizedBox(
               height: 8.0,
             ),
@@ -97,7 +86,7 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 roleDescription,
-                style: Theme.of(context).textTheme.body2,
+                style: Theme.of(context).textTheme.bodyText1,
               ),
             ),
           ],
