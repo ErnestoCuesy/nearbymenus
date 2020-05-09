@@ -1,3 +1,4 @@
+import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_container.dart';
@@ -16,23 +17,37 @@ class ExpandableListView extends StatefulWidget {
 class _ExpandableListViewState extends State<ExpandableListView> {
   Map<String, dynamic> items;
   bool expandItemsFlag = false;
-  var itemList;
-  List<String> itemKeys = List<String>();
+  Map<String, dynamic> sortedMenuItems = Map<String, dynamic>();
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
 
   Map<String, dynamic> get menu => widget.menu;
 
+  void _addMenuItemToOrder(Map<String, dynamic> menuItem) {
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          fullscreenDialog: false,
+                          builder: (context) => PlaceOrderDialog(
+                            item: menuItem,
+                            options: widget.options,
+                          ),
+                        ),
+                      );
+  }
+
   @override
   Widget build(BuildContext context) {
-    itemKeys.clear();
+    sortedMenuItems.clear();
     final itemCount = menu.entries.where((element) {
-      if (element.key.toString().length > 20) {
-        itemKeys.add(element.key.toString());
+      if (element.key.toString().length > 20 &&
+          (element.value['hidden'] == null ||
+           element.value['hidden'] == false)) {
+        sortedMenuItems.putIfAbsent(menu[element.key]['sequence'].toString(), () => element.value);
         return true;
       } else {
         return false;
       }
     }).toList().length;
+    final sortedKeys = sortedMenuItems.keys.toList()..sort();
     if (itemCount == 0) {
       return Container();
     }
@@ -87,10 +102,15 @@ class _ExpandableListViewState extends State<ExpandableListView> {
           ),
           ExpandableContainer(
             expanded: expandItemsFlag,
-            expandedHeight: 90.0 * itemCount,
+            expandedHeight: 100.0 * itemCount,
             child: ListView.builder(
               itemCount: itemCount,
               itemBuilder: (BuildContext context, int index) {
+                final menuItem = sortedMenuItems[sortedKeys[index]];
+                String adjustedDescription = menuItem['description'];
+                if (adjustedDescription.length > 70) {
+                  adjustedDescription = adjustedDescription.substring(0, 70) + '...(more)';
+                }
                 return Container(
                   height: 90.0,
                   decoration: BoxDecoration(
@@ -98,37 +118,26 @@ class _ExpandableListViewState extends State<ExpandableListView> {
                       width: 0.5,
                       color: Colors.orangeAccent,
                       ),
-                      //color: Colors.grey,
                   ),
                   child: ListTile(
                     title: Padding(
                       padding: const EdgeInsets.only(left: 8.0),
                       child: Text(
-                        '${menu[itemKeys[index]]['name']}',
+                        '${menuItem['name']}',
                         style: Theme.of(context).textTheme.headline6,
                       ),
                     ),
                     subtitle: Padding(
                       padding: const EdgeInsets.only(left: 8.0, top: 8.0, bottom: 8.0),
                       child: Text(
-                        '${menu[itemKeys[index]]['description']}',
+                        '$adjustedDescription',
                       ),
                     ),
                     trailing: Text(
-                      f.format(menu[itemKeys[index]]['price']),
+                      f.format(menuItem['price']),
                       style: Theme.of(context).textTheme.headline6,
                     ),
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          fullscreenDialog: false,
-                          builder: (context) => PlaceOrderDialog(
-                            item: menu[itemKeys[index]],
-                            options: widget.options,
-                          ),
-                        ),
-                      );
-                    },
+                    onTap: () => _addMenuItemToOrder(menuItem),
                   ),
                 );
               },
