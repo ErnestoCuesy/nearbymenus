@@ -1,10 +1,5 @@
 
 class APIPath {
-  static String job(String uid, String jobId) => 'users/$uid/jobs/$jobId';
-  static String jobs(String uid) => 'users/$uid/jobs';
-  static String entry(String uid, String entryId) => 'users/$uid/entries/$entryId';
-  static String entries(String uid) => 'users/$uid/entries';
-  // TODO cleanup above unused definitions
   static String userDetails(String uid) => 'users/$uid/';
   static String restaurant(String restaurantId) => 'restaurants/$restaurantId';
   static String restaurants() => 'restaurants';
@@ -20,4 +15,8 @@ class APIPath {
   static String options() => 'options';
   static String optionItem(String optionId) => 'optionItems/$optionId';
   static String optionItems() => 'optionItems';
+  static String order(String orderId) => 'oders/$orderId';
+  static String orders() => 'orders';
+  static String orderItem(String orderId) => 'orderItems/$orderId';
+  static String orderItems() => 'orderItems';
 }
