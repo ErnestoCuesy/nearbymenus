@@ -36,7 +36,7 @@ class MenuItemDetailsForm extends StatefulWidget {
         name: item.name ?? '',
         description: item.description ?? '',
         sequence: item.sequence ?? 0,
-        hidden: item.hidden ?? 0,
+        hidden: item.hidden ?? false,
         price: item.price ?? 0.0,
         optionIdList: item.options ?? [],
       ),
@@ -152,6 +152,7 @@ class _MenuItemDetailsFormState extends State<MenuItemDetailsForm> {
       SizedBox(
         height: 16.0,
       ),
+      if (widget.optionsMap.isNotEmpty)
       Center(
         child: Text(
           'Tick all the options that apply',
@@ -287,7 +288,7 @@ class _MenuItemDetailsFormState extends State<MenuItemDetailsForm> {
 
   Widget _buildHiddenCheckBox() {
     return CheckboxListTile(
-      title: const Text('Hide this menu'),
+      title: const Text('Hide this menu item'),
       value: model.hidden,
       onChanged: model.updateHidden,
     );
