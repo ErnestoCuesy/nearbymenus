@@ -85,6 +85,10 @@ class _MenuItemPageState extends State<MenuItemPage> {
         return ListItemsBuilder<MenuItem>(
             snapshot: snapshot,
             itemBuilder: (context, item) {
+              String adjustedDescription = item.description;
+              if (adjustedDescription.length > 60) {
+                adjustedDescription = adjustedDescription.substring(0, 60) + '...(more)';
+              }
               return Dismissible(
                 background: Container(color: Colors.red),
                 key: Key('item-${item.id}'),
@@ -106,9 +110,12 @@ class _MenuItemPageState extends State<MenuItemPage> {
                         SizedBox(
                           height: 4.0,
                         ),
-                        Text(
-                          item.description,
-                          style: Theme.of(context).textTheme.subtitle1,
+                        Padding(
+                          padding: const EdgeInsets.only(top:8.0, bottom: 8.0),
+                          child: Text(
+                            adjustedDescription,
+                            style: Theme.of(context).textTheme.subtitle1,
+                          ),
                         ),
                       ],
                     ),
@@ -131,15 +138,19 @@ class _MenuItemPageState extends State<MenuItemPage> {
 
   List<Widget> _buildOptions(MenuItem item) {
     List<Widget> optionList = List<Widget>();
-    item.options.forEach((key) {
-      final value = widget.restaurant.restaurantOptions[key];
-      print('Adding: ${value['name']}');
-      optionList.add(CheckboxListTile(
-        title: Text('${value['name']}'),
-        value: true,
-        onChanged: null,
-      ));
-    });
+    if (item.options.isNotEmpty) {
+      item.options.forEach((key) {
+        final value = widget.restaurant.restaurantOptions[key];
+        if (value != null) {
+          print('Adding: ${value['name']}');
+          optionList.add(CheckboxListTile(
+            title: Text('${value['name']}'),
+            value: true,
+            onChanged: null,
+          ));
+        }
+      });
+    }
     return optionList;
   }
 
