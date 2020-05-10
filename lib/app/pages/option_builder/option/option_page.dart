@@ -60,17 +60,23 @@ class _OptionPageState extends State<OptionPage> {
     var message = '';
     var inUse = false;
     var hasChildren = false;
-    if (widget.restaurant.restaurantOptions[option.id]['usedByMenuItems'].length > 0) {
-      inUse = true;
-      message = 'Please first unselect this option from the menu items that are using it.';
-    }
-    if (!inUse) {
-      widget.restaurant.restaurantOptions[option.id].forEach((key, value) {
-        if (key.toString().length > 20) {
-          hasChildren = true;
-          message = 'Please delete all the option items first.';
-        }
-      });
+    if (widget.restaurant.restaurantOptions != null && widget.restaurant.restaurantOptions.isNotEmpty) {
+      if (widget.restaurant.restaurantOptions[option.id]['usedByMenuItems']
+          .length > 0) {
+        inUse = true;
+        message =
+        'Please first unselect this option from the menu items that are using it.';
+      }
+      if (!inUse) {
+        widget.restaurant.restaurantOptions[option.id].forEach((key, value) {
+          if (key
+              .toString()
+              .length > 20) {
+            hasChildren = true;
+            message = 'Please delete all the option items first.';
+          }
+        });
+      }
     }
     if (inUse || hasChildren) {
       return !await PlatformExceptionAlertDialog(
@@ -108,7 +114,7 @@ class _OptionPageState extends State<OptionPage> {
                   margin: EdgeInsets.all(12.0),
                   child: ListTile(
                     isThreeLine: false,
-                    leading: Icon(Icons.link),
+                    // leading: Icon(Icons.link),
                     title: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
