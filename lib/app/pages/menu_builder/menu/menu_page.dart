@@ -109,7 +109,10 @@ class _MenuPageState extends State<MenuPage> {
                         ),
                       ],
                     ),
-                    subtitle: Text(menu.notes ?? ''),
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top:8.0),
+                      child: Text(menu.notes ?? ''),
+                    ),
                     trailing: IconButton(
                       onPressed: () => Navigator.of(context).push(
                         MaterialPageRoute(
