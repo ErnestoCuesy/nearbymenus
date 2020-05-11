@@ -40,6 +40,7 @@ class RestaurantDetailsForm extends StatefulWidget {
         acceptCard: restaurant.acceptCard ?? false,
         acceptZapper: restaurant.acceptZapper ?? false,
         restaurantMenus: restaurant.restaurantMenus ?? {},
+        restaurantOptions: restaurant.restaurantOptions ?? {},
       ),
       child: Consumer<RestaurantDetailsModel>(
         builder: (context, model, _) => RestaurantDetailsForm(
