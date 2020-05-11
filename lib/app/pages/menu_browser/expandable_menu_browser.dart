@@ -103,7 +103,14 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
                       padding: const EdgeInsets.only(right: 26.0),
                       child: IconButton(
                         icon: Icon(Icons.shopping_cart),
-                        onPressed: null,
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                                fullscreenDialog: false,
+                                builder: (context) => PlaceOrder()
+                            ),
+                          );
+                        },
                       ),
                     )
                 ],
