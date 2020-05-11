@@ -28,6 +28,8 @@ class _AddToOrderState extends State<AddToOrder> {
   Map<String, dynamic> get item => widget.item;
   List<String> menuItemOptions = List<String>();
   Map<String, int> optionsSelectionCounters = Map<String, int>();
+  int quantity = 1;
+  double lineTotal = 0;
 
   void _addMenuItemToOrder() {
     final double timestamp = dateFromCurrentDate() / 1.0;
@@ -50,9 +52,9 @@ class _AddToOrderState extends State<AddToOrder> {
       id: documentIdFromCurrentDate(),
       orderId: orderNumber,
       name: item['name'],
-      quantity: 1,
+      quantity: quantity,
       price: item['price'],
-      total: item['total'],
+      lineTotal: lineTotal,
       options: menuItemOptions,
     ).toMap();
     session.currentOrder.orderItems.add(orderItem);
@@ -63,6 +65,7 @@ class _AddToOrderState extends State<AddToOrder> {
   Widget _buildContents(BuildContext context) {
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
+    lineTotal = widget.item['price'] * quantity;
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -77,9 +80,12 @@ class _AddToOrderState extends State<AddToOrder> {
                   SizedBox(
                     height: 16.0,
                   ),
-                  Text(
-                    '${widget.item['name']}',
-                    style: Theme.of(context).accentTextTheme.headline4,
+                  Padding(
+                    padding: const EdgeInsets.only(left: 24.0, right: 24.0),
+                    child: Text(
+                      '${widget.item['name']}',
+                      style: Theme.of(context).accentTextTheme.headline4,
+                    ),
                   ),
                   SizedBox(
                     height: 16.0,
@@ -94,14 +100,19 @@ class _AddToOrderState extends State<AddToOrder> {
                   SizedBox(
                     height: 16.0,
                   ),
-                  SizedBox(
-                    height: 16.0,
-                  ),
+                  if (widget.item['options'].isNotEmpty)
                   Column(
                     children: _buildOptions(),
                   ),
+                  if (widget.item['options'].isEmpty)
+                    Column(
+                      children: _buildQuantityField(),
+                    ),
+                  SizedBox(
+                    height: 16.0,
+                  ),
                   Text(
-                    f.format(widget.item['price']),
+                    f.format(lineTotal),
                     style: Theme.of(context).textTheme.headline6,
                   ),
                   SizedBox(
@@ -137,6 +148,50 @@ class _AddToOrderState extends State<AddToOrder> {
         ),
       ),
     );
+  }
+
+  List<Widget> _buildQuantityField() {
+    return [
+      new Container(
+        child: new Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            new IconButton(
+              icon: new Icon(Icons.remove),
+              onPressed: quantity == 1 ? null : () {
+                setState(() {
+                  quantity--;
+                });
+              },
+            ),
+            new Container(
+              decoration: new BoxDecoration(
+                border: new Border.all(
+                  color: Colors.grey[700],
+                  width: 0.5,
+                ),
+              ),
+              child: new SizedBox(
+                width: 70.0,
+                height: 45.0,
+                child: new Center(
+                    child: new Text('$quantity',
+                        style: Theme.of(context).textTheme.subtitle1,
+                        textAlign: TextAlign.center)),
+              ),
+            ),
+            new IconButton(
+              icon: new Icon(Icons.add),
+              onPressed: () {
+                setState(() {
+                  quantity++;
+                });
+              },
+            ),
+          ],
+        ),
+      ),
+    ];
   }
 
   bool _optionsAreValid() {
