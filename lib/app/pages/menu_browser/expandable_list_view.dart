@@ -109,6 +109,10 @@ class _ExpandableListViewState extends State<ExpandableListView> {
               itemCount: itemCount,
               itemBuilder: (BuildContext context, int index) {
                 final menuItem = sortedMenuItems[sortedKeys[index]];
+                String adjustedName = menuItem['name'];
+                if (adjustedName.length > 25) {
+                  adjustedName = adjustedName.substring(0, 25) + '...(more)';
+                }
                 String adjustedDescription = menuItem['description'];
                 if (adjustedDescription.length > 70) {
                   adjustedDescription = adjustedDescription.substring(0, 70) + '...(more)';
@@ -125,7 +129,7 @@ class _ExpandableListViewState extends State<ExpandableListView> {
                     title: Padding(
                       padding: const EdgeInsets.only(left: 8.0),
                       child: Text(
-                        '${menuItem['name']}',
+                        '$adjustedName',
                         style: Theme.of(context).textTheme.headline6,
                       ),
                     ),
