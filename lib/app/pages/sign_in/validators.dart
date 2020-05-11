@@ -77,18 +77,15 @@ class RestaurantMenuValidators {
   final String invalidSequenceText = 'Sequence can\'t be empty and must be greater than zero';
 }
 
-class MenuSectionValidators {
-  final StringValidator menuSectionNameValidator = NonEmptyStringValidator();
-  final String invalidMenuSectionNameText = 'Section name can\'t be empty';
-}
-
 class MenuItemValidators {
   final StringValidator menuItemNameValidator = NonEmptyStringValidator();
   final StringValidator menuItemDescriptionValidator = NonEmptyStringValidator();
   final DoubleNumberValidator menuItemPriceValidator = DoubleNumericFieldValidator();
+  final NumberValidator sequenceValidator = NumericFieldValidator();
   final String invalidMenuItemNameText = 'Menu item name can\'t be empty';
   final String invalidMenuItemDescriptionText = 'Description can\'t be empty';
   final String invalidMenuItemPriceText = 'Price must be a number';
+  final String invalidSequenceText = 'Sequence can\'t be empty and must be greater than zero';
 }
 
 class OptionItemValidators {
