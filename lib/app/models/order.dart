@@ -46,6 +46,15 @@ class Order {
     );
   }
 
+  double get orderTotal {
+    double total = 0;
+    orderItems.forEach((element) {
+      Map<String, dynamic> item = element;
+      total += item['lineTotal'];
+    });
+    return total;
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
