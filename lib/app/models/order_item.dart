@@ -4,10 +4,10 @@ class OrderItem {
   final String name;
   final int quantity;
   final double price;
-  final double total;
+  final double lineTotal;
   final List<String> options;
 
-  OrderItem({this.id, this.orderId, this.name, this.quantity, this.options, this.price, this.total});
+  OrderItem({this.id, this.orderId, this.name, this.quantity, this.options, this.price, this.lineTotal});
 
   factory OrderItem.fromMap(Map<String, dynamic> data, String documentID) {
     if (data == null) {
@@ -25,7 +25,7 @@ class OrderItem {
       name: data['name'],
       quantity: data['quantity'],
       price: data['price'],
-      total: data['total'],
+      lineTotal: data['lineTotal'],
       options: options,
     );
   }
@@ -37,14 +37,14 @@ class OrderItem {
       'name': name,
       'quantity': quantity,
       'price': price,
-      'total': total,
+      'lineTotal': lineTotal,
       'options': options ?? [],
     };
   }
 
   @override
   String toString() {
-    return 'id: $id, orderId: $orderId, name: $name, quantity: $quantity, price: $price, total: $total, options: $options';
+    return 'id: $id, orderId: $orderId, name: $name, quantity: $quantity, price: $price, lineTotal: $lineTotal, options: $options';
   }
 
 }
