@@ -56,7 +56,7 @@ class _OptionItemPageState extends State<OptionItemPage> {
     }
   }
 
-  Future<bool> _confirmDismiss(BuildContext context, OptionItem item) async {
+  Future<bool> _confirmDismiss(BuildContext context) async {
     return await PlatformAlertDialog(
       title: 'Confirm option item deletion',
       content: 'Do you really want to delete this option item?',
@@ -76,7 +76,7 @@ class _OptionItemPageState extends State<OptionItemPage> {
                 background: Container(color: Colors.red),
                 key: Key('item-${item.id}'),
                 direction: DismissDirection.endToStart,
-                confirmDismiss: (_) => _confirmDismiss(context, item),
+                confirmDismiss: (_) => _confirmDismiss(context),
                 onDismissed: (direction) => _deleteItem(context, item),
                 child: Card(
                   margin: EdgeInsets.all(12.0),
