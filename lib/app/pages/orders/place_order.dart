@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
+import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
 class PlaceOrder extends StatefulWidget {
+
   @override
   _PlaceOrderState createState() => _PlaceOrderState();
 }
@@ -15,7 +17,8 @@ class _PlaceOrderState extends State<PlaceOrder> {
   Session session;
   Database database;
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
-  ScrollController scrollController = ScrollController();
+  ScrollController orderScrollController = ScrollController();
+  ScrollController itemsScrollController = ScrollController();
 
   void _deleteOrderItem(int index) {
     setState(() {
@@ -32,16 +35,49 @@ class _PlaceOrderState extends State<PlaceOrder> {
     ).show(context);
   }
 
+  Future<bool> _confirmCancelOrder(BuildContext context) async {
+    return await PlatformAlertDialog(
+      title: 'Confirm order cancelation',
+      content: 'Do you really want to cancel this order?',
+      cancelActionText: 'No',
+      defaultActionText: 'Yes',
+    ).show(context);
+  }
+
+  void _submitOrder() async {
+    try {
+      session.currentOrder.status = ORDER_PLACED;
+      await database.setOrder(session.currentOrder);
+      session.currentOrder = null;
+      await Future.delayed(Duration(seconds: 2)); // Simulate slow network
+      Navigator.of(context).pop();
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  void _showSnackBar(BuildContext context, String text) {
+    Scaffold.of(context).showSnackBar(
+      SnackBar(
+        content: Text(text),
+      ),
+    );
+  }
+
   Widget _buildContents(BuildContext context) {
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
+    if (session.currentOrder == null) {
+      return null;
+    }
     final orderTotal = session.currentOrder.orderTotal;
     return SingleChildScrollView(
+      controller: orderScrollController,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Container(
           width: MediaQuery.of(context).size.width - 16.0,
-          height: MediaQuery.of(context).size.height - 150.0,
           color: Theme.of(context).dialogBackgroundColor,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -67,14 +103,13 @@ class _PlaceOrderState extends State<PlaceOrder> {
                     child: Text(session.currentOrder.deliveryAddress),
                   ),
                   SizedBox(
-                    height: MediaQuery.of(context).size.height - 500.0,
                     child: Container(
                       decoration: BoxDecoration(border: Border.all()),
                       child: Scrollbar(
                         isAlwaysShown: true,
-                        controller: scrollController,
+                        controller: itemsScrollController,
                         child: ListView.builder(
-                          controller: scrollController,
+                          controller: itemsScrollController,
                           shrinkWrap: true,
                           itemCount: session.currentOrder.orderItems.length,
                           itemBuilder: (BuildContext context, int index) {
@@ -110,7 +145,7 @@ class _PlaceOrderState extends State<PlaceOrder> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text('Scroll to view more items. Swipe an item to the left to remove it. Tap an item to make changes.'),
+                    child: Text('Swipe items to the left to remove.'),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -126,15 +161,26 @@ class _PlaceOrderState extends State<PlaceOrder> {
                       children: [
                         FormSubmitButton(
                           context: context,
-                          text: 'Cancel Order',
+                          text: 'Cancel',
                           color: Theme.of(context).primaryColor,
-                          onPressed: () {},
+                          onPressed: () async {
+                            final bool cancelOrder = await _confirmCancelOrder(context);
+                            if (cancelOrder) {
+                              session.currentOrder = null;
+                              Navigator.of(context).pop();
+                            }
+                          },
                         ),
-                        FormSubmitButton(
-                          context: context,
-                          text: 'Place Order',
-                          color: Theme.of(context).primaryColor,
-                          onPressed: () {},
+                        Builder(
+                          builder: (context) => FormSubmitButton(
+                            context: context,
+                            text: 'Submit',
+                            color: Theme.of(context).primaryColor,
+                            onPressed: () {
+                              _submitOrder();
+                              _showSnackBar(context, 'Order submitted successfully to ${session.nearestRestaurant.name}!');
+                            },
+                          ),
                         ),
                       ],
                     ),
