@@ -15,8 +15,6 @@ class APIPath {
   static String options() => 'options';
   static String optionItem(String optionId) => 'optionItems/$optionId';
   static String optionItems() => 'optionItems';
-  static String order(String orderId) => 'oders/$orderId';
+  static String order(String orderId) => 'orders/$orderId';
   static String orders() => 'orders';
-  static String orderItem(String orderId) => 'orderItems/$orderId';
-  static String orderItems() => 'orderItems';
 }
