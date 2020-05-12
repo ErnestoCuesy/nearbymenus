@@ -112,7 +112,7 @@ class TabItemData {
     TabItem.manageOrders:
     TabItemData(title: 'Orders', icon: Icons.assignment),
     TabItem.myOrders:
-    TabItemData(title: 'My Orders', icon: Icons.shopping_cart),
+    TabItemData(title: 'Orders History', icon: Icons.update),
     TabItem.messages:
     TabItemData(title: 'Messages', icon: Icons.message),
     TabItem.userAccount:
