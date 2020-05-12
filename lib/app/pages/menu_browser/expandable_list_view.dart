@@ -5,11 +5,10 @@ import 'package:nearbymenus/app/pages/menu_browser/expandable_container.dart';
 import 'package:nearbymenus/app/pages/orders/add_to_order.dart';
 
 class ExpandableListView extends StatefulWidget {
-  final Function callBack;
   final Map<String, dynamic> menu;
   final Map<String, dynamic> options;
 
-  const ExpandableListView({Key key, this.callBack, this.menu, this.options}) : super(key: key);
+  const ExpandableListView({Key key, this.menu, this.options}) : super(key: key);
 
   @override
   _ExpandableListViewState createState() => _ExpandableListViewState();
@@ -28,7 +27,6 @@ class _ExpandableListViewState extends State<ExpandableListView> {
       MaterialPageRoute<void>(
         fullscreenDialog: false,
         builder: (context) => AddToOrder(
-          callBack: widget.callBack,
           item: menuItem,
           options: widget.options,
         ),
@@ -60,7 +58,7 @@ class _ExpandableListViewState extends State<ExpandableListView> {
       child: Column(
         children: <Widget>[
           Card(
-            color: Theme.of(context).backgroundColor,
+            color: Theme.of(context).canvasColor,
             margin: EdgeInsets.all(12.0),
             child: ListTile(
               isThreeLine: false,
