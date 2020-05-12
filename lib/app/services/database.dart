@@ -44,9 +44,7 @@ abstract class Database {
   Future<void> setOrder(Order order);
   Stream<List<Order>> restaurantOrders(String restaurantId);
   Future<void> deleteOrder(Order order);
-  Future<void> setOrderItem(OrderItem orderItem);
-  Stream<List<OrderItem>> orderItems(String orderId);
-  Future<void> deleteOrderItem(OrderItem orderItem);
+  Stream<List<Order>> userOrders(String restaurantId, String uid);
 }
 
 String documentIdFromCurrentDate() => DateTime.now().toIso8601String();
@@ -257,21 +255,13 @@ class FirestoreDatabase implements Database {
   }
 
   @override
-  Future<void> setOrderItem(OrderItem orderItem) async => await _service
-      .setData(path: APIPath.orderItem(orderItem.id), data: orderItem.toMap());
-
-  // Used by option details page
-  @override
-  Stream<List<OrderItem>> orderItems(String orderId) => _service.collectionStream(
-    path: APIPath.orderItems(),
-    queryBuilder: orderId != null
-        ? (query) => query.where('orderId', isEqualTo: orderId)
+  Stream<List<Order>> userOrders(String restaurantId, String uid) => _service.collectionStream(
+    path: APIPath.orders(),
+    queryBuilder: restaurantId != null
+        ? (query) => query.where('restaurantId', isEqualTo: restaurantId)
+                          .where('userId', isEqualTo: uid)
         : null,
-    builder: (data, documentId) => OrderItem.fromMap(data, documentId),
+    builder: (data, documentId) => Order.fromMap(data, documentId),
   );
 
-  @override
-  Future<void> deleteOrderItem(OrderItem orderItem) async {
-    await _service.deleteData(path: APIPath.orderItem(orderItem.id));
-  }
 }
