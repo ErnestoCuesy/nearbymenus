@@ -10,11 +10,10 @@ import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
 class AddToOrder extends StatefulWidget {
-  final Function callBack;
   final Map<String, dynamic> item;
   final Map<String, dynamic> options;
 
-  const AddToOrder({Key key, this.callBack, this.item, this.options}) : super(key: key);
+  const AddToOrder({Key key, this.item, this.options}) : super(key: key);
 
   @override
   _AddToOrderState createState() => _AddToOrderState();
@@ -59,7 +58,6 @@ class _AddToOrderState extends State<AddToOrder> {
     ).toMap();
     session.currentOrder.orderItems.add(orderItem);
     print(orderItem);
-    this.widget.callBack();
   }
 
   Widget _buildContents(BuildContext context) {
