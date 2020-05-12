@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
@@ -27,15 +29,9 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
       itemCount: sortedKeys.length,
       itemBuilder: (BuildContext context, int index) {
         final menu = menus[sortedKeys[index]];
-        return ExpandableListView(callBack: this.callBack, menu: menu, options: options,);
+        return ExpandableListView(menu: menu, options: options,);
       },
     );
-  }
-
-  void callBack() {
-    setState(() {
-      print('I WAS CALLED');
-    });
   }
 
   @override
@@ -71,18 +67,28 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
                   style: TextStyle(color: Theme.of(context).appBarTheme.color),
                 ),
                 actions: [
-                  if (orderOnHold)
                   Padding(
                     padding: const EdgeInsets.only(right: 26.0),
                     child: IconButton(
-                      icon: Icon(Icons.shopping_cart),
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            fullscreenDialog: false,
-                            builder: (context) => PlaceOrder()
+                      icon: Icon(Icons.add_shopping_cart),
+                      onPressed: () async {
+                        if (orderOnHold) {
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                                fullscreenDialog: false,
+                                builder: (context) => PlaceOrder()
+                            ),
+                          );
+                        } else {
+                          await PlatformExceptionAlertDialog(
+                              title: 'Empty Order',
+                              exception: PlatformException(
+                              code: 'ORDER_IS_EMPTY',
+                              message:  'Please tap on the menu items you wish to order first.',
+                              details:  'Please tap on the menu items you wish to order first.',
                           ),
-                        );
+                        ).show(context);
+                        }
                       },
                     ),
                   ),
@@ -98,21 +104,31 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
                   style: TextStyle(color: Theme.of(context).appBarTheme.color),
                 ),
                 actions: [
-                  if (orderOnHold)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 26.0),
-                      child: IconButton(
-                        icon: Icon(Icons.shopping_cart),
-                        onPressed: () {
+                  Padding(
+                    padding: const EdgeInsets.only(right: 26.0),
+                    child: IconButton(
+                      icon: Icon(Icons.add_shopping_cart),
+                      onPressed: () async {
+                        if (orderOnHold) {
                           Navigator.of(context).push(
                             MaterialPageRoute<void>(
                                 fullscreenDialog: false,
                                 builder: (context) => PlaceOrder()
                             ),
                           );
-                        },
-                      ),
-                    )
+                        } else {
+                          await PlatformExceptionAlertDialog(
+                            title: 'Empty Order',
+                            exception: PlatformException(
+                              code: 'ORDER_IS_EMPTY',
+                              message:  'Please tap on the menu items you wish to order first.',
+                              details:  'Please tap on the menu items you wish to order first.',
+                            ),
+                          ).show(context);
+                        }
+                      },
+                    ),
+                  ),
                 ],
               ),
               body: _buildContents(context, sortedMenus, options, sortedKeys),
