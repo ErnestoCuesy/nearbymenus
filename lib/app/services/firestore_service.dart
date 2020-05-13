@@ -60,4 +60,13 @@ class FirestoreService {
     final QuerySnapshot snapshot = await Firestore.instance.collection(path).getDocuments();
     return snapshot.documents.map((snaps) => builder(snaps.data, snaps.documentID)).toList();
   }
+
+  Future<T> documentSnapshot<T>({
+    @required String path,
+    @required T builder(Map<String, dynamic> data, String documentID),
+  }) {
+    final DocumentReference reference = Firestore.instance.document(path);
+    final Future<DocumentSnapshot> snapshots = reference.get();
+    return snapshots.then((value) => builder(value.data, value.documentID));
+  }
 }
