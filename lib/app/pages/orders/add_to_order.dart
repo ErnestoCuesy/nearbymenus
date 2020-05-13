@@ -242,7 +242,7 @@ class _AddToOrderState extends State<AddToOrder> {
               title: Text(
                 '${value['name']}',
               ),
-              value: optionCheck('${optionValue['name']}: ${value['name']}'),
+              value: _optionCheck('${optionValue['name']}: ${value['name']}'),
               onChanged: (addFlag) => _updateOptionsList(optionValue['name'], '${optionValue['name']}: ${value['name']}', addFlag),
             ),
           );
@@ -272,7 +272,7 @@ class _AddToOrderState extends State<AddToOrder> {
     });
   }
 
-  bool optionCheck(String key) => menuItemOptions.contains(key);
+  bool _optionCheck(String key) => menuItemOptions.contains(key);
 
   @override
   Widget build(BuildContext context) {
