@@ -2,25 +2,30 @@ const int ORDER_ON_HOLD = 0;
 const int ORDER_PLACED = 1;
 const int ORDER_IN_PROGRESS = 2;
 const int ORDER_DISPATCHED = 3;
+const int ORDER_CANCELLED = 4;
 
 class Order {
   final String id;
+  int orderNumber;
   final String restaurantId;
   final String userId;
   final double timestamp;
   int status;
   final String name;
   final String deliveryAddress;
+  String paymentMethod;
   final List<Map<String, dynamic>> orderItems;
 
   Order({
     this.id,
+    this.orderNumber,
     this.restaurantId,
     this.userId,
     this.timestamp,
     this.status,
     this.name,
     this.deliveryAddress,
+    this.paymentMethod,
     this.orderItems,
   });
 
@@ -36,12 +41,14 @@ class Order {
     }
     return Order(
       id: data['id'],
+      orderNumber: data['orderNumber'],
       restaurantId: data['restaurantId'],
       userId: data['userId'],
       timestamp: data['timestamp'],
       status: data['status'],
       name: data['name'],
       deliveryAddress: data['deliveryAddress'],
+      paymentMethod: data['paymentMethod'],
       orderItems: orderItems,
     );
   }
@@ -58,12 +65,14 @@ class Order {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'orderNumber': orderNumber,
       'restaurantId': restaurantId,
       'userId': userId,
       'timestamp': timestamp,
       'status': status,
       'name': name,
       'deliveryAddress': deliveryAddress,
+      'paymentMethod': paymentMethod ?? '',
       'orderItems': orderItems ?? [],
     };
   }
@@ -83,13 +92,16 @@ class Order {
       case 3:
         stString = 'Dispatched';
         break;
+      case 4:
+        stString = 'Cancelled';
+        break;
     }
     return stString;
   }
 
   @override
   String toString() {
-    return 'id: $id, restaurantId: $restaurantId, userId: $userId, timestamp: $timestamp, status: $status, name: $name, deliveryAddress: $deliveryAddress, orderItems: $orderItems';
+    return 'id: $id, orderNumber: $orderNumber, restaurantId: $restaurantId, userId: $userId, timestamp: $timestamp, status: $status, name: $name, deliveryAddress: $deliveryAddress, paymentMethod: $paymentMethod, orderItems: $orderItems';
   }
 
 }
