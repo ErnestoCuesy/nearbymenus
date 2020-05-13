@@ -8,7 +8,7 @@ class Order {
   final String restaurantId;
   final String userId;
   final double timestamp;
-  final int status;
+  int status;
   final String name;
   final String deliveryAddress;
   final List<Map<String, dynamic>> orderItems;
@@ -66,6 +66,25 @@ class Order {
       'deliveryAddress': deliveryAddress,
       'orderItems': orderItems ?? [],
     };
+  }
+
+  String get statusString {
+    String stString = '';
+    switch (status) {
+      case 0:
+        stString = 'On hold';
+        break;
+      case 1:
+        stString = 'Placed, pending';
+        break;
+      case 2:
+        stString = 'In progress';
+        break;
+      case 3:
+        stString = 'Dispatched';
+        break;
+    }
+    return stString;
   }
 
   @override
