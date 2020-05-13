@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/common_widgets/list_items_builder.dart';
 import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/session.dart';
+import 'package:nearbymenus/app/pages/orders/view_order.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/utilities/format.dart';
 import 'package:provider/provider.dart';
@@ -30,9 +31,13 @@ class _OrderHistoryState extends State<OrderHistory> {
               return Card(
                 margin: EdgeInsets.all(12.0),
                 child: ListTile(
-                  isThreeLine: false,
-                  leading: Icon(Icons.shopping_cart),
-                  title: Padding(
+                  isThreeLine: true,
+                  leading: Icon(Icons.receipt),
+                  title: Text(
+                    'Order: ${order.orderNumber}',
+                      style: Theme.of(context).textTheme.headline6,
+                  ),
+                  subtitle: Padding(
                     padding: const EdgeInsets.only(top: 4.0, bottom: 8.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,7 +47,6 @@ class _OrderHistoryState extends State<OrderHistory> {
                           const EdgeInsets.only(top: 8.0, bottom: 4.0),
                           child: Text(
                             Format.formatDateTime(order.timestamp.toInt()),
-                            style: Theme.of(context).textTheme.headline6,
                           ),
                         ),
                         Padding(
@@ -59,6 +63,14 @@ class _OrderHistoryState extends State<OrderHistory> {
                     f.format(order.orderTotal),
                     style: Theme.of(context).textTheme.headline6,
                   ),
+                  onTap: () async {
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                          fullscreenDialog: false,
+                          builder: (context) => ViewOrder(order: order,)
+                      ),
+                    );
+                  },
                 ),
               );
             });
