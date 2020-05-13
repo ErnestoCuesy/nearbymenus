@@ -91,9 +91,9 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
             'acceptingStaffRequests': acceptingStaffRequests,
           },
           paymentFlags: {
-            'acceptCash': acceptCash,
-            'acceptCard': acceptCard,
-            'acceptZapper': acceptZapper,
+            'Cash': acceptCash,
+            'Card': acceptCard,
+            'Zapper': acceptZapper,
           },
           restaurantMenus: restaurantMenus,
           restaurantOptions: restaurantOptions,
