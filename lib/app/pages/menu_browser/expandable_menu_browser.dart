@@ -1,14 +1,13 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
+import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_list_view.dart';
-import 'package:nearbymenus/app/pages/orders/place_order.dart';
+import 'package:nearbymenus/app/pages/orders/view_order.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
@@ -22,7 +21,7 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
   Session session;
   Database database;
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
-  bool get orderOnHold => session.currentOrder != null;
+  bool get orderOnHold => session.currentOrder != null && session.currentOrder.status == ORDER_ON_HOLD;
 
   Widget _buildContents(BuildContext context, Map<String, dynamic> menus, Map<String, dynamic> options, dynamic sortedKeys) {
     return ListView.builder(
@@ -59,7 +58,6 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
             }
           });
           var sortedKeys = sortedMenus.keys.toList()..sort();
-          if (Platform.isAndroid) {
             return Scaffold(
               appBar: AppBar(
                 title: Text(
@@ -76,10 +74,11 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
                           Navigator.of(context).push(
                             MaterialPageRoute<void>(
                                 fullscreenDialog: false,
-                                builder: (context) => PlaceOrder()
+                                builder: (context) => ViewOrder(order: session.currentOrder,)
                             ),
                           );
                         } else {
+                          session.currentOrder = null;
                           await PlatformExceptionAlertDialog(
                               title: 'Empty Order',
                               exception: PlatformException(
@@ -96,44 +95,6 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
               ),
               body: _buildContents(context, sortedMenus, options, sortedKeys),
             );
-          } else {
-            return Scaffold(
-              appBar: AppBar(
-                title: Text(
-                  '${restaurant.name}',
-                  style: TextStyle(color: Theme.of(context).appBarTheme.color),
-                ),
-                actions: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 26.0),
-                    child: IconButton(
-                      icon: Icon(Icons.add_shopping_cart),
-                      onPressed: () async {
-                        if (orderOnHold) {
-                          Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                                fullscreenDialog: false,
-                                builder: (context) => PlaceOrder()
-                            ),
-                          );
-                        } else {
-                          await PlatformExceptionAlertDialog(
-                            title: 'Empty Order',
-                            exception: PlatformException(
-                              code: 'ORDER_IS_EMPTY',
-                              message:  'Please tap on the menu items you wish to order first.',
-                              details:  'Please tap on the menu items you wish to order first.',
-                            ),
-                          ).show(context);
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              body: _buildContents(context, sortedMenus, options, sortedKeys),
-            );
-          }
         } else {
           return Center(
             child: PlatformProgressIndicator(),
