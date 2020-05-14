@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/pages/account/account_page.dart';
 import 'package:nearbymenus/app/pages/home/tab_item.dart';
 import 'package:nearbymenus/app/pages/notifications/messages_page.dart';
+import 'package:nearbymenus/app/pages/orders/order_history.dart';
 import 'package:nearbymenus/app/pages/restaurant/restaurant_page.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -37,7 +38,7 @@ class _HomePageManagerState extends State<HomePageManager> {
   Map<TabItem, WidgetBuilder> get widgetBuilders {
     return {
       TabItem.restaurant: (_) => RestaurantPage(),
-      TabItem.manageOrders: (_) => Placeholder(),
+      TabItem.manageOrders: (_) => OrderHistory(),
       TabItem.messages: (_) => MessagesPage(),
       TabItem.userAccount: (_) => AccountPage(auth: auth, session: session, database: database,)
     };
