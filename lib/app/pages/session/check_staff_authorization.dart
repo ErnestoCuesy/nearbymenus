@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:nearbymenus/app/common_widgets/function_not_allowed.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/models/authorizations.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/home/home_page_staff.dart';
+import 'package:nearbymenus/app/pages/orders/order_history.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
@@ -35,11 +37,13 @@ class _CheckStaffAuthorizationState extends State<CheckStaffAuthorization> {
           final Authorizations authorizations = snapshot.data;
           if (authorizations.authorizedRoles[database.userId] == 'Staff') {
             session.restaurantAccessGranted = true;
+            return HomePageStaff(role: ROLE_STAFF, ordersPage: OrderHistory(),);
           } else {
             session.restaurantAccessGranted = false;
+            return HomePageStaff(role: ROLE_STAFF, ordersPage: FunctionNotAllowed(),);
           }
         }
-        return HomePageStaff(role: ROLE_STAFF);
+        return Placeholder();
       }
     );
   }
