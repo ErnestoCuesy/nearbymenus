@@ -5,6 +5,7 @@ import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/models/order.dart';
+import 'package:nearbymenus/app/models/order_counter.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/utilities/format.dart';
@@ -64,16 +65,26 @@ class _ViewOrderState extends State<ViewOrder> {
 
   void _submitOrder() async {
     int orderNumber = 0;
+    OrderCounter orderCounter = OrderCounter(ordersLeft: 0, lastUpdated: order.id);
     await database.orderNumber(session.nearestRestaurant.id).then((value) {
       orderNumber = value;
     }).catchError((_) => null);
+    await database.ordersLeft(session.nearestRestaurant.managerId).then((value) {
+      orderCounter = value;
+    }).catchError((_) => null);
+    if (orderCounter.ordersLeft < 1) {
+      order.isBlocked = true;
+    }
     try {
+      orderCounter.ordersLeft--;
+      orderCounter.lastUpdated = order.id;
       orderNumber++;
       print('Order number: $orderNumber');
       order.orderNumber = orderNumber;
       order.status = ORDER_PLACED;
       await database.setOrder(order);
       await database.setOrderNumber(session.nearestRestaurant.id, orderNumber);
+      await database.setOrderCounter(session.nearestRestaurant.managerId, orderCounter);
       session.currentOrder = null;
       //await Future.delayed(Duration(seconds: 2)); // Simulate slow network
       Navigator.of(context).pop();
@@ -113,10 +124,18 @@ class _ViewOrderState extends State<ViewOrder> {
                   SizedBox(
                     height: 16.0,
                   ),
+                  if (order.status != ORDER_ON_HOLD)
                   Padding(
                     padding: const EdgeInsets.only(left: 24, right: 24.0),
                     child: Text(
-                      ' Deliver to:',
+                      'Order # ${order.orderNumber}',
+                      style: Theme.of(context).accentTextTheme.headline5,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 24, right: 24.0),
+                    child: Text(
+                      'Deliver to:',
                       style: Theme.of(context).accentTextTheme.headline4,
                     ),
                   ),
