@@ -15,6 +15,7 @@ class Order {
   final String deliveryAddress;
   String paymentMethod;
   final List<Map<String, dynamic>> orderItems;
+  bool isBlocked;
 
   Order({
     this.id,
@@ -27,6 +28,7 @@ class Order {
     this.deliveryAddress,
     this.paymentMethod,
     this.orderItems,
+    this.isBlocked,
   });
 
   factory Order.fromMap(Map<String, dynamic> data, String documentID) {
@@ -50,6 +52,7 @@ class Order {
       deliveryAddress: data['deliveryAddress'],
       paymentMethod: data['paymentMethod'],
       orderItems: orderItems,
+      isBlocked: data['isBlocked'],
     );
   }
 
@@ -74,6 +77,7 @@ class Order {
       'deliveryAddress': deliveryAddress,
       'paymentMethod': paymentMethod ?? '',
       'orderItems': orderItems ?? [],
+      'isBlocked': isBlocked ?? false,
     };
   }
 
@@ -101,7 +105,7 @@ class Order {
 
   @override
   String toString() {
-    return 'id: $id, orderNumber: $orderNumber, restaurantId: $restaurantId, userId: $userId, timestamp: $timestamp, status: $status, name: $name, deliveryAddress: $deliveryAddress, paymentMethod: $paymentMethod, orderItems: $orderItems';
+    return 'id: $id, orderNumber: $orderNumber, restaurantId: $restaurantId, userId: $userId, timestamp: $timestamp, status: $status, name: $name, deliveryAddress: $deliveryAddress, paymentMethod: $paymentMethod, orderItems: $orderItems, isBlocked: $isBlocked';
   }
 
 }
