@@ -18,4 +18,6 @@ class APIPath {
   static String order(String orderId) => 'orders/$orderId';
   static String orders() => 'orders';
   static String orderNumbers(String restaurantId) => 'orderNumbers/$restaurantId';
+  static String orderCounter(String uid) => 'users/$uid/orderBundles/counter';
+  static String orderBundles(String uid, String bundleId) => 'users/$uid/orderBundles/$bundleId';
 }
