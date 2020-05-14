@@ -5,6 +5,8 @@ import 'package:nearbymenus/app/models/menu.dart';
 import 'package:nearbymenus/app/models/option.dart';
 import 'package:nearbymenus/app/models/option_item.dart';
 import 'package:nearbymenus/app/models/order.dart';
+import 'package:nearbymenus/app/models/order_bundle.dart';
+import 'package:nearbymenus/app/models/order_counter.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
@@ -46,6 +48,10 @@ abstract class Database {
   Stream<List<Order>> userOrders(String restaurantId, String uid);
   Future<void> setOrderNumber(String restaurantId, int orderNumber);
   Future<int> orderNumber(String restaurantId);
+  Future<void> setOrderCounter(String uid, OrderCounter orderCounter);
+  Future<void> setOrderBundle(String uid, OrderBundle orderBundle);
+  Future<OrderCounter> ordersLeft(String uid);
+  Stream<OrderCounter> orderCounterStream(String managerUid);
 }
 
 String documentIdFromCurrentDate() => DateTime.now().toIso8601String();
@@ -269,10 +275,29 @@ class FirestoreDatabase implements Database {
   Future<void> setOrderNumber(String restaurantId, int orderNumber) async => await _service
       .setData(path: APIPath.orderNumbers(restaurantId), data: {'orderNumber': orderNumber});
 
-
   @override
   Future<int> orderNumber(String restaurantId) => _service.documentSnapshot(
     path: APIPath.orderNumbers(restaurantId),
     builder: (data, documentId) => data['orderNumber'],
+  );
+
+  @override
+  Future<void> setOrderCounter(String managerUid, OrderCounter orderCounter) async => await _service
+      .setData(path: APIPath.orderCounter(managerUid), data: orderCounter.toMap());
+
+  @override
+  Future<void> setOrderBundle(String managerUid, OrderBundle orderBundle) async => await _service
+      .setData(path: APIPath.orderBundles(managerUid, orderBundle.id), data: orderBundle.toMap());
+
+  @override
+  Future<OrderCounter> ordersLeft(String managerUid) => _service.documentSnapshot(
+    path: APIPath.orderCounter(managerUid),
+    builder: (data, documentId) => OrderCounter.fromMap(data, documentId),
+  );
+
+  @override
+  Stream<OrderCounter> orderCounterStream(String managerUid) => _service.documentStream(
+    path: APIPath.orderCounter(managerUid),
+    builder: (data, documentId) => OrderCounter.fromMap(data, documentId),
   );
 }
