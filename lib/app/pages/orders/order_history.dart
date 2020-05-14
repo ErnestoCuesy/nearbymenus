@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/common_widgets/list_items_builder.dart';
 import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/session.dart';
+import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/orders/view_order.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/utilities/format.dart';
@@ -19,39 +20,58 @@ class _OrderHistoryState extends State<OrderHistory> {
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
 
   Widget _buildContents(BuildContext context) {
-    return StreamBuilder<List<Order>>(
-      stream: database.userOrders(
+    Stream<List<Order>> stream = database.userOrders(
+      session.nearestRestaurant.id,
+      database.userId,
+    );
+    if (session.userDetails.role != ROLE_PATRON) {
+      stream = database.restaurantOrders(
         session.nearestRestaurant.id,
-        database.userId,
-      ),
+      );
+    }
+    return StreamBuilder<List<Order>>(
+      stream: stream,
       builder: (context, snapshot) {
         return ListItemsBuilder<Order>(
             snapshot: snapshot,
             itemBuilder: (context, order) {
               return Card(
+                color: session.userDetails.role != ROLE_PATRON && order.isBlocked ? Colors.redAccent : Theme.of(context).canvasColor,
                 margin: EdgeInsets.all(12.0),
                 child: ListTile(
                   isThreeLine: true,
-                  leading: Icon(Icons.receipt),
-                  title: Text(
-                    'Order: ${order.orderNumber}',
-                      style: Theme.of(context).textTheme.headline6,
+                  leading: session.userDetails.role != ROLE_PATRON && order.isBlocked ? Icon(Icons.block) : Icon(Icons.receipt),
+                  title: Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Order # ${order.orderNumber}',
+                            style: Theme.of(context).textTheme.headline5,
+                        ),
+                        Text(
+                          '${order.orderItems.length} items',
+                          //style: Theme.of(context).textTheme.subtitle2,
+                        ),
+                      ],
+                    ),
                   ),
                   subtitle: Padding(
-                    padding: const EdgeInsets.only(top: 4.0, bottom: 8.0),
+                    padding: const EdgeInsets.only(bottom: 4.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Padding(
                           padding:
-                          const EdgeInsets.only(top: 8.0, bottom: 4.0),
+                          const EdgeInsets.only(top: 4.0, bottom: 4.0),
                           child: Text(
                             Format.formatDateTime(order.timestamp.toInt()),
                           ),
                         ),
                         Padding(
                           padding:
-                          const EdgeInsets.only(top: 4.0, bottom: 4.0),
+                          const EdgeInsets.only(bottom: 4.0),
                           child: Text(
                             order.statusString,
                           ),
@@ -63,18 +83,20 @@ class _OrderHistoryState extends State<OrderHistory> {
                     f.format(order.orderTotal),
                     style: Theme.of(context).textTheme.headline6,
                   ),
-                  onTap: () async {
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                          fullscreenDialog: false,
-                          builder: (context) => ViewOrder(order: order,)
-                      ),
-                    );
-                  },
+                  onTap: session.userDetails.role != ROLE_PATRON && order.isBlocked ? null : () => _viewOrder(context, order),
                 ),
               );
             });
       },
+    );
+  }
+
+  void _viewOrder(BuildContext context, Order order) async {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+          fullscreenDialog: false,
+          builder: (context) => ViewOrder(order: order,)
+      ),
     );
   }
 
