@@ -38,7 +38,7 @@ class _HomePagePatronState extends State<HomePagePatron> {
   Map<TabItem, WidgetBuilder> get widgetBuilders {
     return {
       TabItem.menu: (_) => ExpandableMenuBrowser(),
-      TabItem.myOrders: (_) => OrderHistory(),
+      TabItem.myOrders: (_) => OrderHistory(showBlocked: false,),
       TabItem.messages: (_) => MessagesPage(),
       TabItem.userAccount: (_) => AccountPage(auth: auth, session: session, database: database,)
     };
