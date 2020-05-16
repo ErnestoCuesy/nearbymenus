@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/common_widgets/list_items_builder.dart';
+import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/models/order.dart';
+import 'package:nearbymenus/app/models/order_counter.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/orders/view_order.dart';
@@ -10,6 +13,10 @@ import 'package:nearbymenus/app/utilities/format.dart';
 import 'package:provider/provider.dart';
 
 class OrderHistory extends StatefulWidget {
+  final bool showBlocked;
+
+  const OrderHistory({Key key, this.showBlocked}) : super(key: key);
+
   @override
   _OrderHistoryState createState() => _OrderHistoryState();
 }
@@ -18,9 +25,11 @@ class _OrderHistoryState extends State<OrderHistory> {
   Session session;
   Database database;
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
+  Stream<List<Order>> stream;
+  List<Order> blockedOrders;
 
   Widget _buildContents(BuildContext context) {
-    Stream<List<Order>> stream = database.userOrders(
+    stream = database.userOrders(
       session.nearestRestaurant.id,
       database.userId,
     );
@@ -29,9 +38,13 @@ class _OrderHistoryState extends State<OrderHistory> {
         session.nearestRestaurant.id,
       );
     }
+    if (widget.showBlocked) {
+      stream =  database.blockedOrders(database.userId);
+    }
     return StreamBuilder<List<Order>>(
       stream: stream,
       builder: (context, snapshot) {
+        blockedOrders = snapshot.data;
         return ListItemsBuilder<Order>(
             snapshot: snapshot,
             itemBuilder: (context, order) {
@@ -40,7 +53,7 @@ class _OrderHistoryState extends State<OrderHistory> {
                 margin: EdgeInsets.all(12.0),
                 child: ListTile(
                   isThreeLine: true,
-                  leading: session.userDetails.role != ROLE_PATRON && order.isBlocked ? Icon(Icons.block) : Icon(Icons.receipt),
+                  leading: session.userDetails.role != ROLE_PATRON && order.isBlocked ? Icon(Icons.lock) : Icon(Icons.receipt),
                   title: Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Column(
@@ -100,6 +113,31 @@ class _OrderHistoryState extends State<OrderHistory> {
     );
   }
 
+  Future<void> _unlockOrders() async {
+    OrderCounter orderCounter = OrderCounter(ordersLeft: 0, lastUpdated: '');
+    await database.ordersLeft(database.userId).then((value) {
+      if (value != null) {
+        orderCounter = value;
+      }
+    }).catchError((_) => null);
+    print('Blocked orders: ${blockedOrders.length}');
+    if (orderCounter.ordersLeft > blockedOrders.length) {
+      blockedOrders.forEach((order) {
+        order.isBlocked = false;
+        database.setOrder(order);
+      });
+    } else {
+        await PlatformExceptionAlertDialog(
+            title: 'Order bundle depleted',
+            exception: PlatformException(
+            code: 'ORDER_BUNDLED_IS_DEPLETED',
+            message:  'Please buy more order bundles from your profile page.',
+            details:  'Please buy more order bundles from your profile page.',
+        ),
+      ).show(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
@@ -107,9 +145,20 @@ class _OrderHistoryState extends State<OrderHistory> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Orders History',
+          widget.showBlocked ? 'Locked orders' : 'Orders',
           style: TextStyle(color: Theme.of(context).appBarTheme.color),
         ),
+        actions: [
+          if (widget.showBlocked)
+          Padding(
+            padding: const EdgeInsets.only(right: 26.0),
+            child: IconButton(
+              iconSize: 24.0,
+              icon: Icon(Icons.lock_open),
+              onPressed: () => _unlockOrders(),
+            ),
+          ),
+        ],
       ),
       body: _buildContents(context),
     );
