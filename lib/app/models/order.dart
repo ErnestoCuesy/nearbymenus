@@ -8,6 +8,7 @@ class Order {
   final String id;
   int orderNumber;
   final String restaurantId;
+  final String managerId;
   final String userId;
   final double timestamp;
   int status;
@@ -15,12 +16,14 @@ class Order {
   final String deliveryAddress;
   String paymentMethod;
   final List<Map<String, dynamic>> orderItems;
+  String notes;
   bool isBlocked;
 
   Order({
     this.id,
     this.orderNumber,
     this.restaurantId,
+    this.managerId,
     this.userId,
     this.timestamp,
     this.status,
@@ -28,6 +31,7 @@ class Order {
     this.deliveryAddress,
     this.paymentMethod,
     this.orderItems,
+    this.notes,
     this.isBlocked,
   });
 
@@ -45,6 +49,7 @@ class Order {
       id: data['id'],
       orderNumber: data['orderNumber'],
       restaurantId: data['restaurantId'],
+      managerId: data['managerId'],
       userId: data['userId'],
       timestamp: data['timestamp'],
       status: data['status'],
@@ -52,6 +57,7 @@ class Order {
       deliveryAddress: data['deliveryAddress'],
       paymentMethod: data['paymentMethod'],
       orderItems: orderItems,
+      notes: data['notes'],
       isBlocked: data['isBlocked'],
     );
   }
@@ -70,6 +76,7 @@ class Order {
       'id': id,
       'orderNumber': orderNumber,
       'restaurantId': restaurantId,
+      'managerId': managerId,
       'userId': userId,
       'timestamp': timestamp,
       'status': status,
@@ -77,6 +84,7 @@ class Order {
       'deliveryAddress': deliveryAddress,
       'paymentMethod': paymentMethod ?? '',
       'orderItems': orderItems ?? [],
+      'notes': notes,
       'isBlocked': isBlocked ?? false,
     };
   }
@@ -105,7 +113,7 @@ class Order {
 
   @override
   String toString() {
-    return 'id: $id, orderNumber: $orderNumber, restaurantId: $restaurantId, userId: $userId, timestamp: $timestamp, status: $status, name: $name, deliveryAddress: $deliveryAddress, paymentMethod: $paymentMethod, orderItems: $orderItems, isBlocked: $isBlocked';
+    return 'id: $id, orderNumber: $orderNumber, restaurantId: $restaurantId, managerId: $managerId, userId: $userId, timestamp: $timestamp, status: $status, name: $name, deliveryAddress: $deliveryAddress, paymentMethod: $paymentMethod, orderItems: $orderItems, notes: $notes, isBlocked: $isBlocked';
   }
 
 }
