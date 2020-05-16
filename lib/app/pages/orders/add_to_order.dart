@@ -10,10 +10,11 @@ import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
 class AddToOrder extends StatefulWidget {
+  final String menuCode;
   final Map<String, dynamic> item;
   final Map<String, dynamic> options;
 
-  const AddToOrder({Key key, this.item, this.options}) : super(key: key);
+  const AddToOrder({Key key, this.menuCode, this.item, this.options}) : super(key: key);
 
   @override
   _AddToOrderState createState() => _AddToOrderState();
@@ -22,13 +23,17 @@ class AddToOrder extends StatefulWidget {
 class _AddToOrderState extends State<AddToOrder> {
   Session session;
   Database database;
+
+  Map<String, dynamic> get item => widget.item;
+  String get menuCode => widget.menuCode;
+
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
   List<String> itemKeys = List<String>();
-  Map<String, dynamic> get item => widget.item;
   List<String> menuItemOptions = List<String>();
   Map<String, int> optionsSelectionCounters = Map<String, int>();
   int quantity = 1;
   double lineTotal = 0;
+  String menuCodeAndItemName = '';
 
   void _addMenuItemToOrder() {
     final double timestamp = dateFromCurrentDate() / 1.0;
@@ -37,12 +42,14 @@ class _AddToOrderState extends State<AddToOrder> {
       session.currentOrder = Order(
         id: orderNumber,
         restaurantId: session.nearestRestaurant.id,
+        managerId: session.nearestRestaurant.managerId,
         userId: database.userId,
         timestamp: timestamp,
         status: ORDER_ON_HOLD,
         name: session.userDetails.name,
         deliveryAddress: '${session.userDetails.address} ${session.nearestRestaurant.restaurantLocation}',
         orderItems: List<Map<String, dynamic>>(),
+        notes: ''
       );
     } else {
       orderNumber = session.currentOrder.id;
@@ -50,6 +57,7 @@ class _AddToOrderState extends State<AddToOrder> {
     final orderItem = OrderItem(
       id: documentIdFromCurrentDate(),
       orderId: orderNumber,
+      menuCode: menuCode,
       name: item['name'],
       quantity: quantity,
       price: item['price'],
@@ -57,6 +65,7 @@ class _AddToOrderState extends State<AddToOrder> {
       options: menuItemOptions,
     ).toMap();
     session.currentOrder.orderItems.add(orderItem);
+    session.currentOrder.status = ORDER_ON_HOLD;
     print(orderItem);
   }
 
@@ -81,7 +90,7 @@ class _AddToOrderState extends State<AddToOrder> {
                   Padding(
                     padding: const EdgeInsets.only(left: 24.0, right: 24.0),
                     child: Text(
-                      '${widget.item['name']}',
+                      item['name'],
                       style: Theme.of(context).accentTextTheme.headline4,
                     ),
                   ),
@@ -91,18 +100,18 @@ class _AddToOrderState extends State<AddToOrder> {
                   Padding(
                     padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                     child: Text(
-                      '${widget.item['description']}',
+                      item['description'],
                       //style: Theme.of(context).accentTextTheme.headline5,
                     ),
                   ),
                   SizedBox(
                     height: 16.0,
                   ),
-                  if (widget.item['options'].isNotEmpty)
+                  if (item['options'].isNotEmpty)
                   Column(
                     children: _buildOptions(),
                   ),
-                  if (widget.item['options'].isEmpty)
+                  if (item['options'].isEmpty)
                     Column(
                       children: _buildQuantityField(),
                     ),
