@@ -22,16 +22,28 @@ class _ExpandableListViewState extends State<ExpandableListView> {
 
   Map<String, dynamic> get menu => widget.menu;
 
-  void _addMenuItemToOrder(Map<String, dynamic> menuItem) {
+  void _addMenuItemToOrder(String menuCode, Map<String, dynamic> menuItem) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         fullscreenDialog: false,
         builder: (context) => AddToOrder(
+          menuCode: menuCode,
           item: menuItem,
           options: widget.options,
         ),
       ),
     );
+  }
+
+  String _menuCode(String menuName) {
+    RegExp consonantFilter = RegExp(r'([^A|E|I|O|U ])');
+    Iterable<Match> matchResult = consonantFilter.allMatches(menuName.toUpperCase());
+    String result = '';
+    for (Match m in matchResult) {
+      result = result + m.group(0);
+    }
+    result = result + '    ';
+    return '[' + result.substring(0, 4) + '] ';
   }
 
   @override
@@ -53,6 +65,7 @@ class _ExpandableListViewState extends State<ExpandableListView> {
     }
     final key = menu.keys.firstWhere((element) => element.toString().length > 20);
     items = menu[key];
+    String menuName = menu['name'];
     return Container(
       margin: EdgeInsets.symmetric(vertical: 1.0),
       child: Column(
@@ -141,7 +154,7 @@ class _ExpandableListViewState extends State<ExpandableListView> {
                       f.format(menuItem['price']),
                       style: Theme.of(context).textTheme.headline6,
                     ),
-                    onTap: () => _addMenuItemToOrder(menuItem),
+                    onTap: () => _addMenuItemToOrder(_menuCode(menuName), menuItem),
                   ),
                 );
               },
