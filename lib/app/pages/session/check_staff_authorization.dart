@@ -37,7 +37,7 @@ class _CheckStaffAuthorizationState extends State<CheckStaffAuthorization> {
           final Authorizations authorizations = snapshot.data;
           if (authorizations.authorizedRoles[database.userId] == 'Staff') {
             session.restaurantAccessGranted = true;
-            return HomePageStaff(role: ROLE_STAFF, ordersPage: OrderHistory(),);
+            return HomePageStaff(role: ROLE_STAFF, ordersPage: OrderHistory(showBlocked: false,),);
           } else {
             session.restaurantAccessGranted = false;
             return HomePageStaff(role: ROLE_STAFF, ordersPage: FunctionNotAllowed(),);
