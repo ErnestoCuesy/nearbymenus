@@ -52,6 +52,7 @@ abstract class Database {
   Future<void> setOrderBundle(String uid, OrderBundle orderBundle);
   Future<OrderCounter> ordersLeft(String uid);
   Stream<OrderCounter> orderCounterStream(String managerUid);
+  Stream<List<Order>> blockedOrders(String managerId);
 }
 
 String documentIdFromCurrentDate() => DateTime.now().toIso8601String();
@@ -300,4 +301,15 @@ class FirestoreDatabase implements Database {
     path: APIPath.orderCounter(managerUid),
     builder: (data, documentId) => OrderCounter.fromMap(data, documentId),
   );
+
+  @override
+  Stream<List<Order>> blockedOrders(String managerId) => _service.collectionStream(
+    path: APIPath.orders(),
+    queryBuilder: managerId != null
+        ? (query) => query.where('managerId', isEqualTo: managerId)
+                          .where('isBlocked', isEqualTo: true)
+        : null,
+    builder: (data, documentId) => Order.fromMap(data, documentId),
+  );
+
 }
