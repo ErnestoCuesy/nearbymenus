@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -27,6 +29,8 @@ class _ViewOrderState extends State<ViewOrder> {
   String paymentMethod;
   ScrollController orderScrollController = ScrollController();
   ScrollController itemsScrollController = ScrollController();
+  final TextEditingController _notesController = TextEditingController();
+  final FocusNode _notesFocusNode = FocusNode();
 
   Order get order => widget.order;
 
@@ -34,6 +38,15 @@ class _ViewOrderState extends State<ViewOrder> {
   void initState() {
     super.initState();
     paymentMethod = order.paymentMethod ?? '';
+    _notesController.text = order.notes;
+  }
+
+
+  @override
+  void dispose() {
+    _notesController.dispose();
+    _notesFocusNode.dispose();
+    super.dispose();
   }
 
   void _deleteOrderItem(int index) {
@@ -67,20 +80,26 @@ class _ViewOrderState extends State<ViewOrder> {
     int orderNumber = 0;
     OrderCounter orderCounter = OrderCounter(ordersLeft: 0, lastUpdated: order.id);
     await database.orderNumber(session.nearestRestaurant.id).then((value) {
-      orderNumber = value;
+      if (value != null) {
+        orderNumber = value;
+      }
     }).catchError((_) => null);
     await database.ordersLeft(session.nearestRestaurant.managerId).then((value) {
-      orderCounter = value;
+      if (value != null) {
+        orderCounter = value;
+      }
     }).catchError((_) => null);
     if (orderCounter.ordersLeft < 1) {
       order.isBlocked = true;
     }
+    print('Orders left in bundle: ${orderCounter.ordersLeft}');
     try {
       orderCounter.ordersLeft--;
       orderCounter.lastUpdated = order.id;
       orderNumber++;
       print('Order number: $orderNumber');
       order.orderNumber = orderNumber;
+      order.notes = _notesController.text;
       order.status = ORDER_PLACED;
       await database.setOrder(order);
       await database.setOrderNumber(session.nearestRestaurant.id, orderNumber);
@@ -172,8 +191,16 @@ class _ViewOrderState extends State<ViewOrder> {
                                 leading: Text(
                                   orderItem['quantity'].toString(),
                                 ),
-                                title: Text(
-                                  orderItem['name'],
+                                title: Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 60.0,
+                                      child: Text(orderItem['menuCode']),
+                                    ),
+                                    Text(
+                                      orderItem['name'],
+                                    ),
+                                  ],
                                 ),
                                 subtitle: orderItemOptions.isEmpty ? Text('') : Text(
                                   orderItem['options'].toString().replaceAll(RegExp(r'\[|\]'), ''),
@@ -217,6 +244,7 @@ class _ViewOrderState extends State<ViewOrder> {
                       'Order status: ${order.statusString}'
                     ),
                   ),
+                  _notesField(context, order.notes),
                   if (order.status == ORDER_ON_HOLD)
                   Padding(
                     padding: const EdgeInsets.all(16.0),
@@ -257,6 +285,44 @@ class _ViewOrderState extends State<ViewOrder> {
     );
   }
 
+  Widget _notesField(BuildContext context, String notes) {
+    var notesField;
+    if (session.currentOrder != null && session.currentOrder.status == ORDER_ON_HOLD) {
+      notesField = TextField(
+        style: Theme.of(context).inputDecorationTheme.labelStyle,
+        controller: _notesController,
+        focusNode: _notesFocusNode,
+        textCapitalization: TextCapitalization.sentences,
+        cursorColor: Colors.black,
+        decoration: InputDecoration(
+          labelText: 'Notes',
+          enabled: true,
+        ),
+        autocorrect: false,
+        enableSuggestions: false,
+        enableInteractiveSelection: false,
+        keyboardType: TextInputType.text,
+        textInputAction: TextInputAction.done,
+        //onChanged: model.updateMenuName,
+        //onEditingComplete: () => _menuNameEditingComplete(),
+      );
+    } else {
+      notesField = Text(notes);
+    }
+    return Column(
+      children: [
+        Text(
+          'Notes',
+          style: Theme.of(context).textTheme.headline5,
+        ),
+        Padding(
+          padding: EdgeInsets.all(16.0),
+          child: notesField,
+        )
+      ],
+    );
+  }
+
   void _checkAndSubmitOrder(BuildContext context) async {
     if (paymentMethod != '') {
       order.paymentMethod = paymentMethod;
@@ -292,6 +358,9 @@ class _ViewOrderState extends State<ViewOrder> {
   }
 
   void _updatePaymentMethod(String key, bool flag) {
+    if (order.status != ORDER_ON_HOLD) {
+      return;
+    }
     setState(() {
       if (flag) {
         paymentMethod = key;
