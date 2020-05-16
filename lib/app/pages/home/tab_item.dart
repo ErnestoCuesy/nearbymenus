@@ -6,6 +6,7 @@ enum TabItem {
   restaurant,
   menu,
   manageOrders,
+  blockedOrders,
   myOrders,
   messages,
   userAccount,
@@ -74,6 +75,7 @@ class ManagerRoleEnum extends RoleEnumBase {
   final List<TabItem> roleEnumList = const [
     TabItem.restaurant,
     TabItem.manageOrders,
+    TabItem.blockedOrders,
     TabItem.messages,
     TabItem.userAccount
   ];
@@ -111,6 +113,8 @@ class TabItemData {
     TabItemData(title: 'Menu', icon: Icons.fastfood),
     TabItem.manageOrders:
     TabItemData(title: 'Orders', icon: Icons.assignment),
+    TabItem.blockedOrders:
+    TabItemData(title: 'Locked Orders', icon: Icons.lock),
     TabItem.myOrders:
     TabItemData(title: 'Orders History', icon: Icons.update),
     TabItem.messages:
