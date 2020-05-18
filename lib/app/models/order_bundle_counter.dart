@@ -1,14 +1,14 @@
-class OrderCounter {
+class OrderBundleCounter {
   int ordersLeft;
   String lastUpdated;
 
-  OrderCounter({this.ordersLeft, this.lastUpdated});
+  OrderBundleCounter({this.ordersLeft, this.lastUpdated});
 
-  factory OrderCounter.fromMap(Map<String, dynamic> data, String documentID) {
+  factory OrderBundleCounter.fromMap(Map<String, dynamic> data, String documentID) {
     if (data == null) {
       return null;
     }
-    return OrderCounter(
+    return OrderBundleCounter(
       ordersLeft: data['ordersLeft'],
       lastUpdated: data['lastUpdated'],
     );
