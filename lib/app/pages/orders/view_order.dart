@@ -7,7 +7,6 @@ import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/models/order.dart';
-import 'package:nearbymenus/app/models/order_counter.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/utilities/format.dart';
@@ -76,36 +75,14 @@ class _ViewOrderState extends State<ViewOrder> {
     ).show(context);
   }
 
-  void _submitOrder() async {
-    int orderNumber = 0;
-    OrderCounter orderCounter = OrderCounter(ordersLeft: 0, lastUpdated: order.id);
-    await database.orderNumber(session.nearestRestaurant.id).then((value) {
-      if (value != null) {
-        orderNumber = value;
-      }
-    }).catchError((_) => null);
-    await database.ordersLeft(session.nearestRestaurant.managerId).then((value) {
-      if (value != null) {
-        orderCounter = value;
-      }
-    }).catchError((_) => null);
-    if (orderCounter.ordersLeft < 1) {
-      order.isBlocked = true;
-    }
-    print('Orders left in bundle: ${orderCounter.ordersLeft}');
+  Future<void> _submitOrder() async {
     try {
-      orderCounter.ordersLeft--;
-      orderCounter.lastUpdated = order.id;
-      orderNumber++;
-      print('Order number: $orderNumber');
-      order.orderNumber = orderNumber;
       order.notes = _notesController.text;
       order.status = ORDER_PLACED;
-      await database.setOrder(order);
-      await database.setOrderNumber(session.nearestRestaurant.id, orderNumber);
-      await database.setOrderCounter(session.nearestRestaurant.managerId, orderCounter);
+      database.setOrderTransaction(session.nearestRestaurant.managerId,
+          session.nearestRestaurant.id,
+          order);
       session.currentOrder = null;
-      //await Future.delayed(Duration(seconds: 2)); // Simulate slow network
       Navigator.of(context).pop();
     } catch (e) {
       print(e);
@@ -324,17 +301,29 @@ class _ViewOrderState extends State<ViewOrder> {
   }
 
   void _checkAndSubmitOrder(BuildContext context) async {
-    if (paymentMethod != '') {
+    if (paymentMethod != '' && order.orderTotal > 0) {
       order.paymentMethod = paymentMethod;
-      _submitOrder();
-      _showSnackBar(context, 'Order submitted successfully to ${session.nearestRestaurant.name}!');
-    } else {
-        await PlatformExceptionAlertDialog(
-            title: 'Payment method not selected',
-            exception: PlatformException(
-            code: 'INCORRECT_PAYMENT_METHOD',
-            message:  'Please select a payment method.',
-            details:  'Please select a payment method.',
+      await _submitOrder();
+      _showSnackBar(context, 'Order placed successfully to ${session.nearestRestaurant.name}!');
+      return;
+    }
+    if (paymentMethod == '') {
+      await PlatformExceptionAlertDialog(
+        title: 'Payment method not selected',
+        exception: PlatformException(
+          code: 'INCORRECT_PAYMENT_METHOD',
+          message: 'Please select a payment method.',
+          details: 'Please select a payment method.',
+        ),
+      ).show(context);
+    }
+    if (order.orderTotal == 0) {
+      await PlatformExceptionAlertDialog(
+        title: 'Order total is zero',
+        exception: PlatformException(
+          code: 'INCORRECT_PAYMENT_METHOD',
+          message: 'Please add items to your order.',
+          details: 'Please add items to your order.',
         ),
       ).show(context);
     }
