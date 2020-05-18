@@ -42,6 +42,7 @@ class _AddToOrderState extends State<AddToOrder> {
       session.currentOrder = Order(
         id: orderNumber,
         restaurantId: session.nearestRestaurant.id,
+        restaurantName: session.nearestRestaurant.name,
         managerId: session.nearestRestaurant.managerId,
         userId: database.userId,
         timestamp: timestamp,
