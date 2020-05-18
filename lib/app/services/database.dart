@@ -5,8 +5,7 @@ import 'package:nearbymenus/app/models/menu.dart';
 import 'package:nearbymenus/app/models/option.dart';
 import 'package:nearbymenus/app/models/option_item.dart';
 import 'package:nearbymenus/app/models/order.dart';
-import 'package:nearbymenus/app/models/order_bundle.dart';
-import 'package:nearbymenus/app/models/order_counter.dart';
+import 'package:nearbymenus/app/models/bundle.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
@@ -46,13 +45,11 @@ abstract class Database {
   Stream<List<Order>> restaurantOrders(String restaurantId);
   Future<void> deleteOrder(Order order);
   Stream<List<Order>> userOrders(String restaurantId, String uid);
-  Future<void> setOrderNumber(String restaurantId, int orderNumber);
-  Future<int> orderNumber(String restaurantId);
-  Future<void> setOrderCounter(String uid, OrderCounter orderCounter);
-  Future<void> setOrderBundle(String uid, OrderBundle orderBundle);
-  Future<OrderCounter> ordersLeft(String uid);
-  Stream<OrderCounter> orderCounterStream(String managerUid);
+  Future<void> setBundle(String uid, Bundle orderBundle);
+  Future<int> ordersLeft(String uid);
   Stream<List<Order>> blockedOrders(String managerId);
+  Future<int> setBundleCounterTransaction(String managerId, int quantity);
+  Future<void> setOrderTransaction(String managerId, String restaurantId, Order order);
 }
 
 String documentIdFromCurrentDate() => DateTime.now().toIso8601String();
@@ -273,33 +270,13 @@ class FirestoreDatabase implements Database {
   );
 
   @override
-  Future<void> setOrderNumber(String restaurantId, int orderNumber) async => await _service
-      .setData(path: APIPath.orderNumbers(restaurantId), data: {'orderNumber': orderNumber});
+  Future<void> setBundle(String managerUid, Bundle orderBundle) async => await _service
+      .setData(path: APIPath.bundle(managerUid, orderBundle.id), data: orderBundle.toMap());
 
   @override
-  Future<int> orderNumber(String restaurantId) => _service.documentSnapshot(
-    path: APIPath.orderNumbers(restaurantId),
-    builder: (data, documentId) => data['orderNumber'],
-  );
-
-  @override
-  Future<void> setOrderCounter(String managerUid, OrderCounter orderCounter) async => await _service
-      .setData(path: APIPath.orderCounter(managerUid), data: orderCounter.toMap());
-
-  @override
-  Future<void> setOrderBundle(String managerUid, OrderBundle orderBundle) async => await _service
-      .setData(path: APIPath.orderBundles(managerUid, orderBundle.id), data: orderBundle.toMap());
-
-  @override
-  Future<OrderCounter> ordersLeft(String managerUid) => _service.documentSnapshot(
-    path: APIPath.orderCounter(managerUid),
-    builder: (data, documentId) => OrderCounter.fromMap(data, documentId),
-  );
-
-  @override
-  Stream<OrderCounter> orderCounterStream(String managerUid) => _service.documentStream(
-    path: APIPath.orderCounter(managerUid),
-    builder: (data, documentId) => OrderCounter.fromMap(data, documentId),
+  Future<int> ordersLeft(String managerUid) => _service.documentSnapshot(
+    path: APIPath.bundleOrdersCounter(managerUid),
+    builder: (data, documentId) => data['ordersLeft'],
   );
 
   @override
@@ -312,4 +289,28 @@ class FirestoreDatabase implements Database {
     builder: (data, documentId) => Order.fromMap(data, documentId),
   );
 
+  @override
+  Future<int> setBundleCounterTransaction(String managerId, int quantity) async {
+    return await _service
+        .runUpdateCounterTransaction(
+        counterPath: APIPath.bundles(managerId),
+        documentId: 'counter',
+        fieldName: 'ordersLeft',
+        quantity: quantity);
+  }
+
+  @override
+  Future<void> setOrderTransaction(String managerId, String restaurantId, Order order) async {
+    await _service.runSetOrderTransaction(
+        orderNumberPath: APIPath.orderNumberCounter(),
+        orderNumberDocumentId: restaurantId,
+        orderNumberFieldName: 'lastOrderNumber',
+        bundleCounterPath: APIPath.bundles(managerId),
+        bundleCounterDocumentId: 'counter',
+        bundleCounterFieldName: 'ordersLeft',
+        orderPath: APIPath.orders(),
+        orderDocumentId: order.id,
+        orderData: order.toMap(),
+    );
+  }
 }
