@@ -17,7 +17,8 @@ class APIPath {
   static String optionItems() => 'optionItems';
   static String order(String orderId) => 'orders/$orderId';
   static String orders() => 'orders';
-  static String orderNumbers(String restaurantId) => 'orderNumbers/$restaurantId';
-  static String orderCounter(String managerId) => 'orderBundles/$managerId/bundles/counter';
-  static String orderBundles(String managerId, String bundleId) => 'orderBundles/$managerId/bundles/$bundleId';
+  static String orderNumberCounter() => 'orderNumbers';
+  static String bundle(String managerId, String bundleId) => 'bundles/$managerId/bundles/$bundleId';
+  static String bundles(String managerId) => 'bundles/$managerId/bundles';
+  static String bundleOrdersCounter(String managerId) => 'bundles/$managerId/bundles/counter';
 }
