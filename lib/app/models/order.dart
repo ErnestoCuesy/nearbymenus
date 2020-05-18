@@ -8,6 +8,7 @@ class Order {
   final String id;
   int orderNumber;
   final String restaurantId;
+  final String restaurantName;
   final String managerId;
   final String userId;
   final double timestamp;
@@ -23,6 +24,7 @@ class Order {
     this.id,
     this.orderNumber,
     this.restaurantId,
+    this.restaurantName,
     this.managerId,
     this.userId,
     this.timestamp,
@@ -49,6 +51,7 @@ class Order {
       id: data['id'],
       orderNumber: data['orderNumber'],
       restaurantId: data['restaurantId'],
+      restaurantName: data['restaurantName'],
       managerId: data['managerId'],
       userId: data['userId'],
       timestamp: data['timestamp'],
@@ -76,6 +79,7 @@ class Order {
       'id': id,
       'orderNumber': orderNumber,
       'restaurantId': restaurantId,
+      'restaurantName': restaurantName,
       'managerId': managerId,
       'userId': userId,
       'timestamp': timestamp,
@@ -113,7 +117,7 @@ class Order {
 
   @override
   String toString() {
-    return 'id: $id, orderNumber: $orderNumber, restaurantId: $restaurantId, managerId: $managerId, userId: $userId, timestamp: $timestamp, status: $status, name: $name, deliveryAddress: $deliveryAddress, paymentMethod: $paymentMethod, orderItems: $orderItems, notes: $notes, isBlocked: $isBlocked';
+    return 'id: $id, orderNumber: $orderNumber, restaurantId: $restaurantId, restaurantName: $restaurantName, managerId: $managerId, userId: $userId, timestamp: $timestamp, status: $status, name: $name, deliveryAddress: $deliveryAddress, paymentMethod: $paymentMethod, orderItems: $orderItems, notes: $notes, isBlocked: $isBlocked';
   }
 
 }
