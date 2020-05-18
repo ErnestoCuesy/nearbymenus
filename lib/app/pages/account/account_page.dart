@@ -137,18 +137,25 @@ class _AccountPageState extends State<AccountPage> {
       // SUBSCRIPTION
       if (session.userDetails.role == ROLE_MANAGER)
         _userDetailsSection(
-          sectionTitle: 'Subscription details',
+          sectionTitle: 'Bundle details',
           cardTitle: session.subscription.subscriptionTypeString,
           cardSubtitle:
               'Expired on: ${session.subscription.latestExpirationDate}',
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    UpsellScreen(subscription: session.subscription),
-              ),
-            );
+            _ordersLeft().then((value) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                  UpsellScreen(
+                    database: database,
+                    session: session,
+                    ordersLeft: value,
+                    ordersBlocked: null,
+                  ),
+                ),
+              );
+            });
           },
         ),
       // STAFF STATUS SECTION
@@ -186,6 +193,17 @@ class _AccountPageState extends State<AccountPage> {
         content: Text('Access request sent, pending approval... please wait'),
       ),
     );
+  }
+
+  Future<int> _ordersLeft() async {
+    int ordersLeft;
+    await database.ordersLeft(database.userId).then((value) {
+      if (value != null) {
+        ordersLeft = value;
+      }
+    }).catchError((_) => null);
+    print('Orders left: $ordersLeft');
+    return ordersLeft;
   }
 
   Widget _userDetailsSection(
