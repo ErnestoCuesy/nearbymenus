@@ -1,5 +1,3 @@
-import 'package:purchases_flutter/purchases_flutter.dart';
-
 Map<dynamic, dynamic> purchaserInfoTestDataU = {
   "entitlements": {
     "all": {
@@ -84,14 +82,14 @@ Map<dynamic, dynamic> offeringsTestData = {
     "availablePackages": [
       {
         "identifier": "rc_monthly",
-        "packageType": "MONTHLY",
+        "packageType": "COOK",
         "product": {
           "identifier": "rc_sub_1m",
-          "description": "RevenueCat 1 month subscription test",
+          "description": "100 orders bundle",
           "title":
-              "RevenueCat 1 month subscription test (Flutter Purchases RC Example)",
-          "price": 4.59,
-          "price_string": "R 4,59",
+              "100 orders bundle",
+          "price": 500.00,
+          "price_string": "R 500,00",
           "currency_code": "ZAR",
           "intro_price": 0,
           "intro_price_string": "R0,00",
@@ -104,14 +102,34 @@ Map<dynamic, dynamic> offeringsTestData = {
       },
       {
         "identifier": "rc_monthly2",
-        "packageType": "MONTHLY",
+        "packageType": "CHEF",
         "product": {
           "identifier": "rc_sub_1m2",
-          "description": "RevenueCat 1 month subscription test 2",
+          "description": "500 orders bundle",
           "title":
-          "RevenueCat 1 month subscription test 2 (Flutter Purchases RC Example)",
-          "price": 4.59,
-          "price_string": "R 4,59",
+          "500 orders bundle",
+          "price": 2000.00,
+          "price_string": "R 2000,00",
+          "currency_code": "ZAR",
+          "intro_price": 0,
+          "intro_price_string": "R0,00",
+          "intro_price_period": "P1W",
+          "intro_pric_period_unit": "DAY",
+          "intro_price_period_number_of_units": 7,
+          "intro_price_cycles": 1,
+        },
+        "offeringIdentifier": "Offering",
+      },
+      {
+        "identifier": "rc_monthly2",
+        "packageType": "MICHELIN",
+        "product": {
+          "identifier": "rc_sub_1m2",
+          "description": "1000 orders bundle",
+          "title":
+          "1000 orders bundle",
+          "price": 3000.00,
+          "price_string": "R 3000,00",
           "currency_code": "ZAR",
           "intro_price": 0,
           "intro_price_string": "R0,00",
@@ -130,15 +148,15 @@ Map<dynamic, dynamic> offeringsTestData = {
       "serverDescription": "RevenueCat Pro offering",
       "availablePackages": [
         {
-          "identifier": "rc_monthly1",
-          "packageType": "MONTHLY",
+          "identifier": "rc_monthly",
+          "packageType": "COOK",
           "product": {
-            "identifier": "rc_sub_1m1",
-            "description": "RevenueCat 1 month subscription test 1",
+            "identifier": "rc_sub_1m",
+            "description": "100 orders bundle",
             "title":
-                "RevenueCat 1 month subscription test 1 (Flutter Purchases RC Example)",
-            "price": 4.59,
-            "price_string": "R 4,59",
+            "100 orders bundle",
+            "price": 500.00,
+            "price_string": "R 500,00",
             "currency_code": "ZAR",
             "intro_price": 0,
             "intro_price_string": "R0,00",
@@ -151,14 +169,34 @@ Map<dynamic, dynamic> offeringsTestData = {
         },
         {
           "identifier": "rc_monthly2",
-          "packageType": "MONTHLY",
+          "packageType": "CHEF",
           "product": {
             "identifier": "rc_sub_1m2",
-            "description": "RevenueCat 1 month subscription test 2",
+            "description": "500 orders bundle",
             "title":
-            "RevenueCat 1 month subscription test 2 (Flutter Purchases RC Example)",
-            "price": 4.59,
-            "price_string": "R 4,59",
+            "500 orders bundle",
+            "price": 2000.00,
+            "price_string": "R 2000,00",
+            "currency_code": "ZAR",
+            "intro_price": 0,
+            "intro_price_string": "R0,00",
+            "intro_price_period": "P1W",
+            "intro_pric_period_unit": "DAY",
+            "intro_price_period_number_of_units": 7,
+            "intro_price_cycles": 1,
+          },
+          "offeringIdentifier": "Offering",
+        },
+        {
+          "identifier": "rc_monthly2",
+          "packageType": "MICHELIN",
+          "product": {
+            "identifier": "rc_sub_1m2",
+            "description": "1000 orders bundle",
+            "title":
+            "1000 orders bundle",
+            "price": 3000.00,
+            "price_string": "R 3000,00",
             "currency_code": "ZAR",
             "intro_price": 0,
             "intro_price_string": "R0,00",
