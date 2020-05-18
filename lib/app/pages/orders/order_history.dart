@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/common_widgets/list_items_builder.dart';
-import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/models/order.dart';
-import 'package:nearbymenus/app/models/order_counter.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/orders/view_order.dart';
+import 'package:nearbymenus/app/pages/session/upsell_screen.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/utilities/format.dart';
 import 'package:provider/provider.dart';
@@ -64,7 +62,7 @@ class _OrderHistoryState extends State<OrderHistory> {
                             style: Theme.of(context).textTheme.headline5,
                         ),
                         Text(
-                          '${order.orderItems.length} items',
+                          '${order.restaurantName}, ${order.orderItems.length} items',
                           //style: Theme.of(context).textTheme.subtitle2,
                         ),
                       ],
@@ -114,27 +112,32 @@ class _OrderHistoryState extends State<OrderHistory> {
   }
 
   Future<void> _unlockOrders() async {
-    OrderCounter orderCounter = OrderCounter(ordersLeft: 0, lastUpdated: '');
+    int ordersLeft;
     await database.ordersLeft(database.userId).then((value) {
       if (value != null) {
-        orderCounter = value;
+        ordersLeft = value;
       }
     }).catchError((_) => null);
+    print('Orders left: $ordersLeft');
     print('Blocked orders: ${blockedOrders.length}');
-    if (orderCounter.ordersLeft > blockedOrders.length) {
+    if (ordersLeft > blockedOrders.length) {
       blockedOrders.forEach((order) {
         order.isBlocked = false;
         database.setOrder(order);
       });
     } else {
-        await PlatformExceptionAlertDialog(
-            title: 'Order bundle depleted',
-            exception: PlatformException(
-            code: 'ORDER_BUNDLED_IS_DEPLETED',
-            message:  'Please buy more order bundles from your profile page.',
-            details:  'Please buy more order bundles from your profile page.',
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              UpsellScreen(
+                database: database,
+                session: session,
+                ordersLeft: ordersLeft,
+                ordersBlocked: blockedOrders.length,
+              ),
         ),
-      ).show(context);
+      );
     }
   }
 
