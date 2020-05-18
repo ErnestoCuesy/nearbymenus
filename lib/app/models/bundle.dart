@@ -1,20 +1,20 @@
-class OrderBundle {
+class Bundle {
   final String id;
   final String purchaseDate;
   final String rcInfo;
-  final int orders;
+  final int ordersInBundle;
 
-  OrderBundle({this.id, this.purchaseDate, this.rcInfo, this.orders});
+  Bundle({this.id, this.purchaseDate, this.rcInfo, this.ordersInBundle});
 
-  factory OrderBundle.fromMap(Map<String, dynamic> data, String documentID) {
+  factory Bundle.fromMap(Map<String, dynamic> data, String documentID) {
     if (data == null) {
       return null;
     }
-    return OrderBundle(
+    return Bundle(
       id: data['id'],
       purchaseDate: data['purchaseDate'],
       rcInfo: data['rcInfo'],
-      orders: data['orders'],
+      ordersInBundle: data['ordersInBundle'],
     );
   }
 
@@ -23,7 +23,7 @@ class OrderBundle {
       'id': id,
       'purchaseDate': purchaseDate,
       'rcInfo': rcInfo,
-      'orders': orders,
+      'ordersInBundle': ordersInBundle,
     };
   }
 
