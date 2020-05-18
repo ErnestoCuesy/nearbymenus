@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
-import 'package:nearbymenus/app/pages/session/upsell_screen.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/models/session.dart';
-import 'package:nearbymenus/app/services/iap_manager.dart';
 import 'package:provider/provider.dart';
 
 class RoleSelectionPage extends StatefulWidget {
@@ -39,19 +37,7 @@ class _RoleSelectionPageState extends State<RoleSelectionPage> {
         roleName: ROLE_MANAGER,
         roleDescription: 'Open a restaurant, create menus and manage orders! \n(Requires subscription)',
         // onPressed: () => _changeRole(ROLE_CHECK_SUBSCRIPTION),
-        onPressed: () {
-          if (session.subscription.subscriptionType == SubscriptionType.Unsubscribed) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    UpsellScreen(subscription: session.subscription),
-              ),
-            );
-          } else {
-            _changeRole(ROLE_MANAGER);
-          }
-        },
+        onPressed: () => _changeRole(ROLE_MANAGER),
       ),
       SizedBox(height: 16.0,),
       _roleContainer(
