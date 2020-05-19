@@ -106,7 +106,12 @@ class _OrderHistoryState extends State<OrderHistory> {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
           fullscreenDialog: false,
-          builder: (context) => ViewOrder(order: order,)
+          builder: (context) => ViewOrder.create(
+            context: context,
+            database: database,
+            session: session,
+            order: order,
+          )
       ),
     );
   }

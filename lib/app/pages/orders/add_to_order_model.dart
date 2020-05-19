@@ -16,7 +16,6 @@ class AddToOrderModel with ChangeNotifier {
   List<String> tempMenuItemOptions = List<String>();
   Map<String, int> optionsSelectionCounters = Map<String, int>();
   int quantity = 1;
-  double lineTotal = 0;
   String menuCodeAndItemName = '';
 
   AddToOrderModel(
@@ -48,6 +47,7 @@ class AddToOrderModel with ChangeNotifier {
           status: ORDER_ON_HOLD,
           name: session.userDetails.name,
           deliveryAddress: '${session.userDetails.address} ${session.nearestRestaurant.restaurantLocation}',
+          paymentMethod: '',
           orderItems: List<Map<String, dynamic>>(),
           notes: ''
       );
@@ -61,7 +61,7 @@ class AddToOrderModel with ChangeNotifier {
       name: item['name'],
       quantity: quantity,
       price: item['price'],
-      lineTotal: lineTotal,
+      lineTotal: item['price'] * quantity,
       options: tempMenuItemOptions,
     ).toMap();
     session.currentOrder.orderItems.add(orderItem);
@@ -95,8 +95,7 @@ class AddToOrderModel with ChangeNotifier {
 
   void updateQuantity(int quantity) {
     final qty = this.quantity += quantity;
-    final lineTotal = item['price'] * qty;
-    updateWith(quantity: qty, lineTotal: lineTotal);
+    updateWith(quantity: qty);
   }
 
   void updateOptionsList(String key, String option, bool addFlag) {
@@ -123,13 +122,11 @@ class AddToOrderModel with ChangeNotifier {
   void updateWith({
     List<String> menuItemOptions,
     int quantity,
-    double lineTotal,
     bool isLoading,
     bool submitted,
   }) {
     this.menuItemOptions = menuItemOptions ?? this.menuItemOptions;
     this.quantity = quantity ?? this.quantity;
-    this.lineTotal = lineTotal ?? this.lineTotal;
     this.isLoading = isLoading ?? this.isLoading;
     this.submitted = this.submitted;
     notifyListeners();

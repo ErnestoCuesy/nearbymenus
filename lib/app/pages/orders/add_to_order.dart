@@ -46,9 +46,6 @@ class AddToOrder extends StatefulWidget {
 }
 
 class _AddToOrderState extends State<AddToOrder> {
-  Session session;
-  Database database;
-
   Map<String, dynamic> get item => widget.item;
   String get menuCode => widget.menuCode;
 
@@ -67,8 +64,6 @@ class _AddToOrderState extends State<AddToOrder> {
   }
 
   Widget _buildContents(BuildContext context) {
-    session = Provider.of<Session>(context);
-    database = Provider.of<Database>(context);
     lineTotal = widget.item['price'] * model.quantity;
     return SingleChildScrollView(
       child: Padding(

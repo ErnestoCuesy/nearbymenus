@@ -5,17 +5,37 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
-import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/session.dart';
+import 'package:nearbymenus/app/pages/orders/view_order_model.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/utilities/format.dart';
 import 'package:provider/provider.dart';
 
 class ViewOrder extends StatefulWidget {
-  final Order order;
+  final ViewOrderModel model;
 
-  const ViewOrder({Key key, this.order}) : super(key: key);
+  const ViewOrder({Key key, this.model}) : super(key: key);
+
+  static Widget create({
+    BuildContext context,
+    Session session,
+    Database database,
+    Order order,
+  }) {
+    return ChangeNotifierProvider<ViewOrderModel>(
+      create: (context) => ViewOrderModel(
+          database: database,
+          session: session,
+          order: order,
+      ),
+      child: Consumer<ViewOrderModel>(
+        builder: (context, model, _) => ViewOrder(
+          model: model,
+        ),
+      ),
+    );
+  }
 
   @override
   _ViewOrderState createState() => _ViewOrderState();
@@ -23,21 +43,18 @@ class ViewOrder extends StatefulWidget {
 
 class _ViewOrderState extends State<ViewOrder> {
   Session session;
-  Database database;
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
-  String paymentMethod;
   ScrollController orderScrollController = ScrollController();
   ScrollController itemsScrollController = ScrollController();
   final TextEditingController _notesController = TextEditingController();
   final FocusNode _notesFocusNode = FocusNode();
 
-  Order get order => widget.order;
+  ViewOrderModel get model => widget.model;
 
   @override
   void initState() {
     super.initState();
-    paymentMethod = order.paymentMethod ?? '';
-    _notesController.text = order.notes;
+    _notesController.text = model.order.notes;
   }
 
 
@@ -48,14 +65,8 @@ class _ViewOrderState extends State<ViewOrder> {
     super.dispose();
   }
 
-  void _deleteOrderItem(int index) {
-    setState(() {
-      order.orderItems.removeAt(index);
-    });
-  }
-
   Future<bool> _confirmDismiss(BuildContext context) async {
-    if (order.status != ORDER_ON_HOLD) {
+    if (model.order.status != ORDER_ON_HOLD) {
       return false;
     }
     return await PlatformAlertDialog(
@@ -68,43 +79,29 @@ class _ViewOrderState extends State<ViewOrder> {
 
   Future<bool> _confirmCancelOrder(BuildContext context) async {
     return await PlatformAlertDialog(
-      title: 'Confirm order cancelation',
+      title: 'Confirm order cancellation',
       content: 'Do you really want to cancel this order?',
       cancelActionText: 'No',
       defaultActionText: 'Yes',
     ).show(context);
   }
 
-  Future<void> _submitOrder() async {
-    try {
-      order.notes = _notesController.text;
-      order.status = ORDER_PLACED;
-      database.setOrderTransaction(session.nearestRestaurant.managerId,
-          session.nearestRestaurant.id,
-          order);
-      session.currentOrder = null;
-      Navigator.of(context).pop();
-    } catch (e) {
-      print(e);
-      rethrow;
-    }
-  }
-
-  void _showSnackBar(BuildContext context, String text) {
+  void _save(BuildContext context) {
+    model.save();
+    Navigator.of(context).pop();
     Scaffold.of(context).showSnackBar(
       SnackBar(
-        content: Text(text),
+        content: Text(
+          'Order successfully placed at ${session.nearestRestaurant.name}!'
+        ),
       ),
     );
   }
 
   Widget _buildContents(BuildContext context) {
-    session = Provider.of<Session>(context);
-    database = Provider.of<Database>(context);
-    if (order == null) {
+    if (model.order == null) {
       return null;
     }
-    final orderTotal = order.orderTotal;
     return SingleChildScrollView(
       controller: orderScrollController,
       child: Padding(
@@ -120,11 +117,11 @@ class _ViewOrderState extends State<ViewOrder> {
                   SizedBox(
                     height: 16.0,
                   ),
-                  if (order.status != ORDER_ON_HOLD)
+                  if (model.order.status != ORDER_ON_HOLD)
                   Padding(
                     padding: const EdgeInsets.only(left: 24, right: 24.0),
                     child: Text(
-                      'Order # ${order.orderNumber}',
+                      'Order # ${model.order.orderNumber}',
                       style: Theme.of(context).accentTextTheme.headline5,
                     ),
                   ),
@@ -137,11 +134,11 @@ class _ViewOrderState extends State<ViewOrder> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(4.0),
-                    child: Text(order.name),
+                    child: Text(model.order.name),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Text(order.deliveryAddress),
+                    child: Text(model.order.deliveryAddress),
                   ),
                   SizedBox(
                     child: Container(
@@ -152,16 +149,16 @@ class _ViewOrderState extends State<ViewOrder> {
                         child: ListView.builder(
                           controller: itemsScrollController,
                           shrinkWrap: true,
-                          itemCount: order.orderItems.length,
+                          itemCount: model.order.orderItems.length,
                           itemBuilder: (BuildContext context, int index) {
-                          final orderItem = order.orderItems[index];
+                          final orderItem = model.order.orderItems[index];
                           final List<dynamic> orderItemOptions = orderItem['options'];
                           return Dismissible(
                             background: Container(color: Colors.red),
                             key: Key('${orderItem['id']}'),
                             direction: DismissDirection.endToStart,
                             confirmDismiss: (_) => _confirmDismiss(context),
-                            onDismissed: (direction) => _deleteOrderItem(index),
+                            onDismissed: (direction) => model.deleteOrderItem(index),
                             child: Card(
                               child: ListTile(
                                 isThreeLine: false,
@@ -199,7 +196,7 @@ class _ViewOrderState extends State<ViewOrder> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      'Total: ' + f.format(orderTotal),
+                      'Total: ' + f.format(model.order.orderTotal),
                       style: Theme.of(context).textTheme.headline4,
                     ),
                   ),
@@ -213,16 +210,16 @@ class _ViewOrderState extends State<ViewOrder> {
                      children: _buildPaymentMethods(),
                   ),
                   Text(
-                      Format.formatDateTime(order.timestamp.toInt()),
+                      Format.formatDateTime(model.order.timestamp.toInt()),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      'Order status: ${order.statusString}'
+                      'Order status: ${model.order.statusString}'
                     ),
                   ),
-                  _notesField(context, order.notes),
-                  if (order.status == ORDER_ON_HOLD)
+                  _notesField(context, model.order.notes),
+                  if (model.order.status == ORDER_ON_HOLD)
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Row(
@@ -235,7 +232,7 @@ class _ViewOrderState extends State<ViewOrder> {
                           onPressed: () async {
                             final bool cancelOrder = await _confirmCancelOrder(context);
                             if (cancelOrder) {
-                              order.status = ORDER_CANCELLED;
+                              model.order.status = ORDER_CANCELLED;
                               Navigator.of(context).pop();
                             }
                           },
@@ -244,10 +241,10 @@ class _ViewOrderState extends State<ViewOrder> {
                           builder: (context) => FormSubmitButton(
                             context: context,
                             text: 'Submit',
-                            color: Theme.of(context).primaryColor,
-                            onPressed: () {
-                              _checkAndSubmitOrder(context);
-                            },
+                            color: model.canSave
+                                ? Theme.of(context).primaryColor
+                                : Theme.of(context).disabledColor,
+                            onPressed: model.canSave ? () => _save(context) : null,
                           ),
                         ),
                       ],
@@ -280,8 +277,7 @@ class _ViewOrderState extends State<ViewOrder> {
         enableInteractiveSelection: false,
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.done,
-        //onChanged: model.updateMenuName,
-        //onEditingComplete: () => _menuNameEditingComplete(),
+        onChanged: model.updateNotes,
       );
     } else {
       notesField = Text(notes);
@@ -300,35 +296,6 @@ class _ViewOrderState extends State<ViewOrder> {
     );
   }
 
-  void _checkAndSubmitOrder(BuildContext context) async {
-    if (paymentMethod != '' && order.orderTotal > 0) {
-      order.paymentMethod = paymentMethod;
-      await _submitOrder();
-      _showSnackBar(context, 'Order placed successfully to ${session.nearestRestaurant.name}!');
-      return;
-    }
-    if (paymentMethod == '') {
-      await PlatformExceptionAlertDialog(
-        title: 'Payment method not selected',
-        exception: PlatformException(
-          code: 'INCORRECT_PAYMENT_METHOD',
-          message: 'Please select a payment method.',
-          details: 'Please select a payment method.',
-        ),
-      ).show(context);
-    }
-    if (order.orderTotal == 0) {
-      await PlatformExceptionAlertDialog(
-        title: 'Order total is zero',
-        exception: PlatformException(
-          code: 'INCORRECT_PAYMENT_METHOD',
-          message: 'Please add items to your order.',
-          details: 'Please add items to your order.',
-        ),
-      ).show(context);
-    }
-  }
-
   List<Widget> _buildPaymentMethods() {
     List<Widget> paymentOptionsList = List<Widget>();
     Map<String, dynamic> restaurantPaymentOptions = session.nearestRestaurant.paymentFlags;
@@ -338,31 +305,17 @@ class _ViewOrderState extends State<ViewOrder> {
           title: Text(
             key,
           ),
-          value: _optionCheck(key),
-          onChanged: (flag) => _updatePaymentMethod(key, flag),
+          value: model.optionCheck(key),
+          onChanged: (flag) => model.updatePaymentMethod(key, flag),
         ));
       }
     });
     return paymentOptionsList;
   }
 
-  void _updatePaymentMethod(String key, bool flag) {
-    if (order.status != ORDER_ON_HOLD) {
-      return;
-    }
-    setState(() {
-      if (flag) {
-        paymentMethod = key;
-      } else {
-        paymentMethod = '';
-      }
-    });
-  }
-
-  bool _optionCheck(String key) => paymentMethod == key;
-
   @override
   Widget build(BuildContext context) {
+    session = Provider.of<Session>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(
