@@ -1,20 +1,45 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
-import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
-import 'package:nearbymenus/app/models/order.dart';
-import 'package:nearbymenus/app/models/order_item.dart';
 import 'package:nearbymenus/app/models/session.dart';
+import 'package:nearbymenus/app/pages/orders/add_to_order_model.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
 class AddToOrder extends StatefulWidget {
+  final AddToOrderModel model;
   final String menuCode;
   final Map<String, dynamic> item;
   final Map<String, dynamic> options;
 
-  const AddToOrder({Key key, this.menuCode, this.item, this.options}) : super(key: key);
+  const AddToOrder({Key key, this.model, this.menuCode, this.item, this.options}) : super(key: key);
+
+  static Widget create({
+    BuildContext context,
+    Session session,
+    Database database,
+    String menuCode,
+    Map<String, dynamic> item,
+    Map<String, dynamic> options,
+  }) {
+    return ChangeNotifierProvider<AddToOrderModel>(
+      create: (context) => AddToOrderModel(
+        database: database,
+        session: session,
+        menuCode: menuCode,
+        item: item,
+        options: options
+      ),
+      child: Consumer<AddToOrderModel>(
+        builder: (context, model, _) => AddToOrder(
+          model: model,
+          menuCode: menuCode,
+          item: item,
+          options: options,
+        ),
+      ),
+    );
+  }
 
   @override
   _AddToOrderState createState() => _AddToOrderState();
@@ -28,52 +53,23 @@ class _AddToOrderState extends State<AddToOrder> {
   String get menuCode => widget.menuCode;
 
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
-  List<String> itemKeys = List<String>();
   List<String> menuItemOptions = List<String>();
   Map<String, int> optionsSelectionCounters = Map<String, int>();
   int quantity = 1;
   double lineTotal = 0;
   String menuCodeAndItemName = '';
 
-  void _addMenuItemToOrder() {
-    final double timestamp = dateFromCurrentDate() / 1.0;
-    var orderNumber = documentIdFromCurrentDate();
-    if (session.currentOrder == null) {
-      session.currentOrder = Order(
-        id: orderNumber,
-        restaurantId: session.nearestRestaurant.id,
-        restaurantName: session.nearestRestaurant.name,
-        managerId: session.nearestRestaurant.managerId,
-        userId: database.userId,
-        timestamp: timestamp,
-        status: ORDER_ON_HOLD,
-        name: session.userDetails.name,
-        deliveryAddress: '${session.userDetails.address} ${session.nearestRestaurant.restaurantLocation}',
-        orderItems: List<Map<String, dynamic>>(),
-        notes: ''
-      );
-    } else {
-      orderNumber = session.currentOrder.id;
-    }
-    final orderItem = OrderItem(
-      id: documentIdFromCurrentDate(),
-      orderId: orderNumber,
-      menuCode: menuCode,
-      name: item['name'],
-      quantity: quantity,
-      price: item['price'],
-      lineTotal: lineTotal,
-      options: menuItemOptions,
-    ).toMap();
-    session.currentOrder.orderItems.add(orderItem);
-    session.currentOrder.status = ORDER_ON_HOLD;
-    print(orderItem);
+  AddToOrderModel get model => widget.model;
+
+  void _save() {
+    model.save();
+    Navigator.of(context).pop();
   }
 
   Widget _buildContents(BuildContext context) {
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
-    lineTotal = widget.item['price'] * quantity;
+    lineTotal = widget.item['price'] * model.quantity;
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -129,22 +125,10 @@ class _AddToOrderState extends State<AddToOrder> {
                   FormSubmitButton(
                     context: context,
                     text: 'Add to order',
-                    color: Theme.of(context).primaryColor,
-                    onPressed: () async {
-                      if (_optionsAreValid()) {
-                        _addMenuItemToOrder();
-                        Navigator.of(context).pop();
-                      } else {
-                        await PlatformExceptionAlertDialog(
-                          title: 'Incorrect number of options selected',
-                          exception: PlatformException(
-                            code: 'INCORRECT_OPTIONS',
-                            message:  'Please check your choices.',
-                            details:  'Please check your choices.',
-                          ),
-                        ).show(context);
-                      }
-                    },
+                    color: model.canSave
+                        ? Theme.of(context).primaryColor
+                        : Theme.of(context).disabledColor,
+                    onPressed: model.canSave ? _save : null,
                   ),
                   SizedBox(
                     height: 16.0,
@@ -166,11 +150,7 @@ class _AddToOrderState extends State<AddToOrder> {
           children: <Widget>[
             new IconButton(
               icon: new Icon(Icons.remove),
-              onPressed: quantity == 1 ? null : () {
-                setState(() {
-                  quantity--;
-                });
-              },
+              onPressed: model.quantity == 1 ? null : () => model.updateQuantity(-1),
             ),
             new Container(
               decoration: new BoxDecoration(
@@ -183,43 +163,19 @@ class _AddToOrderState extends State<AddToOrder> {
                 width: 70.0,
                 height: 45.0,
                 child: new Center(
-                    child: new Text('$quantity',
+                    child: new Text('${model.quantity}',
                         style: Theme.of(context).textTheme.subtitle1,
                         textAlign: TextAlign.center)),
               ),
             ),
             new IconButton(
               icon: new Icon(Icons.add),
-              onPressed: () {
-                setState(() {
-                  quantity++;
-                });
-              },
+              onPressed: () => model.updateQuantity(1),
             ),
           ],
         ),
       ),
     ];
-  }
-
-  bool _optionsAreValid() {
-    if (widget.item['options'].isEmpty) {
-      return true;
-    }
-    if (optionsSelectionCounters.isEmpty) {
-      return false;
-    }
-    bool optionsAreValid = true;
-    widget.item['options'].forEach((key) {
-      Map<String, dynamic> optionValue = widget.options[key];
-      final maxAllowed = optionValue['numberAllowed'];
-      if (optionsSelectionCounters[optionValue['name']] == null ||
-          optionsSelectionCounters[optionValue['name']] > maxAllowed ||
-          optionsSelectionCounters[optionValue['name']] == 0) {
-        optionsAreValid = false;
-      }
-    });
-    return optionsAreValid;
   }
 
   List<Widget> _buildOptions() {
@@ -252,8 +208,8 @@ class _AddToOrderState extends State<AddToOrder> {
               title: Text(
                 '${value['name']}',
               ),
-              value: _optionCheck('${optionValue['name']}: ${value['name']}'),
-              onChanged: (addFlag) => _updateOptionsList(optionValue['name'], '${optionValue['name']}: ${value['name']}', addFlag),
+              value: model.optionCheck('${optionValue['name']}: ${value['name']}'),
+              onChanged: (addFlag) => model.updateOptionsList(optionValue['name'], '${optionValue['name']}: ${value['name']}', addFlag),
             ),
           );
         }
@@ -261,28 +217,6 @@ class _AddToOrderState extends State<AddToOrder> {
     });
     return optionList;
   }
-
-  void _updateOptionsList(String key, String option, bool addFlag) {
-    setState(() {
-      if (addFlag) {
-        menuItemOptions.add(option);
-        if (optionsSelectionCounters.containsKey(key)) {
-          optionsSelectionCounters.update(key, (value) => value + 1);
-        } else {
-          optionsSelectionCounters.putIfAbsent(key, () => 1);
-        }
-      } else {
-        menuItemOptions.remove(option);
-        if (optionsSelectionCounters.containsKey(key)) {
-          optionsSelectionCounters.update(key, (value) => value - 1);
-        } else {
-          optionsSelectionCounters.putIfAbsent(key, () => 0);
-        }
-      }
-    });
-  }
-
-  bool _optionCheck(String key) => menuItemOptions.contains(key);
 
   @override
   Widget build(BuildContext context) {
