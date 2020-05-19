@@ -1,8 +1,11 @@
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_container.dart';
 import 'package:nearbymenus/app/pages/orders/add_to_order.dart';
+import 'package:nearbymenus/app/services/database.dart';
+import 'package:provider/provider.dart';
 
 class ExpandableListView extends StatefulWidget {
   final Map<String, dynamic> menu;
@@ -15,6 +18,8 @@ class ExpandableListView extends StatefulWidget {
 }
 
 class _ExpandableListViewState extends State<ExpandableListView> {
+  Session session;
+  Database database;
   Map<String, dynamic> items;
   bool expandItemsFlag = false;
   Map<String, dynamic> sortedMenuItems = Map<String, dynamic>();
@@ -26,7 +31,10 @@ class _ExpandableListViewState extends State<ExpandableListView> {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         fullscreenDialog: false,
-        builder: (context) => AddToOrder(
+        builder: (context) => AddToOrder.create(
+          context: context,
+          database: database,
+          session: session,
           menuCode: menuCode,
           item: menuItem,
           options: widget.options,
@@ -48,6 +56,8 @@ class _ExpandableListViewState extends State<ExpandableListView> {
 
   @override
   Widget build(BuildContext context) {
+    session = Provider.of<Session>(context);
+    database = Provider.of<Database>(context);
     sortedMenuItems.clear();
     final itemCount = menu.entries.where((element) {
       if (element.key.toString().length > 20 &&

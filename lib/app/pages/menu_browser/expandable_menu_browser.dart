@@ -74,7 +74,12 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
                           Navigator.of(context).push(
                             MaterialPageRoute<void>(
                                 fullscreenDialog: false,
-                                builder: (context) => ViewOrder(order: session.currentOrder,)
+                                builder: (context) => ViewOrder.create(
+                                  context: context,
+                                  database: database,
+                                  session: session,
+                                  order: session.currentOrder,
+                                )
                             ),
                           );
                         } else {
