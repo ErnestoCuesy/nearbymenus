@@ -1,3 +1,5 @@
+import 'package:nearbymenus/app/models/session.dart';
+import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/sign_in/validators.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:flutter/foundation.dart';
@@ -7,6 +9,7 @@ enum EmailSignInFormType { signIn, register, resetPassword }
 class EmailSignInModel with UserCredentialsValidators, ChangeNotifier {
   EmailSignInModel({
     @required this.auth,
+    @required this.session,
     this.email,
     this.password,
     this.formType = EmailSignInFormType.signIn,
@@ -15,6 +18,7 @@ class EmailSignInModel with UserCredentialsValidators, ChangeNotifier {
   });
 
   final AuthBase auth;
+  final Session session;
   String email;
   String password;
   EmailSignInFormType formType;
@@ -39,6 +43,7 @@ class EmailSignInModel with UserCredentialsValidators, ChangeNotifier {
         }
         break;
       }
+      session.userDetails = UserDetails(email: email);
     } catch (e) {
       if (e.code == 'PASSWORD_RESET' || e.code == 'EMAIL_NOT_VERIFIED') {
         updateWith(formType: EmailSignInFormType.signIn);
