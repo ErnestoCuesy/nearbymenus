@@ -16,12 +16,12 @@ class AddToOrder extends StatefulWidget {
 
   static Widget create({
     BuildContext context,
-    Session session,
-    Database database,
     String menuCode,
     Map<String, dynamic> item,
     Map<String, dynamic> options,
   }) {
+    final database = Provider.of<Database>(context);
+    final session = Provider.of<Session>(context);
     return ChangeNotifierProvider<AddToOrderModel>(
       create: (context) => AddToOrderModel(
         database: database,
