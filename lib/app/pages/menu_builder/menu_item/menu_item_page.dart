@@ -35,8 +35,6 @@ class _MenuItemPageState extends State<MenuItemPage> {
       MaterialPageRoute<void>(
         fullscreenDialog: false,
         builder: (context) => MenuItemDetailsPage(
-          session: session,
-          database: database,
           restaurant: widget.restaurant,
           menu: widget.menu,
           item: item,
@@ -142,7 +140,6 @@ class _MenuItemPageState extends State<MenuItemPage> {
       item.options.forEach((key) {
         final value = widget.restaurant.restaurantOptions[key];
         if (value != null) {
-          print('Adding: ${value['name']}');
           optionList.add(CheckboxListTile(
             title: Text('${value['name']}'),
             value: true,
