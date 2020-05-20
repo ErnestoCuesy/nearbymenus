@@ -34,8 +34,6 @@ class _OptionPageState extends State<OptionPage> {
       MaterialPageRoute<void>(
         fullscreenDialog: false,
         builder: (context) => OptionDetailsPage(
-          session: session,
-          database: database,
           restaurant: widget.restaurant,
           option: option,
         ),
