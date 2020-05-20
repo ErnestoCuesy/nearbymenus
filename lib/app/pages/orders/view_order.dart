@@ -14,11 +14,13 @@ import 'package:provider/provider.dart';
 
 class ViewOrder extends StatefulWidget {
   final ViewOrderModel model;
+  final GlobalKey<ScaffoldState> scaffoldKey;
 
-  const ViewOrder({Key key, this.model}) : super(key: key);
+  const ViewOrder({Key key, this.model, this.scaffoldKey}) : super(key: key);
 
   static Widget create({
     BuildContext context,
+    GlobalKey<ScaffoldState> scaffoldKey,
     Order order,
   }) {
     final database = Provider.of<Database>(context);
@@ -31,6 +33,7 @@ class ViewOrder extends StatefulWidget {
       ),
       child: Consumer<ViewOrderModel>(
         builder: (context, model, _) => ViewOrder(
+          scaffoldKey: scaffoldKey,
           model: model,
         ),
       ),
@@ -50,6 +53,7 @@ class _ViewOrderState extends State<ViewOrder> {
   final FocusNode _notesFocusNode = FocusNode();
 
   ViewOrderModel get model => widget.model;
+  GlobalKey<ScaffoldState> get scaffoldKey => widget.scaffoldKey;
 
   @override
   void initState() {
@@ -88,7 +92,7 @@ class _ViewOrderState extends State<ViewOrder> {
 
   void _save(BuildContext context) {
     model.save();
-    Scaffold.of(context).showSnackBar(
+    scaffoldKey.currentState.showSnackBar(
       SnackBar(
         content: Text(
             'Order successfully placed at ${session.nearestRestaurant.name}!'
@@ -154,7 +158,12 @@ class _ViewOrderState extends State<ViewOrder> {
                           final orderItem = model.order.orderItems[index];
                           final List<dynamic> orderItemOptions = orderItem['options'];
                           return Dismissible(
-                            background: Container(color: Colors.red),
+                            background: Container(
+                              color: Colors.red,
+                              child: model.order.status == ORDER_ON_HOLD
+                                  ? Icon(Icons.delete, size: 32.0,)
+                                  : Icon(Icons.block, size: 32.0),
+                            ),
                             key: Key('${orderItem['id']}'),
                             direction: DismissDirection.endToStart,
                             confirmDismiss: (_) => _confirmDismiss(context),
@@ -189,6 +198,7 @@ class _ViewOrderState extends State<ViewOrder> {
                       ),
                     ),
                   ),
+                  if (model.order.status == ORDER_ON_HOLD)
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text('Swipe items to the left to remove.'),
@@ -200,6 +210,7 @@ class _ViewOrderState extends State<ViewOrder> {
                       style: Theme.of(context).textTheme.headline4,
                     ),
                   ),
+                  if (model.order.status == ORDER_ON_HOLD)
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Text(
