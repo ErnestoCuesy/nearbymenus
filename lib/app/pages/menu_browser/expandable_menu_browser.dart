@@ -20,6 +20,7 @@ class ExpandableMenuBrowser extends StatefulWidget {
 class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
   Session session;
   Database database;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
   bool get orderOnHold => session.currentOrder != null && session.currentOrder.status == ORDER_ON_HOLD;
 
@@ -59,6 +60,7 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
           });
           var sortedKeys = sortedMenus.keys.toList()..sort();
             return Scaffold(
+              key: _scaffoldKey,
               appBar: AppBar(
                 title: Text(
                   '${restaurant.name}',
@@ -77,6 +79,7 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
                                   fullscreenDialog: false,
                                   builder: (context) => ViewOrder.create(
                                     context: context,
+                                    scaffoldKey: _scaffoldKey,
                                     order: session.currentOrder,
                                   )
                               ),
