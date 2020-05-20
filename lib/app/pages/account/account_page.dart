@@ -35,6 +35,7 @@ class _AccountPageState extends State<AccountPage> {
   Database get database => widget.database;
   bool staffRequestPending = false;
 
+
   Future<void> _signOut() async {
     try {
       session.signOut();
@@ -140,19 +141,16 @@ class _AccountPageState extends State<AccountPage> {
           sectionTitle: 'Bundle details',
           cardTitle: session.subscription.subscriptionTypeString,
           cardSubtitle:
-              'Expired on: ${session.subscription.latestExpirationDate}',
+              'Last purchase was on: ${session.subscription.latestExpirationDate}',
           onPressed: () {
             _ordersLeft().then((value) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                  UpsellScreen(
-                    database: database,
-                    session: session,
-                    ordersLeft: value,
-                    ordersBlocked: null,
-                  ),
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                    fullscreenDialog: false,
+                    builder: (context) => UpsellScreen(
+                      ordersLeft: value,
+                      blockedOrders: null,
+                    )
                 ),
               );
             });
