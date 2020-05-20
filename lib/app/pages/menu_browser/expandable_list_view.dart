@@ -33,8 +33,6 @@ class _ExpandableListViewState extends State<ExpandableListView> {
         fullscreenDialog: false,
         builder: (context) => AddToOrder.create(
           context: context,
-          database: database,
-          session: session,
           menuCode: menuCode,
           item: menuItem,
           options: widget.options,
