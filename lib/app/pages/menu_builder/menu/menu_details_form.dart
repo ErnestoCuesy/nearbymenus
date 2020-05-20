@@ -16,11 +16,11 @@ class MenuDetailsForm extends StatefulWidget {
 
   static Widget create({
     BuildContext context,
-    Session session,
-    Database database,
     Menu menu,
     Restaurant restaurant,
   }) {
+    final database = Provider.of<Database>(context);
+    final session = Provider.of<Session>(context);
     return ChangeNotifierProvider<MenuDetailsModel>(
       create: (context) => MenuDetailsModel(
           database: database,
