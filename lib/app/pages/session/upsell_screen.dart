@@ -1,29 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/purchase_button.dart';
 import 'package:nearbymenus/app/models/session.dart';
-import 'package:nearbymenus/app/services/database.dart';
-import 'package:nearbymenus/app/services/iap_manager.dart';
 import 'package:provider/provider.dart';
 
 class UpsellScreen extends StatefulWidget {
-  final Database database;
-  final Session session;
+  final int blockedOrders;
   final int ordersLeft;
-  final int ordersBlocked;
 
-  const UpsellScreen({Key key, this.database, this.session, this.ordersLeft, this.ordersBlocked}) : super(key: key);
+  const UpsellScreen({Key key, this.blockedOrders, this.ordersLeft}) : super(key: key);
 
   @override
   _UpsellScreenState createState() => _UpsellScreenState();
 }
 
 class _UpsellScreenState extends State<UpsellScreen> {
-  IAPManagerBase iap;
-
-  Database get database => widget.database;
-  Session get session => widget.session;
+  Session session;
   int get ordersLeft => widget.ordersLeft;
-  int get ordersBlocked => widget.ordersBlocked;
+  int get blockedOrders => widget.blockedOrders;
 
   List<Widget> buildPackages(BuildContext context) {
     print('Orders left: $ordersLeft');
@@ -38,9 +31,9 @@ class _UpsellScreenState extends State<UpsellScreen> {
       ));
       packages.add(SizedBox(height: 16.0,));
     }
-    if (ordersBlocked != null) {
+    if (blockedOrders != null) {
       packages.add(Text(
-        'Orders locked: ${widget.ordersBlocked}',
+        'Orders locked: $blockedOrders',
         style: Theme
             .of(context)
             .textTheme
@@ -50,9 +43,8 @@ class _UpsellScreenState extends State<UpsellScreen> {
     }
     session.subscription.availableOfferings.forEach((pkg) {
       packages.add(PurchaseButton(
-        iap: iap,
-        database: database,
         package: pkg,
+        blockedOrders: blockedOrders,
       ));
       packages.add(SizedBox(height: 24.0,));
     });
@@ -61,7 +53,7 @@ class _UpsellScreenState extends State<UpsellScreen> {
 
   @override
   Widget build(BuildContext context) {
-    iap = Provider.of<IAPManagerBase>(context, listen: false);
+    session = Provider.of<Session>(context);
     return Scaffold(
         appBar: AppBar(
           title: Text(
