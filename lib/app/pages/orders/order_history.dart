@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/common_widgets/list_items_builder.dart';
+import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
@@ -25,6 +27,7 @@ class _OrderHistoryState extends State<OrderHistory> {
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
   Stream<List<Order>> stream;
   List<Order> blockedOrders;
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Widget _buildContents(BuildContext context) {
     stream = database.userOrders(
@@ -114,33 +117,49 @@ class _OrderHistoryState extends State<OrderHistory> {
     );
   }
 
-  Future<void> _unlockOrders() async {
-    int ordersLeft;
-    await database.ordersLeft(database.userId).then((value) {
-      if (value != null) {
-        ordersLeft = value;
-      }
-    }).catchError((_) => null);
-    print('Orders left: $ordersLeft');
-    print('Blocked orders: ${blockedOrders.length}');
-    if (ordersLeft > blockedOrders.length) {
-      blockedOrders.forEach((order) {
-        order.isBlocked = false;
-        database.setOrder(order);
-      });
-    } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              UpsellScreen(
-                database: database,
-                session: session,
-                ordersLeft: ordersLeft,
-                ordersBlocked: blockedOrders.length,
+  Future<void> _unlockOrders(BuildContext context) async {
+    if (blockedOrders.length > 0) {
+      await database.ordersLeft(database.userId).then((value) {
+        int ordersLeft = 0;
+        if (value != null) {
+          ordersLeft = value;
+        }
+        print('Orders left: $ordersLeft');
+        print('Blocked orders: ${blockedOrders.length}');
+        if (ordersLeft >= blockedOrders.length) {
+          blockedOrders.forEach((order) {
+            order.isBlocked = false;
+            database.setOrder(order);
+          });
+          _scaffoldKey.currentState.showSnackBar(
+            SnackBar(
+              content: Text(
+                  '${blockedOrders.length} orders unlocked'
               ),
+            ),
+          );
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  UpsellScreen(
+                    ordersLeft: ordersLeft,
+                    blockedOrders: blockedOrders.length,
+                  ),
+            ),
+          );
+        }
+      }).catchError((_) => null);
+    } else {
+      await PlatformExceptionAlertDialog(
+        title: 'Locked orders',
+        exception: PlatformException(
+          code: 'ORDER_BUNDLED_PURCHASE_SUCCESS',
+          message:  'There are no locked orders at the moment.',
+          details:  'There are no locked orders at the moment',
         ),
-      );
+      ).show(context);
     }
   }
 
@@ -149,6 +168,7 @@ class _OrderHistoryState extends State<OrderHistory> {
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text(
           widget.showBlocked ? 'Locked orders' : 'Orders',
@@ -161,7 +181,7 @@ class _OrderHistoryState extends State<OrderHistory> {
             child: IconButton(
               iconSize: 24.0,
               icon: Icon(Icons.lock_open),
-              onPressed: () => _unlockOrders(),
+              onPressed: () => _unlockOrders(context),
             ),
           ),
         ],
