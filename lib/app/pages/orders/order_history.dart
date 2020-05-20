@@ -108,8 +108,6 @@ class _OrderHistoryState extends State<OrderHistory> {
           fullscreenDialog: false,
           builder: (context) => ViewOrder.create(
             context: context,
-            database: database,
-            session: session,
             order: order,
           )
       ),

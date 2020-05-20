@@ -19,10 +19,10 @@ class ViewOrder extends StatefulWidget {
 
   static Widget create({
     BuildContext context,
-    Session session,
-    Database database,
     Order order,
   }) {
+    final database = Provider.of<Database>(context);
+    final session = Provider.of<Session>(context);
     return ChangeNotifierProvider<ViewOrderModel>(
       create: (context) => ViewOrderModel(
           database: database,
@@ -88,14 +88,14 @@ class _ViewOrderState extends State<ViewOrder> {
 
   void _save(BuildContext context) {
     model.save();
-    Navigator.of(context).pop();
     Scaffold.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'Order successfully placed at ${session.nearestRestaurant.name}!'
+            'Order successfully placed at ${session.nearestRestaurant.name}!'
         ),
       ),
     );
+    Navigator.of(context).pop();
   }
 
   Widget _buildContents(BuildContext context) {
