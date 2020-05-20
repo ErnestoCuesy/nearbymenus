@@ -98,7 +98,7 @@ class _AccountPageState extends State<AccountPage> {
       // NAME AND ADDRESS
         _userDetailsSection(
           sectionTitle: 'Your details',
-          cardTitle: session.userDetails.name ?? '',
+          cardTitle: session.userDetails.name +  ' (${session.userDetails.email})' ?? '',
           cardSubtitle: session.userDetails.address == null
               ? 'Address unknown'
               : '${session.userDetails.address} ${restaurant.restaurantLocation}',
