@@ -30,10 +30,6 @@ abstract class RoleEnumBase {
         items = StaffRoleEnum();
       }
       break;
-      case ROLE_DEV: {
-        items = DevRoleEnum();
-      }
-      break;
     }
     return items;
   }
@@ -64,39 +60,28 @@ abstract class RoleEnumBase {
 
 class PatronRoleEnum extends RoleEnumBase {
   List<TabItem> roleEnumList = const [
+    TabItem.userAccount,
     TabItem.menu,
     TabItem.myOrders,
     TabItem.messages,
-    TabItem.userAccount
   ];
 }
 
 class ManagerRoleEnum extends RoleEnumBase {
   final List<TabItem> roleEnumList = const [
+    TabItem.userAccount,
     TabItem.restaurant,
     TabItem.manageOrders,
     TabItem.blockedOrders,
     TabItem.messages,
-    TabItem.userAccount
   ];
 }
 
 class StaffRoleEnum extends RoleEnumBase {
   List<TabItem> roleEnumList = const [
+    TabItem.userAccount,
     TabItem.manageOrders,
     TabItem.messages,
-    TabItem.userAccount
-  ];
-}
-
-class DevRoleEnum extends RoleEnumBase {
-  final List<TabItem> roleEnumList = const [
-    TabItem.restaurant,
-    TabItem.menu,
-    TabItem.manageOrders,
-    TabItem.myOrders,
-    TabItem.messages,
-    TabItem.userAccount
   ];
 }
 
@@ -107,6 +92,8 @@ class TabItemData {
   final IconData icon;
 
   static const Map<TabItem, TabItemData> allTabs = {
+    TabItem.userAccount:
+    TabItemData(title: 'Profile', icon: Icons.account_circle),
     TabItem.restaurant:
     TabItemData(title: 'Restaurants', icon: Icons.home),
     TabItem.menu:
@@ -119,8 +106,6 @@ class TabItemData {
     TabItemData(title: 'Orders History', icon: Icons.update),
     TabItem.messages:
     TabItemData(title: 'Messages', icon: Icons.message),
-    TabItem.userAccount:
-    TabItemData(title: 'Profile', icon: Icons.account_circle),
   };
 
 }
