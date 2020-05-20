@@ -17,7 +17,9 @@ class RestaurantDetailsForm extends StatefulWidget {
 
   const RestaurantDetailsForm({Key key, this.model}) : super(key: key);
 
-  static Widget create(BuildContext context, Session session, Database database, Restaurant restaurant) {
+  static Widget create(BuildContext context, Restaurant restaurant) {
+    final database = Provider.of<Database>(context);
+    final session = Provider.of<Session>(context);
     return ChangeNotifierProvider<RestaurantDetailsModel>(
       create: (context) => RestaurantDetailsModel(
         database: database,
