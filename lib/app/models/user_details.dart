@@ -6,6 +6,7 @@ const String ROLE_CHECK_SUBSCRIPTION = 'Subscription';
 const String ROLE_DEV = 'Dev';
 
 class UserDetails {
+  String email;
   String name;
   String address;
   String nearestRestaurantId;
@@ -13,6 +14,7 @@ class UserDetails {
   String deviceName;
 
   UserDetails({
+    this.email = '',
     this.name = '',
     this.address = '',
     this.nearestRestaurantId = '',
@@ -25,6 +27,7 @@ class UserDetails {
       return UserDetails();
     }
     return UserDetails(
+        email: data['email'],
         name: data['name'],
         address: data['address'],
         nearestRestaurantId: data['nearestRestaurantId'],
@@ -34,6 +37,7 @@ class UserDetails {
 
   Map<String, dynamic> toMap() {
     return {
+      'email': email,
       'name': name,
       'address': address,
       'nearestRestaurantId': nearestRestaurantId,
