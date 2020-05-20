@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
+import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/sign_in/email_sign_in_model.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:provider/provider.dart';
@@ -14,8 +15,9 @@ class EmailSignInForm extends StatefulWidget {
 
   static Widget create(BuildContext context) {
     final auth = Provider.of<AuthBase>(context);
+    final session = Provider.of<Session>(context);
     return ChangeNotifierProvider<EmailSignInModel>(
-      create: (context) => EmailSignInModel(auth: auth),
+      create: (context) => EmailSignInModel(auth: auth, session: session),
       child: Consumer<EmailSignInModel>(
         builder: (context, model, _) => EmailSignInForm(model: model),
       ),
