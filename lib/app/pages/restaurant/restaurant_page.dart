@@ -28,8 +28,6 @@ class _RestaurantPageState extends State<RestaurantPage> {
       MaterialPageRoute<void>(
         fullscreenDialog: false,
         builder: (context) => RestaurantDetailsPage(
-          session: session,
-          database: database,
           restaurant: restaurant,
         ),
       ),
