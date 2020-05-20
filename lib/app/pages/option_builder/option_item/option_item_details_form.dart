@@ -18,12 +18,12 @@ class OptionItemDetailsForm extends StatefulWidget {
 
   static Widget create({
     BuildContext context,
-    Session session,
-    Database database,
     Restaurant restaurant,
     Option option,
     OptionItem item,
   }) {
+    final database = Provider.of<Database>(context);
+    final session = Provider.of<Session>(context);
     return ChangeNotifierProvider<OptionItemDetailsModel>(
       create: (context) => OptionItemDetailsModel(
         database: database,
