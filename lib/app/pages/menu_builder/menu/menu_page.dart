@@ -34,8 +34,6 @@ class _MenuPageState extends State<MenuPage> {
       MaterialPageRoute<void>(
         fullscreenDialog: false,
         builder: (context) => MenuDetailsPage(
-          session: session,
-          database: database,
           restaurant: widget.restaurant,
           menu: menu,
         ),
