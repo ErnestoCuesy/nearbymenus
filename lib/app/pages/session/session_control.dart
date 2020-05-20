@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/models/notification_streams.dart';
-import 'package:nearbymenus/app/models/received_notification.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/home/home_page_manager.dart';
 import 'package:nearbymenus/app/pages/home/home_page_dev.dart';
@@ -32,43 +30,6 @@ class _SessionControlState extends State<SessionControl> {
   UserDetails userDetails;
   NotificationStreams notificationStreams;
 
-  void _configureDidReceiveLocalNotificationSubject() {
-    notificationStreams.didReceiveLocalNotificationSubject.stream
-        .listen((ReceivedNotification receivedNotification) async {
-      final notificationReceived = await PlatformAlertDialog(
-        title: receivedNotification.title != null
-            ? receivedNotification.title
-            : null,
-        content: receivedNotification.body != null
-            ? receivedNotification.body
-            : null,
-        defaultActionText: 'Ok',
-      ).show(context);
-      if (notificationReceived) {
-        Navigator.of(context, rootNavigator: true).pop();
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                Placeholder(),
-          ),
-        );
-      }
-    });
-  }
-
-  void _configureSelectNotificationSubject() {
-    notificationStreams.selectNotificationSubject.stream.listen((String payload) async {
-      // TODO there's a problem here
-      final didRequestContinue = await PlatformAlertDialog(
-        title: 'Nearby Menus',
-        content: 'You have a new message. Go to your messages page to check it out.',
-        //cancelActionText: 'Exit',
-        defaultActionText: 'Ok',
-      ).show(context);
-    });
-  }
-
   @override
   void dispose() {
     notificationStreams.didReceiveLocalNotificationSubject.close();
@@ -90,6 +51,7 @@ class _SessionControlState extends State<SessionControl> {
         if (snapshot.connectionState == ConnectionState.active) {
           if (snapshot.hasData && snapshot.data != null) {
             userDetails = snapshot.data;
+            userDetails.email = session.userDetails.email;
             session.setUserDetails(userDetails);
             print('User details: ${userDetails.toString()}');
             if (userDetails.deviceName != '' &&
