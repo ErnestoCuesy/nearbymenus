@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/models/option.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
-import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/option_builder/option/option_details_form.dart';
-import 'package:nearbymenus/app/services/database.dart';
 
 class OptionDetailsPage extends StatelessWidget {
-  final Session session;
-  final Database database;
   final Restaurant restaurant;
   final Option option;
 
   const OptionDetailsPage(
-      {Key key, this.session, this.database, this.option, this.restaurant})
+      {Key key, this.option, this.restaurant})
       : super(key: key);
 
   @override
@@ -28,8 +24,6 @@ class OptionDetailsPage extends StatelessWidget {
           child: Card(
             child: OptionDetailsForm.create(
               context: context,
-              session: session,
-              database: database,
               restaurant: restaurant,
               option: option,
             ),
