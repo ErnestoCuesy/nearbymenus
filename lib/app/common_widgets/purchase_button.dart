@@ -5,14 +5,52 @@ import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.d
 import 'package:nearbymenus/app/models/bundle.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/services/iap_manager.dart';
+import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 class PurchaseButton extends StatelessWidget {
-  final IAPManagerBase iap;
-  final Database database;
   final Package package;
+  final int blockedOrders;
 
-  PurchaseButton({Key key, @required this.iap, this.database, this.package}) : super(key: key);
+  PurchaseButton({Key key, this.package, this.blockedOrders}) : super(key: key);
+
+  Future<void> _setBundleAndUnlock(BuildContext context, int ordersInBundle) async {
+    final database = Provider.of<Database>(context);
+    final bundleUpdateDate = documentIdFromCurrentDate();
+    try {
+      await database.setBundleCounterTransaction(database.userId, ordersInBundle);
+      database.setBundle(database.userId, Bundle(
+              id: bundleUpdateDate,
+              purchaseDate: bundleUpdateDate,
+              rcInfo: 'RevenueCat stuff',
+              ordersInBundle: ordersInBundle,
+          ));
+    } catch (e) {
+      print('DB Bundle set and unlock failed: $e');
+    }
+  }
+
+  Future<void> _buyPackage(BuildContext context) async {
+    final iap = Provider.of<IAPManagerBase>(context, listen: false);
+    String message = '';
+    if (blockedOrders != null) {
+      message = 'You can unlock your orders now.';
+    }
+    try {
+      iap.purchasePackage(package);
+      _setBundleAndUnlock(context, 5);
+      await PlatformExceptionAlertDialog(
+        title: 'Thank you!',
+        exception: PlatformException(
+          code: 'ORDER_BUNDLED_PURCHASE_SUCCESS',
+          message:  'Your purchase was successful. $message',
+          details:  'Your purchase was successful. $message',
+        ),
+      ).show(context);
+    } catch (e) {
+      print('IAP purchase failed: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,30 +59,7 @@ class PurchaseButton extends StatelessWidget {
         height: 150.0,
         width: 250.0,
         color: Theme.of(context).buttonTheme.colorScheme.background,
-        onPressed: () async {
-          try {
-            iap.purchasePackage(package);
-            int testBundles = 5;
-            final bundleUpdateDate = documentIdFromCurrentDate();
-            await database.setBundleCounterTransaction(database.userId, testBundles);
-            database.setBundle(database.userId, Bundle(
-                      id: bundleUpdateDate,
-                      purchaseDate: bundleUpdateDate,
-                      rcInfo: 'RevenueCat stuff',
-                      ordersInBundle: testBundles
-                    ));
-            await PlatformExceptionAlertDialog(
-                title: 'Thank you!',
-                exception: PlatformException(
-                code: 'ORDER_BUNDLED_PURCHASE_SUCCESS',
-                message:  'Your purchase was successful. You can unlock your orders.',
-                details:  'Your purchase was successful. You can unlock your orders.',
-              ),
-            ).show(context);
-          } catch (e) {
-            print(e);
-          }
-        },
+        onPressed: () => _buyPackage(context),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
