@@ -67,33 +67,33 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
                 actions: [
                   Padding(
                     padding: const EdgeInsets.only(right: 26.0),
-                    child: IconButton(
-                      icon: Icon(Icons.add_shopping_cart),
-                      onPressed: () async {
-                        if (orderOnHold) {
-                          Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                                fullscreenDialog: false,
-                                builder: (context) => ViewOrder.create(
-                                  context: context,
-                                  database: database,
-                                  session: session,
-                                  order: session.currentOrder,
-                                )
+                    child: Builder(
+                      builder: (context) => IconButton(
+                        icon: Icon(Icons.add_shopping_cart),
+                        onPressed: () async {
+                          if (orderOnHold) {
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                  fullscreenDialog: false,
+                                  builder: (context) => ViewOrder.create(
+                                    context: context,
+                                    order: session.currentOrder,
+                                  )
+                              ),
+                            );
+                          } else {
+                            session.currentOrder = null;
+                            await PlatformExceptionAlertDialog(
+                                title: 'Empty Order',
+                                exception: PlatformException(
+                                code: 'ORDER_IS_EMPTY',
+                                message:  'Please tap on the menu items you wish to order first.',
+                                details:  'Please tap on the menu items you wish to order first.',
                             ),
-                          );
-                        } else {
-                          session.currentOrder = null;
-                          await PlatformExceptionAlertDialog(
-                              title: 'Empty Order',
-                              exception: PlatformException(
-                              code: 'ORDER_IS_EMPTY',
-                              message:  'Please tap on the menu items you wish to order first.',
-                              details:  'Please tap on the menu items you wish to order first.',
-                          ),
-                        ).show(context);
-                        }
-                      },
+                          ).show(context);
+                          }
+                        },
+                      ),
                     ),
                   ),
                 ],
