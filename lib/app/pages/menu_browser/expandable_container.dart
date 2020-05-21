@@ -23,7 +23,12 @@ class ExpandableContainer extends StatelessWidget {
       height: expanded ? expandedHeight : collapsedHeight,
       child: Container(
         child: child,
-        decoration: BoxDecoration(border: Border.all(width: 1.0, color: Colors.orangeAccent)),
+        decoration: BoxDecoration(
+          border: Border.all(
+            width: 1.0,
+            color: Theme.of(context).accentColor,
+          ),
+        ),
       ),
     );
   }
