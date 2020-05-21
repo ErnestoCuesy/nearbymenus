@@ -243,7 +243,7 @@ class _ViewOrderState extends State<ViewOrder> {
                           onPressed: () async {
                             final bool cancelOrder = await _confirmCancelOrder(context);
                             if (cancelOrder) {
-                              model.order.status = ORDER_CANCELLED;
+                              model.cancel();
                               Navigator.of(context).pop();
                             }
                           },
