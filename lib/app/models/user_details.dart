@@ -12,6 +12,7 @@ class UserDetails {
   String nearestRestaurantId;
   String role;
   String deviceName;
+  Map<String, dynamic> orderOnHold;
 
   UserDetails({
     this.email = '',
@@ -19,7 +20,8 @@ class UserDetails {
     this.address = '',
     this.nearestRestaurantId = '',
     this.role = ROLE_NONE,
-    this.deviceName = ''
+    this.deviceName = '',
+    this.orderOnHold,
   });
 
   factory UserDetails.fromMap(Map<String, dynamic> data) {
@@ -32,7 +34,9 @@ class UserDetails {
         address: data['address'],
         nearestRestaurantId: data['nearestRestaurantId'],
         role: data['role'],
-        deviceName: data['deviceName']);
+        deviceName: data['deviceName'],
+        orderOnHold: data['orderOnHold'] ?? {},
+    );
   }
 
   Map<String, dynamic> toMap() {
@@ -42,7 +46,8 @@ class UserDetails {
       'address': address,
       'nearestRestaurantId': nearestRestaurantId,
       'role': role,
-      'deviceName': deviceName
+      'deviceName': deviceName,
+      'orderOnHold': orderOnHold,
     };
   }
 }
