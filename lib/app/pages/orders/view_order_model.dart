@@ -30,10 +30,18 @@ class ViewOrderModel with ChangeNotifier {
           session.nearestRestaurant.id,
           order);
       session.currentOrder = null;
+      session.userDetails.orderOnHold = null;
+      database.setUserDetails(session.userDetails);
     } catch (e) {
       print(e);
       rethrow;
     }
+  }
+
+  void cancel() {
+    order = null;
+    session.userDetails.orderOnHold = null;
+    database.setUserDetails(session.userDetails);
   }
 
   void updateNotes(String notes) => updateWith(notes: notes);
