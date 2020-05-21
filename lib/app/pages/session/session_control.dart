@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/models/notification_streams.dart';
+import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/home/home_page_manager.dart';
 import 'package:nearbymenus/app/pages/home/home_page_dev.dart';
@@ -51,8 +52,13 @@ class _SessionControlState extends State<SessionControl> {
         if (snapshot.connectionState == ConnectionState.active) {
           if (snapshot.hasData && snapshot.data != null) {
             userDetails = snapshot.data;
-            userDetails.email = session.userDetails.email;
+            if (userDetails.email == null) {
+              userDetails.email = session.userDetails.email;
+            }
             session.setUserDetails(userDetails);
+            if (userDetails.orderOnHold != null) {
+              session.currentOrder = Order.fromMap(userDetails.orderOnHold, null);
+            }
             print('User details: ${userDetails.toString()}');
             if (userDetails.deviceName != '' &&
                 userDetails.deviceName != deviceInfo.deviceName) {
