@@ -103,7 +103,7 @@ class _ExpandableListViewState extends State<ExpandableListView> {
                   height: 50.0,
                   width: 50.0,
                   decoration: BoxDecoration(
-                    color: Colors.orange,
+                    color: Theme.of(context).primaryColor,
                     shape: BoxShape.circle,
                   ),
                   child: Center(
@@ -141,7 +141,7 @@ class _ExpandableListViewState extends State<ExpandableListView> {
                   decoration: BoxDecoration(
                       border: Border.all(
                       width: 0.5,
-                      color: Colors.orangeAccent,
+                      color: Theme.of(context).primaryColor,
                       ),
                   ),
                   child: ListTile(
