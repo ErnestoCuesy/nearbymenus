@@ -66,7 +66,8 @@ class AddToOrderModel with ChangeNotifier {
     ).toMap();
     session.currentOrder.orderItems.add(orderItem);
     session.currentOrder.status = ORDER_ON_HOLD;
-    print(orderItem);
+    session.userDetails.orderOnHold = session.currentOrder.toMap();
+    database.setUserDetails(session.userDetails);
   }
 
   String get primaryButtonText => 'Save';
