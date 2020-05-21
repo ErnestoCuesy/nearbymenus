@@ -20,6 +20,8 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'package:nearbymenus/app/pages/landing/subscription_check.dart';
 import 'package:rxdart/subjects.dart';
 
+import 'common_widgets/platform_exception_alert_dialog.dart';
+
 class MyApp extends StatefulWidget {
   @override
   _MyAppState createState() => _MyAppState();
@@ -127,12 +129,35 @@ class _MyAppState extends State<MyApp> {
 
   _determineCurrentLocation() {
     _geolocator = Geolocator();
-    _geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best).then((position) {
-      _currentLocation = position;
-      print('Current location: ${_currentLocation.latitude} : ${_currentLocation.longitude}');
-      setState(() {
+    _geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.best
+    ).timeout(
+        Duration(
+            seconds: 30
+        ),
+        onTimeout: () {
+          print('Geolocator timed out');
+          return;
+    }).then((position) async {
+      if (position != null) {
         _currentLocation = position;
-      });
+        print(
+            'Current location: ${_currentLocation.latitude} : ${_currentLocation
+                .longitude}');
+        setState(() {
+          _currentLocation = position;
+        });
+      } else {
+        await PlatformExceptionAlertDialog(
+            title: 'Could not determine location',
+            exception: PlatformException(
+            code: 'NO_LOCATION_SERVICE',
+            message:  'Please make sure location services are enabled.',
+            details:  'Please make sure location services are enabled.',
+        ),
+        ).show(context);
+        exit(0);
+      }
     });
   }
 
@@ -151,7 +176,7 @@ class _MyAppState extends State<MyApp> {
             Provider<LogoImageAsset>(create: (context) => LogoImageAsset()),
             Provider<IAPManagerBase>(create: (context) => IAPManagerMock(userID: 'test@test.com')),
             Provider<DeviceInfo>(create: (context) => DeviceInfo()),
-            Provider<AuthBase>(create: (context) => Auth(),),
+            Provider<AuthBase>(create: (context) => Auth()),
             Provider<Database>(create: (context) => FirestoreDatabase()),
             Provider<Session>(create: (context) => Session(position: _currentLocation)),
           ],
