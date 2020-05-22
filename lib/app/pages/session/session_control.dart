@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/notification_streams.dart';
 import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/home/home_page_manager.dart';
-import 'package:nearbymenus/app/pages/home/home_page_dev.dart';
 import 'package:nearbymenus/app/pages/home/home_page_patron.dart';
 import 'package:nearbymenus/app/pages/home/home_page_staff.dart';
 import 'package:nearbymenus/app/pages/landing/loading_progress_indicator.dart';
 import 'package:nearbymenus/app/pages/session/already_logged_in_page.dart';
 import 'package:nearbymenus/app/pages/session/messages_listener.dart';
 import 'package:nearbymenus/app/pages/session/restaurant_query.dart';
-import 'package:nearbymenus/app/pages/session/role_selection_page.dart';
 import 'package:nearbymenus/app/pages/session/user_details_page.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/services/device_info.dart';
@@ -44,8 +43,6 @@ class _SessionControlState extends State<SessionControl> {
     database = Provider.of<Database>(context, listen: true);
     deviceInfo = Provider.of<DeviceInfo>(context);
     notificationStreams = Provider.of<NotificationStreams>(context, listen: true);
-    //_configureSelectNotificationSubject();
-    //_configureDidReceiveLocalNotificationSubject();
     return StreamBuilder<UserDetails>(
       stream: database.userDetailsStream(),
       builder: (context, snapshot) {
@@ -68,9 +65,12 @@ class _SessionControlState extends State<SessionControl> {
                 deviceInfo: deviceInfo,
               );
             }
-            if (userDetails.role == '' || userDetails.role == null ||
-                userDetails.role == ROLE_NONE) {
-              return RoleSelectionPage();
+            if (FlavourConfig.isManager()) {
+              userDetails.role = ROLE_MANAGER;
+            } else if (FlavourConfig.isStaff()) {
+              userDetails.role = ROLE_STAFF;
+            } else {
+              userDetails.role = ROLE_PATRON;
             }
             if ((userDetails.nearestRestaurantId == '' || userDetails.nearestRestaurantId == null) &&
                 (userDetails.role == ROLE_PATRON ||
@@ -99,11 +99,6 @@ class _SessionControlState extends State<SessionControl> {
               case ROLE_STAFF:
                 {
                   home = HomePageStaff(role: ROLE_STAFF,);
-                }
-                break;
-              case ROLE_DEV:
-                {
-                  home = HomePageDev(role: ROLE_DEV,);
                 }
                 break;
             }
