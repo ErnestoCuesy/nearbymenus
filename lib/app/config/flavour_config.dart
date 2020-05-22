@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
-enum Flavour { DEV, PROD }
-enum ColorTheme { PURPLE, BROWN, GREENISH, ORANGE }
+enum Flavour { PATRON, MANAGER, STAFF }
+enum ColorTheme { PURPLE, BROWN, GREENISH, ORANGE, GREEN }
 
 class StringUtils {
   static String enumName(String enumToString) {
@@ -38,6 +38,7 @@ class FlavourConfig {
     this.bannerColor,
   );
   static FlavourConfig get instance => _instance;
-  static bool isProduction() => _instance.flavour == Flavour.PROD;
-  static bool isDevelopment() => _instance.flavour == Flavour.DEV;
+  static bool isPatron() => _instance.flavour == Flavour.PATRON;
+  static bool isManager() => _instance.flavour == Flavour.MANAGER;
+  static bool isStaff() => _instance.flavour == Flavour.STAFF;
 }
