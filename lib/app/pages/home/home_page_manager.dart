@@ -26,7 +26,7 @@ class _HomePageManagerState extends State<HomePageManager> {
   Database database;
 
   String get role => widget.role;
-  TabItem _currentTab = TabItem.userAccount;
+  TabItem _currentTab = TabItem.restaurant;
 
   final Map<TabItem, GlobalKey<NavigatorState>> navigatorKeys = {
     TabItem.restaurant: GlobalKey<NavigatorState>(),
