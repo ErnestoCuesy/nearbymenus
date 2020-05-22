@@ -52,7 +52,7 @@ class _SessionControlState extends State<SessionControl> {
         if (snapshot.connectionState == ConnectionState.active) {
           if (snapshot.hasData && snapshot.data != null) {
             userDetails = snapshot.data;
-            if (userDetails.email == null) {
+            if (userDetails.email == null || userDetails.email == '') {
               userDetails.email = session.userDetails.email;
             }
             session.setUserDetails(userDetails);
