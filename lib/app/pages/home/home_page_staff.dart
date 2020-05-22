@@ -25,7 +25,7 @@ class _HomePageStaffState extends State<HomePageStaff> {
   Database database;
 
   String get role => widget.role;
-  TabItem _currentTab = TabItem.userAccount;
+  TabItem _currentTab = TabItem.manageOrders;
 
   final Map<TabItem, GlobalKey<NavigatorState>> navigatorKeys = {
     TabItem.manageOrders: GlobalKey<NavigatorState>(),
