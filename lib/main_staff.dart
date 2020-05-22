@@ -3,7 +3,7 @@ import 'app/config/flavour_config.dart';
 import 'app/app.dart';
 
 void main() {
-  var flavour = Flavour.DEV;
+  var flavour = Flavour.STAFF;
   FlavourConfig(
     flavour: flavour,
     colorTheme: ColorTheme.GREEN,
