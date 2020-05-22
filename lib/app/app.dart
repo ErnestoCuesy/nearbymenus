@@ -4,20 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:nearbymenus/app/models/notification_streams.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
+import 'package:nearbymenus/app/manager_app.dart';
 import 'package:nearbymenus/app/models/received_notification.dart';
 import 'package:nearbymenus/app/pages/landing/splash_screen.dart';
-import 'package:nearbymenus/app/services/auth.dart';
-import 'package:nearbymenus/app/services/database.dart';
-import 'package:nearbymenus/app/services/device_info.dart';
-import 'package:nearbymenus/app/models/session.dart';
-import 'package:nearbymenus/app/services/iap_manager.dart';
-import 'package:nearbymenus/app/utilities/app_theme.dart';
-import 'package:nearbymenus/app/utilities/logo_image_asset.dart';
+import 'package:nearbymenus/app/patron_and_staff_app.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
-import 'package:responsive_framework/responsive_framework.dart';
-import 'package:nearbymenus/app/pages/landing/subscription_check.dart';
 import 'package:rxdart/subjects.dart';
 
 import 'common_widgets/platform_exception_alert_dialog.dart';
@@ -166,38 +158,21 @@ class _MyAppState extends State<MyApp> {
     // Below line disabled since the bottom android nav bar behaves funny
     // SystemChrome.setEnabledSystemUIOverlays([]);
     if (_currentLocation != null) {
-      return MultiProvider(
-          providers: [
-            Provider.value(value: flutterLocalNotificationsPlugin),
-            Provider<NotificationStreams>(create: (context) => NotificationStreams(
-                didReceiveLocalNotificationSubject: didReceiveLocalNotificationSubject,
-                selectNotificationSubject: selectNotificationSubject),
-            ),
-            Provider<LogoImageAsset>(create: (context) => LogoImageAsset()),
-            Provider<IAPManagerBase>(create: (context) => IAPManagerMock(userID: 'test@test.com')),
-            Provider<DeviceInfo>(create: (context) => DeviceInfo()),
-            Provider<AuthBase>(create: (context) => Auth()),
-            Provider<Database>(create: (context) => FirestoreDatabase()),
-            Provider<Session>(create: (context) => Session(position: _currentLocation)),
-          ],
-          child: MaterialApp(
-            title: 'Nearby Menus',
-            theme: AppTheme.createTheme(context),
-            // home: LandingPage(),
-            home: SubscriptionCheck(),
-            builder: (context, widget) => ResponsiveWrapper.builder(
-              widget,
-              maxWidth: 1200,
-              minWidth: 450,
-              defaultScale: true,
-              breakpoints: [
-                ResponsiveBreakpoint(breakpoint: 450, name: MOBILE),
-                ResponsiveBreakpoint(breakpoint: 800, name: TABLET, autoScale: true),
-                ResponsiveBreakpoint(breakpoint: 1000, name: TABLET, autoScale: true),
-              ],
-            ),
-          )
-      );
+      if (FlavourConfig.isPatron() || FlavourConfig.isStaff()) {
+        return PatronAndStaffApp(
+          currentLocation: _currentLocation,
+          flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin,
+          didReceiveLocalNotificationSubject: didReceiveLocalNotificationSubject,
+          selectNotificationSubject: selectNotificationSubject,
+        );
+      } else {
+        return ManagerApp(
+            currentLocation: _currentLocation,
+            flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin,
+            didReceiveLocalNotificationSubject: didReceiveLocalNotificationSubject,
+            selectNotificationSubject: selectNotificationSubject,
+        );
+      }
     } else {
       return SplashScreen();
     }
