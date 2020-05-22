@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
-import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
@@ -64,8 +63,6 @@ class _AccountPageState extends State<AccountPage> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final imageAsset = Provider.of<LogoImageAsset>(context);
-    // TODO restaurant could be null - fix
-    final restaurantName = restaurant.name == '' ? '(unknown)' : restaurant.name;
     final staffAccessStatus = session.restaurantAccessGranted ? '' : 'not ';
     final staffAccessSubtitle = 'You are ${staffAccessStatus}allowed to access orders';
     var restaurantStatusTitle = '';
@@ -127,17 +124,6 @@ class _AccountPageState extends State<AccountPage> {
             );
           })),
         ),
-      // ROLE
-      _userDetailsSection(
-        sectionTitle: 'Current role',
-        cardTitle: session.userDetails.role,
-        cardSubtitle: 'At $restaurantName',
-        onPressed: () {
-          session.userDetails.role = ROLE_NONE;
-          session.userDetails.orderOnHold = null;
-          database.setUserDetails(session.userDetails);
-        },
-      ),
       // TODO in progress subscription details for managers
       // SUBSCRIPTION
       if (session.userDetails.role == ROLE_MANAGER)
@@ -309,7 +295,7 @@ class _AccountPageState extends State<AccountPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          FlavourConfig.isProduction() ? accountText : accountText + ' [DEV]',
+          accountText,
           style: Theme.of(context).primaryTextTheme.headline6,
         ),
         actions: <Widget>[
