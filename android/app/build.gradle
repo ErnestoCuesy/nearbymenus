@@ -70,6 +70,25 @@ android {
         }
     }
 
+    flavorDimensions "app"
+
+    productFlavors {
+        manager {
+            dimension "app"
+            resValue "string", "app_name", "NM Manager"
+            applicationIdSuffix ".manager"
+            versionNameSuffix "-manager"
+        }
+        staff {
+            dimension "app"
+            resValue "string", "app_name", "NM Staff"
+            applicationIdSuffix ".staff"
+            versionNameSuffix "-staff"
+        }
+        patron {
+            dimension "app"
+        }
+    }
 }
 
 flutter {
