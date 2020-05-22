@@ -39,6 +39,8 @@ class _AccountPageState extends State<AccountPage> {
   Future<void> _signOut() async {
     try {
       session.signOut();
+      session.userDetails.orderOnHold = null;
+      session.userDetails.deviceName = '';
       database.setUserDetails(session.userDetails);
       await auth.signOut();
     } catch (e) {
@@ -92,6 +94,7 @@ class _AccountPageState extends State<AccountPage> {
           ),
           onPressed: () {
             session.userDetails.nearestRestaurantId = '';
+            session.userDetails.orderOnHold = null;
             database.setUserDetails(session.userDetails);
           },
         ),
@@ -131,6 +134,7 @@ class _AccountPageState extends State<AccountPage> {
         cardSubtitle: 'At $restaurantName',
         onPressed: () {
           session.userDetails.role = ROLE_NONE;
+          session.userDetails.orderOnHold = null;
           database.setUserDetails(session.userDetails);
         },
       ),
