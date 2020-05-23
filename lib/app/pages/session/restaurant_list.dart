@@ -6,16 +6,19 @@ import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
+import 'package:nearbymenus/app/pages/menu_browser/expandable_menu_browser.dart';
 import 'package:nearbymenus/app/pages/session/restaurant_list_tile.dart';
+import 'package:nearbymenus/app/pages/session/staff_authorization_page.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:provider/provider.dart';
 
 class RestaurantList extends StatefulWidget {
+  final GlobalKey<ScaffoldState> scaffoldKey;
   final List<Restaurant> nearbyRestaurantsList;
   final bool stillLoading;
 
-  const RestaurantList({Key key, this.nearbyRestaurantsList, this.stillLoading}) : super(key: key);
+  const RestaurantList({Key key, this.scaffoldKey, this.nearbyRestaurantsList, this.stillLoading}) : super(key: key);
   @override
   _RestaurantListState createState() => _RestaurantListState();
 }
@@ -39,8 +42,9 @@ class _RestaurantListState extends State<RestaurantList> {
         nearestRestaurantId: nearestRestaurantId,
         role: session.userDetails.role,
         deviceName: session.userDetails.deviceName));
-    session.nearestRestaurant = nearestRestaurant;
+    session.currentRestaurant = nearestRestaurant;
     session.restaurantsFound = true;
+    //Navigator.of(context).pop();
   }
 
   Future<void> _confirmContinue(BuildContext context) async {
@@ -55,6 +59,24 @@ class _RestaurantListState extends State<RestaurantList> {
     } else {
       exit(0);
     }
+  }
+
+  void _expandableMenuBrowserPage(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        fullscreenDialog: false,
+        builder: (context) => ExpandableMenuBrowser(),
+      ),
+    );
+  }
+
+  void _staffAuthorizationPage(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        fullscreenDialog: false,
+        builder: (context) => StaffAuthorizationPage(scaffoldKey: widget.scaffoldKey, restaurant: session.currentRestaurant,),
+      ),
+    );
   }
 
   @override
@@ -74,7 +96,14 @@ class _RestaurantListState extends State<RestaurantList> {
                       restaurantFound: true,
                     ),
                     // subtitle: _buildSubtitle(index),
-                    onTap: () => _setNearestRestaurant(index),
+                    onTap: () {
+                      _setNearestRestaurant(index);
+                      if (session.userDetails.role == ROLE_PATRON) {
+                        _expandableMenuBrowserPage(context);
+                      } else {
+                        _staffAuthorizationPage(context);
+                      }
+                    },
                   ),
                 );
               });
