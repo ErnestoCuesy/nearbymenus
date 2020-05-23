@@ -3,6 +3,7 @@ import 'package:nearbymenus/app/pages/account/account_page.dart';
 import 'package:nearbymenus/app/pages/home/cupertino_home_scaffold_staff.dart';
 import 'package:nearbymenus/app/pages/home/tab_item.dart';
 import 'package:nearbymenus/app/pages/notifications/messages_page.dart';
+import 'package:nearbymenus/app/pages/session/restaurant_query.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/models/session.dart';
@@ -25,9 +26,10 @@ class _HomePageStaffState extends State<HomePageStaff> {
   Database database;
 
   String get role => widget.role;
-  TabItem _currentTab = TabItem.manageOrders;
+  TabItem _currentTab = TabItem.restaurant;
 
   final Map<TabItem, GlobalKey<NavigatorState>> navigatorKeys = {
+    TabItem.restaurant: GlobalKey<NavigatorState>(),
     TabItem.manageOrders: GlobalKey<NavigatorState>(),
     TabItem.messages: GlobalKey<NavigatorState>(),
     TabItem.userAccount: GlobalKey<NavigatorState>()
@@ -35,6 +37,7 @@ class _HomePageStaffState extends State<HomePageStaff> {
 
   Map<TabItem, WidgetBuilder> get widgetBuilders {
     return {
+      TabItem.restaurant: (_) => RestaurantQuery(),
       TabItem.manageOrders: (_) => widget.ordersPage,
       TabItem.messages: (_) => MessagesPage(),
       TabItem.userAccount: (_) => AccountPage(auth: auth, session: session, database: database,)
