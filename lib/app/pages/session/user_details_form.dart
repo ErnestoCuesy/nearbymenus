@@ -149,8 +149,8 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
   @override
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
-    model.userNearestRestaurant = session.nearestRestaurant.id;
-    model.userLocation = session.nearestRestaurant.restaurantLocation ?? '(unknown)';
+    model.userNearestRestaurant = session.currentRestaurant.id;
+    model.userLocation = session.currentRestaurant.restaurantLocation ?? '(unknown)';
     model.userRole = session.userDetails.role;
     model.deviceName = session.userDetails.deviceName;
     return Container(
