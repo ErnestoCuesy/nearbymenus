@@ -79,6 +79,7 @@ class ManagerRoleEnum extends RoleEnumBase {
 
 class StaffRoleEnum extends RoleEnumBase {
   List<TabItem> roleEnumList = const [
+    TabItem.restaurant,
     TabItem.manageOrders,
     TabItem.messages,
     TabItem.userAccount,
