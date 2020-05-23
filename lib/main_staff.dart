@@ -6,7 +6,7 @@ void main() {
   var flavour = Flavour.STAFF;
   FlavourConfig(
     flavour: flavour,
-    colorTheme: ColorTheme.GREEN,
+    colorTheme: ColorTheme.ORANGE,
     bannerColor: Colors.blue,
   );
 
