@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
+import 'package:nearbymenus/app/pages/session/new_session_control.dart';
 import 'package:nearbymenus/app/pages/sign_in/sign_in_page.dart';
-import 'package:nearbymenus/app/pages/session/session_control.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/models/session.dart';
@@ -24,7 +24,7 @@ class LandingPage extends StatelessWidget {
             return SignInPage();
           }
           database.setUserId(user.uid);
-          return SessionControl();
+          return NewSessionControl();
         } else {
           return Scaffold(
             body: Center(
