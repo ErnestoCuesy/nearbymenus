@@ -4,7 +4,7 @@ class FunctionNotAllowed extends StatelessWidget {
   const FunctionNotAllowed({
     Key key,
     this.title = 'Access not allowed',
-    this.message = 'Please request access to manage orders from your profile page',
+    this.message = 'Please request access to manage orders from the restaurant page',
   }) : super(key: key);
 
   final String title;
