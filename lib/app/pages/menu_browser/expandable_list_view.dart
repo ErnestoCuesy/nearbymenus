@@ -11,7 +11,8 @@ class ExpandableListView extends StatefulWidget {
   final Map<String, dynamic> menu;
   final Map<String, dynamic> options;
 
-  const ExpandableListView({Key key, this.menu, this.options}) : super(key: key);
+  const ExpandableListView({Key key, this.menu, this.options})
+      : super(key: key);
 
   @override
   _ExpandableListViewState createState() => _ExpandableListViewState();
@@ -39,11 +40,17 @@ class _ExpandableListViewState extends State<ExpandableListView> {
         ),
       ),
     );
+    Scaffold.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Item added to the order.'),
+      ),
+    );
   }
 
   String _menuCode(String menuName) {
     RegExp consonantFilter = RegExp(r'([^A|E|I|O|U ])');
-    Iterable<Match> matchResult = consonantFilter.allMatches(menuName.toUpperCase());
+    Iterable<Match> matchResult =
+        consonantFilter.allMatches(menuName.toUpperCase());
     String result = '';
     for (Match m in matchResult) {
       result = result + m.group(0);
@@ -57,21 +64,26 @@ class _ExpandableListViewState extends State<ExpandableListView> {
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
     sortedMenuItems.clear();
-    final itemCount = menu.entries.where((element) {
-      if (element.key.toString().length > 20 &&
-          (element.value['hidden'] == null ||
-           element.value['hidden'] == false)) {
-        sortedMenuItems.putIfAbsent(menu[element.key]['sequence'].toString(), () => element.value);
-        return true;
-      } else {
-        return false;
-      }
-    }).toList().length;
+    final itemCount = menu.entries
+        .where((element) {
+          if (element.key.toString().length > 20 &&
+              (element.value['hidden'] == null ||
+                  element.value['hidden'] == false)) {
+            sortedMenuItems.putIfAbsent(
+                menu[element.key]['sequence'].toString(), () => element.value);
+            return true;
+          } else {
+            return false;
+          }
+        })
+        .toList()
+        .length;
     final sortedKeys = sortedMenuItems.keys.toList()..sort();
     if (itemCount == 0) {
       return Container();
     }
-    final key = menu.keys.firstWhere((element) => element.toString().length > 20);
+    final key =
+        menu.keys.firstWhere((element) => element.toString().length > 20);
     items = menu[key];
     String menuName = menu['name'];
     return Container(
@@ -99,26 +111,28 @@ class _ExpandableListViewState extends State<ExpandableListView> {
                 ),
               ),
               trailing: IconButton(
-                icon: Container(
-                  height: 50.0,
-                  width: 50.0,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Icon(
-                      expandItemsFlag ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                      color: Colors.white,
-                      size: 30.0,
+                  icon: Container(
+                    height: 50.0,
+                    width: 50.0,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Icon(
+                        expandItemsFlag
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down,
+                        color: Colors.white,
+                        size: 30.0,
+                      ),
                     ),
                   ),
-                ),
-                onPressed: () {
-                  setState(() {
-                    expandItemsFlag = !expandItemsFlag;
-                  });
-                }),
+                  onPressed: () {
+                    setState(() {
+                      expandItemsFlag = !expandItemsFlag;
+                    });
+                  }),
             ),
           ),
           ExpandableContainer(
@@ -134,15 +148,16 @@ class _ExpandableListViewState extends State<ExpandableListView> {
                 }
                 String adjustedDescription = menuItem['description'];
                 if (adjustedDescription.length > 70) {
-                  adjustedDescription = adjustedDescription.substring(0, 70) + '...(more)';
+                  adjustedDescription =
+                      adjustedDescription.substring(0, 70) + '...(more)';
                 }
                 return Container(
                   height: 90.0,
                   decoration: BoxDecoration(
-                      border: Border.all(
+                    border: Border.all(
                       width: 0.5,
                       color: Theme.of(context).primaryColor,
-                      ),
+                    ),
                   ),
                   child: ListTile(
                     title: Padding(
@@ -153,7 +168,8 @@ class _ExpandableListViewState extends State<ExpandableListView> {
                       ),
                     ),
                     subtitle: Padding(
-                      padding: const EdgeInsets.only(left: 8.0, top: 8.0, bottom: 8.0),
+                      padding: const EdgeInsets.only(
+                          left: 8.0, top: 8.0, bottom: 8.0),
                       child: Text(
                         '$adjustedDescription',
                       ),
@@ -162,7 +178,8 @@ class _ExpandableListViewState extends State<ExpandableListView> {
                       f.format(menuItem['price']),
                       style: Theme.of(context).textTheme.headline6,
                     ),
-                    onTap: () => _addMenuItemToOrder(_menuCode(menuName), menuItem),
+                    onTap: () =>
+                        _addMenuItemToOrder(_menuCode(menuName), menuItem),
                   ),
                 );
               },
