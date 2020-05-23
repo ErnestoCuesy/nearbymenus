@@ -46,7 +46,7 @@ class _MessagesListenerState extends State<MessagesListener> {
         Provider.of<FlutterLocalNotificationsPlugin>(context);
     return StreamBuilder<List<UserMessage>>(
         stream: database.userMessages(
-          session.nearestRestaurant.id,
+          session.currentRestaurant.id,
           database.userId,
           session.userDetails.role,
         ),
