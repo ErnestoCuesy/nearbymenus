@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
-import 'package:nearbymenus/app/models/user_message.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
-import 'package:nearbymenus/app/pages/session/restaurant_list_tile.dart';
 import 'package:nearbymenus/app/pages/session/upsell_screen.dart';
 import 'package:nearbymenus/app/pages/session/user_details_form.dart';
 import 'package:nearbymenus/app/services/auth.dart';
@@ -26,14 +24,14 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
-  Restaurant restaurant = Restaurant(name: '', restaurantLocation: '', acceptingStaffRequests: false);
-  bool restaurantFound = false;
+  Restaurant restaurant = Restaurant(
+      name: '', restaurantLocation: '', acceptingStaffRequests: false);
+  bool get restaurantFound => widget.session.restaurantsFound;
 
   Auth get auth => widget.auth;
   Session get session => widget.session;
   Database get database => widget.database;
   bool staffRequestPending = false;
-
 
   Future<void> _signOut() async {
     try {
@@ -63,14 +61,6 @@ class _AccountPageState extends State<AccountPage> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final imageAsset = Provider.of<LogoImageAsset>(context);
-    final staffAccessStatus = session.restaurantAccessGranted ? '' : 'not ';
-    final staffAccessSubtitle = 'You are ${staffAccessStatus}allowed to access orders';
-    var restaurantStatusTitle = '';
-    if (!session.restaurantAccessGranted) {
-      restaurantStatusTitle = restaurant.acceptingStaffRequests
-          ? 'Tap to request access'
-          : 'Restaurant is not accepting staff requests at the moment';
-    }
     return [
       Container(
         width: screenWidth / 4,
@@ -80,50 +70,36 @@ class _AccountPageState extends State<AccountPage> {
       SizedBox(
         height: 16.0,
       ),
-      // RESTAURANT
-      if (session.userDetails.role == ROLE_PATRON ||
-          session.userDetails.role == ROLE_STAFF)
-        _restaurantDetailsSection(
-          sectionTitle: 'Current restaurant',
-          restaurantListTile: RestaurantListTile(
-            restaurant: restaurant,
-            restaurantFound: restaurantFound,
-          ),
-          onPressed: () {
-            session.userDetails.nearestRestaurantId = '';
-            session.userDetails.orderOnHold = null;
-            database.setUserDetails(session.userDetails);
-          },
-        ),
       // NAME AND ADDRESS
-        _userDetailsSection(
-          sectionTitle: 'Your details',
-          cardTitle: session.userDetails.name +  ' (${session.userDetails.email})' ?? '',
-          cardSubtitle: session.userDetails.address == null
-              ? 'Address unknown'
-              : '${session.userDetails.address} ${restaurant.restaurantLocation}',
-          onPressed: () => Navigator.of(context)
-              .push(MaterialPageRoute(builder: (BuildContext context) {
-            return Scaffold(
-              appBar: AppBar(
-                title: Text(
-                  'Change your details',
-                  style: TextStyle(color: Theme.of(context).appBarTheme.color),
-                ),
-                elevation: 2.0,
+      _userDetailsSection(
+        sectionTitle: 'Your details',
+        cardTitle:
+            session.userDetails.name + ' (${session.userDetails.email})' ?? '',
+        cardSubtitle: session.userDetails.address == null
+            ? 'Address unknown'
+            : '${session.userDetails.address} ${restaurant.restaurantLocation}',
+        onPressed: () => Navigator.of(context)
+            .push(MaterialPageRoute(builder: (BuildContext context) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(
+                'Change your details',
+                style: TextStyle(color: Theme.of(context).appBarTheme.color),
               ),
-              body: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Card(
-                    child: UserDetailsForm.create(context),
-                  ),
+              elevation: 2.0,
+            ),
+            body: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Card(
+                  child: UserDetailsForm.create(context),
                 ),
               ),
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            );
-          })),
-        ),
+            ),
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          );
+        })),
+      ),
       // TODO in progress subscription details for managers
       // SUBSCRIPTION
       if (session.userDetails.role == ROLE_MANAGER)
@@ -138,49 +114,14 @@ class _AccountPageState extends State<AccountPage> {
                 MaterialPageRoute<void>(
                     fullscreenDialog: false,
                     builder: (context) => UpsellScreen(
-                      ordersLeft: value,
-                      blockedOrders: null,
-                    )
-                ),
+                          ordersLeft: value,
+                          blockedOrders: null,
+                        )),
               );
             });
           },
         ),
-      // STAFF STATUS SECTION
-      if (session.userDetails.role == ROLE_STAFF && restaurantFound)
-        _userDetailsSection(
-          sectionTitle: 'Restaurant status',
-          cardTitle: staffAccessSubtitle,
-          cardSubtitle: restaurantStatusTitle,
-          onPressed: session.nearestRestaurant.acceptingStaffRequests &&
-              !staffRequestPending &&
-              !session.restaurantAccessGranted
-              ? () => _requestRestaurantAccess(context)
-              : null,
-        ),
     ];
-  }
-
-  void _requestRestaurantAccess(BuildContext context) {
-    final double timestamp = dateFromCurrentDate() / 1.0;
-    database.setMessageDetails(UserMessage(
-        id: documentIdFromCurrentDate(),
-        timestamp: timestamp,
-        fromUid: database.userId,
-        toUid: session.nearestRestaurant.managerId,
-        restaurantId: session.userDetails.nearestRestaurantId,
-        fromRole: ROLE_STAFF,
-        toRole: ROLE_MANAGER,
-        fromName: session.userDetails.name,
-        delivered: false,
-        type: 'Access to ${session.nearestRestaurant.name}',
-        authFlag: false,
-    ));
-    Scaffold.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Access request sent, pending approval... please wait'),
-      ),
-    );
   }
 
   Future<int> _ordersLeft() async {
@@ -230,36 +171,6 @@ class _AccountPageState extends State<AccountPage> {
     );
   }
 
-  Widget _restaurantDetailsSection(
-      {String sectionTitle,
-      RestaurantListTile restaurantListTile,
-      VoidCallback onPressed}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(left: 16.0, top: 8.0),
-          child: Text(
-            sectionTitle,
-            style: Theme.of(context).primaryTextTheme.headline5,
-          ),
-        ),
-        SizedBox(
-          height: 8.0,
-        ),
-        Card(
-          child: ListTile(
-            title: restaurantListTile,
-            trailing: IconButton(
-              icon: Icon(Icons.edit),
-              onPressed: onPressed,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildContents(BuildContext context) {
     return StreamBuilder<List<Restaurant>>(
       stream: database.userRestaurant(session.userDetails.nearestRestaurantId),
@@ -267,8 +178,8 @@ class _AccountPageState extends State<AccountPage> {
         if (snapshot.connectionState == ConnectionState.active) {
           if (snapshot.hasData && snapshot.data.length > 0) {
             restaurant = snapshot.data.elementAt(0);
-            session.nearestRestaurant = restaurant;
-            restaurantFound = true;
+            session.currentRestaurant = restaurant;
+            session.restaurantsFound = true;
           }
           return SingleChildScrollView(
             child: Padding(
