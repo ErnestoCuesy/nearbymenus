@@ -26,8 +26,8 @@ class ViewOrderModel with ChangeNotifier {
   Future<void> _submitOrder() async {
     try {
       order.status = ORDER_PLACED;
-      database.setOrderTransaction(session.nearestRestaurant.managerId,
-          session.nearestRestaurant.id,
+      database.setOrderTransaction(session.currentRestaurant.managerId,
+          session.currentRestaurant.id,
           order);
       session.currentOrder = null;
       session.userDetails.orderOnHold = null;
