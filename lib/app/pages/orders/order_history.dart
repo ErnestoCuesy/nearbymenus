@@ -31,12 +31,12 @@ class _OrderHistoryState extends State<OrderHistory> {
 
   Widget _buildContents(BuildContext context) {
     stream = database.userOrders(
-      session.nearestRestaurant.id,
+      session.currentRestaurant.id,
       database.userId,
     );
     if (session.userDetails.role != ROLE_PATRON) {
       stream = database.restaurantOrders(
-        session.nearestRestaurant.id,
+        session.currentRestaurant.id,
       );
     }
     if (widget.showBlocked) {
