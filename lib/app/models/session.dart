@@ -7,7 +7,7 @@ import 'package:nearbymenus/app/services/iap_manager.dart';
 class Session {
   final Position position;
   UserDetails userDetails = UserDetails();
-  Restaurant nearestRestaurant;
+  Restaurant currentRestaurant;
   bool restaurantsFound = false;
   Subscription subscription = Subscription();
   bool restaurantAccessGranted = false;
@@ -17,7 +17,7 @@ class Session {
 
   void setUserDetails(UserDetails userDetails) {
     this.userDetails = userDetails;
-    this.nearestRestaurant = nearestRestaurant ?? Restaurant(id: 'None');
+    this.currentRestaurant = currentRestaurant ?? Restaurant(id: 'None');
   }
 
   void setSubscription(Subscription subscription) {
