@@ -39,14 +39,14 @@ class AddToOrderModel with ChangeNotifier {
     if (session.currentOrder == null) {
       session.currentOrder = Order(
           id: orderNumber,
-          restaurantId: session.nearestRestaurant.id,
-          restaurantName: session.nearestRestaurant.name,
-          managerId: session.nearestRestaurant.managerId,
+          restaurantId: session.currentRestaurant.id,
+          restaurantName: session.currentRestaurant.name,
+          managerId: session.currentRestaurant.managerId,
           userId: database.userId,
           timestamp: timestamp,
           status: ORDER_ON_HOLD,
           name: session.userDetails.name,
-          deliveryAddress: '${session.userDetails.address} ${session.nearestRestaurant.restaurantLocation}',
+          deliveryAddress: '${session.userDetails.address} ${session.currentRestaurant.restaurantLocation}',
           paymentMethod: '',
           orderItems: List<Map<String, dynamic>>(),
           notes: ''
