@@ -50,6 +50,7 @@ abstract class Database {
   Stream<List<Order>> blockedOrders(String managerId);
   Future<int> setBundleCounterTransaction(String managerId, int quantity);
   Future<void> setOrderTransaction(String managerId, String restaurantId, Order order);
+  Future<UserDetails> userDetailsSnapshot(String uid);
 }
 
 String documentIdFromCurrentDate() => DateTime.now().toIso8601String();
@@ -313,4 +314,11 @@ class FirestoreDatabase implements Database {
         orderData: order.toMap(),
     );
   }
+
+  @override
+  Future<UserDetails> userDetailsSnapshot(String uid) => _service.documentSnapshot(
+    path: APIPath.userDetails(uid),
+    builder: (data, documentId) => UserDetails.fromMap(data),
+  );
+
 }
