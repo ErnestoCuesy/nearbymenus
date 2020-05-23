@@ -7,9 +7,6 @@ import 'package:nearbymenus/app/models/session.dart';
 import 'package:provider/provider.dart';
 
 class RestaurantQuery extends StatefulWidget {
-  final String role;
-
-  const RestaurantQuery({Key key, this.role}) : super(key: key);
 
   @override
   _RestaurantQueryState createState() => _RestaurantQueryState();
@@ -17,13 +14,14 @@ class RestaurantQuery extends StatefulWidget {
 
 class _RestaurantQueryState extends State<RestaurantQuery> {
   NearRestaurantBloc bloc;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     final database = Provider.of<Database>(context, listen: true);
     final session = Provider.of<Session>(context);
     final userCoordinates = session.position;
-    final useStaffFilter = false; //widget.role == ROLE_STAFF ? true : false;
+    final useStaffFilter = false;
     bloc = NearRestaurantBloc(
         source: database.patronRestaurants(), userCoordinates: userCoordinates, useStaffFilter: useStaffFilter);
     return StreamBuilder<List<Restaurant>>(
@@ -38,15 +36,16 @@ class _RestaurantQueryState extends State<RestaurantQuery> {
           stillLoading = false;
         }
         return Scaffold(
+          key: _scaffoldKey,
           appBar: AppBar(
             title: Text(
-              'Select your nearest restaurant',
+              'Restaurants near you',
               style: TextStyle(color: Theme.of(context).appBarTheme.color),
             ),
             elevation: 2.0,
           ),
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          body: RestaurantList(nearbyRestaurantsList: restaurantList, stillLoading: stillLoading,),
+          body: RestaurantList(scaffoldKey: _scaffoldKey, nearbyRestaurantsList: restaurantList, stillLoading: stillLoading,),
         );
       },
     );
