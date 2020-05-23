@@ -15,7 +15,7 @@ class RestaurantListTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              'No restaurants found near you',
+              'Tap to search for restaurants',
               style: Theme.of(context).textTheme.subtitle1,
             ),
             SizedBox(
