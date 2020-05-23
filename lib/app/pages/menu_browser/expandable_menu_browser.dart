@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:nearbymenus/app/common_widgets/empty_content.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/models/order.dart';
@@ -51,12 +52,18 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
       stream: database.userRestaurant(session.userDetails.nearestRestaurantId),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.active ||
-            !snapshot.hasData ||
-            snapshot.data.length == 0) {
-          return Center(child: PlatformProgressIndicator());
+            !snapshot.hasData) {
+          return Center(child: PlatformProgressIndicator(),);
+        } else if (snapshot.data.length == 0) {
+          return Scaffold(
+            body: EmptyContent(
+              title: 'No restaurant selected',
+              message: 'You can search for restaurants in your profile page',
+            ),
+          );
         }
         restaurant = snapshot.data.elementAt(0);
-        session.nearestRestaurant = restaurant;
+        session.currentRestaurant = restaurant;
         menus = restaurant.restaurantMenus;
         options = restaurant.restaurantOptions;
         sortedMenus.clear();
