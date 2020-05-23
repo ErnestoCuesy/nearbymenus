@@ -95,7 +95,7 @@ class _ViewOrderState extends State<ViewOrder> {
     scaffoldKey.currentState.showSnackBar(
       SnackBar(
         content: Text(
-            'Order successfully placed at ${session.nearestRestaurant.name}!'
+            'Order successfully placed at ${session.currentRestaurant.name}!'
         ),
       ),
     );
@@ -309,7 +309,7 @@ class _ViewOrderState extends State<ViewOrder> {
 
   List<Widget> _buildPaymentMethods() {
     List<Widget> paymentOptionsList = List<Widget>();
-    Map<String, dynamic> restaurantPaymentOptions = session.nearestRestaurant.paymentFlags;
+    Map<String, dynamic> restaurantPaymentOptions = session.currentRestaurant.paymentFlags;
     restaurantPaymentOptions.forEach((key, value) {
       if (value) {
         paymentOptionsList.add(CheckboxListTile(
