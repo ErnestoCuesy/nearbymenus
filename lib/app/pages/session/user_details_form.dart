@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
+import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/session/user_details_model.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/services/database.dart';
-import 'package:nearbymenus/app/services/device_info.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
@@ -14,11 +14,24 @@ class UserDetailsForm extends StatefulWidget {
 
   const UserDetailsForm({Key key, this.model}) : super(key: key);
 
-  static Widget create(BuildContext context) {
+  static Widget create({
+    BuildContext context,
+    UserDetails userDetails,
+  }) {
     final database = Provider.of<Database>(context);
     final session = Provider.of<Session>(context);
     return ChangeNotifierProvider<UserDetailsModel>(
-      create: (context) => UserDetailsModel(database: database, role: session.userDetails.role),
+      create: (context) => UserDetailsModel(
+          session: session,
+          database: database,
+          role: session.role,
+          email: userDetails.email,
+          userName: userDetails.name,
+          userAddress1: userDetails.address1,
+          userAddress2: userDetails.address2,
+          userAddress3: userDetails.address3,
+          userAddress4: userDetails.address4,
+      ),
       child: Consumer<UserDetailsModel>(
         builder: (context, model, _) => UserDetailsForm(model: model,),
       ),
@@ -32,9 +45,15 @@ class UserDetailsForm extends StatefulWidget {
 
 class _UserDetailsFormState extends State<UserDetailsForm> {
   final TextEditingController _userNameController = TextEditingController();
-  final TextEditingController _userAddressController = TextEditingController();
+  final TextEditingController _userAddress1Controller = TextEditingController();
+  final TextEditingController _userAddress2Controller = TextEditingController();
+  final TextEditingController _userAddress3Controller = TextEditingController();
+  final TextEditingController _userAddress4Controller = TextEditingController();
   final FocusNode _userNameFocusNode = FocusNode();
-  final FocusNode _userAddressFocusNode = FocusNode();
+  final FocusNode _userAddress1FocusNode = FocusNode();
+  final FocusNode _userAddress2FocusNode = FocusNode();
+  final FocusNode _userAddress3FocusNode = FocusNode();
+  final FocusNode _userAddress4FocusNode = FocusNode();
   Session session;
 
   UserDetailsModel get model => widget.model;
@@ -42,19 +61,33 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
   @override
   void dispose() {
     _userNameController.dispose();
-    _userAddressController.dispose();
+    _userAddress1Controller.dispose();
+    _userAddress2Controller.dispose();
+    _userAddress3Controller.dispose();
+    _userAddress4Controller.dispose();
     _userNameFocusNode.dispose();
-    _userAddressFocusNode.dispose();
+    _userAddress1FocusNode.dispose();
+    _userAddress2FocusNode.dispose();
+    _userAddress3FocusNode.dispose();
+    _userAddress4FocusNode.dispose();
     super.dispose();
   }
 
+  @override
+  void initState() {
+    super.initState();
+    _userNameController.text = model.userName;
+    _userAddress1Controller.text = model.userAddress1;
+    _userAddress2Controller.text = model.userAddress2;
+    _userAddress3Controller.text = model.userAddress3;
+    _userAddress4Controller.text = model.userAddress4;
+  }
+
   Future<void> _save() async {
-    final deviceInfo = Provider.of<DeviceInfo>(context);
-    model.deviceName = deviceInfo.deviceName;
     try {
       // await Future.delayed(Duration(seconds: 3)); // Simulate slow network
       await model.save();
-      //Navigator.of(context).pop();
+      Navigator.of(context).pop();
     } on PlatformException catch (e) {
       PlatformExceptionAlertDialog(
         title: 'Save User Details',
@@ -65,15 +98,36 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
 
   void _userNameEditingComplete() {
     final newFocus = model.userNameValidator.isValid(model.userName)
-        ? _userAddressFocusNode
+        ? _userAddress1FocusNode
         : _userNameFocusNode;
     FocusScope.of(context).requestFocus(newFocus);
   }
 
-  void _userAddressEditingComplete() {
-    final newFocus = model.userAddressValidator.isValid(model.userAddress)
+  void _userAddress1EditingComplete() {
+    final newFocus = model.userAddressValidator.isValid(model.userAddress1)
+        ? _userAddress2FocusNode
+        : _userAddress1FocusNode;
+    FocusScope.of(context).requestFocus(newFocus);
+  }
+
+  void _userAddress2EditingComplete() {
+    final newFocus = model.userAddressValidator.isValid(model.userAddress1)
+        ? _userAddress3FocusNode
+        : _userAddress2FocusNode;
+    FocusScope.of(context).requestFocus(newFocus);
+  }
+
+  void _userAddress3EditingComplete() {
+    final newFocus = model.userAddressValidator.isValid(model.userAddress1)
+        ? _userAddress4FocusNode
+        : _userAddress3FocusNode;
+    FocusScope.of(context).requestFocus(newFocus);
+  }
+
+  void _userAddress4EditingComplete() {
+    final newFocus = model.userAddressValidator.isValid(model.userAddress1)
         ? _save()
-        : _userAddressFocusNode;
+        : _userAddress4FocusNode;
     FocusScope.of(context).requestFocus(newFocus);
   }
 
@@ -83,10 +137,21 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
       SizedBox(
         height: 8.0,
       ),
-      //if (session.userDetails.role == ROLE_PATRON && model.userLocation != null)
-      _buildUserAddressTextField(),
+      _buildUserAddress1TextField(),
       SizedBox(
-        height: 16.0,
+        height: 8.0,
+      ),
+      _buildUserAddress2TextField(),
+      SizedBox(
+        height: 8.0,
+      ),
+      _buildUserAddress3TextField(),
+      SizedBox(
+        height: 8.0,
+      ),
+      _buildUserAddress4TextField(),
+      SizedBox(
+        height: 32.0,
       ),
       FormSubmitButton(
         context: context,
@@ -123,16 +188,16 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
     );
   }
 
-  TextField _buildUserAddressTextField() {
+  TextField _buildUserAddress1TextField() {
     return TextField(
       style: Theme.of(context).inputDecorationTheme.labelStyle,
-      controller: _userAddressController,
-      focusNode: _userAddressFocusNode,
+      controller: _userAddress1Controller,
+      focusNode: _userAddress1FocusNode,
       textCapitalization: TextCapitalization.words,
       cursorColor: Colors.black,
       decoration: InputDecoration(
-        labelText: 'Unit or address at ${model.userLocation}',
-        hintText: 'Unit, flat or house number',
+        labelText: 'House or unit number',
+        hintText: '123',
         errorText: model.userAddressErrorText,
         enabled: model.isLoading == false,
       ),
@@ -141,18 +206,79 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
       enableInteractiveSelection: false,
       keyboardType: TextInputType.text,
       textInputAction: TextInputAction.next,
-      onChanged: model.updateUserAddress,
-      onEditingComplete: () => _userAddressEditingComplete(),
+      onChanged: model.updateUserAddress1,
+      onEditingComplete: () => _userAddress1EditingComplete(),
+    );
+  }
+
+  TextField _buildUserAddress2TextField() {
+    return TextField(
+      style: Theme.of(context).inputDecorationTheme.labelStyle,
+      controller: _userAddress2Controller,
+      focusNode: _userAddress2FocusNode,
+      textCapitalization: TextCapitalization.words,
+      cursorColor: Colors.black,
+      decoration: InputDecoration(
+        labelText: 'Street or estate name',
+        hintText: 'Fifth Avenue',
+        errorText: model.userAddressErrorText,
+        enabled: model.isLoading == false,
+      ),
+      autocorrect: false,
+      enableSuggestions: false,
+      enableInteractiveSelection: false,
+      keyboardType: TextInputType.text,
+      textInputAction: TextInputAction.next,
+      onChanged: model.updateUserAddress2,
+      onEditingComplete: () => _userAddress2EditingComplete(),
+    );
+  }
+
+  TextField _buildUserAddress3TextField() {
+    return TextField(
+      style: Theme.of(context).inputDecorationTheme.labelStyle,
+      controller: _userAddress3Controller,
+      focusNode: _userAddress3FocusNode,
+      textCapitalization: TextCapitalization.words,
+      cursorColor: Colors.black,
+      decoration: InputDecoration(
+        labelText: 'Other address information',
+        hintText: 'Suburb name',
+        enabled: model.isLoading == false,
+      ),
+      autocorrect: false,
+      enableSuggestions: false,
+      enableInteractiveSelection: false,
+      keyboardType: TextInputType.text,
+      textInputAction: TextInputAction.next,
+      onChanged: model.updateUserAddress3,
+      onEditingComplete: () => _userAddress3EditingComplete(),
+    );
+  }
+
+  TextField _buildUserAddress4TextField() {
+    return TextField(
+      style: Theme.of(context).inputDecorationTheme.labelStyle,
+      controller: _userAddress4Controller,
+      focusNode: _userAddress4FocusNode,
+      textCapitalization: TextCapitalization.words,
+      cursorColor: Colors.black,
+      decoration: InputDecoration(
+        enabled: model.isLoading == false,
+      ),
+      autocorrect: false,
+      enableSuggestions: false,
+      enableInteractiveSelection: false,
+      keyboardType: TextInputType.text,
+      textInputAction: TextInputAction.done,
+      onChanged: model.updateUserAddress4,
+      onEditingComplete: () => _userAddress4EditingComplete(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
-    model.userNearestRestaurant = session.currentRestaurant.id;
-    model.userLocation = session.currentRestaurant.restaurantLocation ?? '(unknown)';
-    model.userRole = session.userDetails.role;
-    model.deviceName = session.userDetails.deviceName;
     return Container(
       color: Theme
           .of(context)

@@ -46,7 +46,7 @@ class UserDetailsValidators {
   final StringValidator userAddressValidator = NonEmptyStringValidator();
   final StringValidator userLocationValidator = NonEmptyStringValidator();
   final String invalidUsernameErrorText = 'Name can\'t be empty';
-  final String invalidAddressErrorText = 'Address can\'t be empty';
+  final String invalidAddressErrorText = 'Can\'t be empty';
   final String invalidLocationErrorText = 'Location can\'t be empty';
 }
 

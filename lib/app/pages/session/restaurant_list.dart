@@ -5,7 +5,6 @@ import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
-import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_menu_browser.dart';
 import 'package:nearbymenus/app/pages/session/restaurant_list_tile.dart';
 import 'package:nearbymenus/app/pages/session/staff_authorization_page.dart';
@@ -29,24 +28,6 @@ class _RestaurantListState extends State<RestaurantList> {
 
   List<Restaurant> get nearbyRestaurantsList => widget.nearbyRestaurantsList;
 
-  void _setNearestRestaurant(int index) {
-    var nearestRestaurantId = 'No restaurants found';
-    var nearestRestaurant = Restaurant(id: nearestRestaurantId);
-    if (index != -1) {
-      nearestRestaurantId = nearbyRestaurantsList[index].id;
-      nearestRestaurant = nearbyRestaurantsList[index];
-    }
-    database.setUserDetails(UserDetails(
-        name: session.userDetails.name,
-        address: session.userDetails.address,
-        nearestRestaurantId: nearestRestaurantId,
-        role: session.userDetails.role,
-        deviceName: session.userDetails.deviceName));
-    session.currentRestaurant = nearestRestaurant;
-    session.restaurantsFound = true;
-    //Navigator.of(context).pop();
-  }
-
   Future<void> _confirmContinue(BuildContext context) async {
     final didRequestContinue = await PlatformAlertDialog(
       title: 'Restaurant search',
@@ -55,13 +36,14 @@ class _RestaurantListState extends State<RestaurantList> {
       defaultActionText: 'Continue',
     ).show(context);
     if (didRequestContinue == true) {
-      _setNearestRestaurant(-1);
+      session.currentRestaurant = null;
     } else {
       exit(0);
     }
   }
 
-  void _expandableMenuBrowserPage(BuildContext context) {
+  void _expandableMenuBrowserPage(BuildContext context, int index) {
+    session.currentRestaurant = nearbyRestaurantsList[index];
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         fullscreenDialog: false,
@@ -97,9 +79,8 @@ class _RestaurantListState extends State<RestaurantList> {
                     ),
                     // subtitle: _buildSubtitle(index),
                     onTap: () {
-                      _setNearestRestaurant(index);
-                      if (session.userDetails.role == ROLE_PATRON) {
-                        _expandableMenuBrowserPage(context);
+                      if (session.role == ROLE_PATRON) {
+                        _expandableMenuBrowserPage(context, index);
                       } else {
                         _staffAuthorizationPage(context);
                       }

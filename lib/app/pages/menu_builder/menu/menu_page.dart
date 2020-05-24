@@ -85,6 +85,8 @@ class _MenuPageState extends State<MenuPage> {
       stream: database.restaurantMenus(widget.restaurant.id),
       builder: (context, snapshot) {
         return ListItemsBuilder<Menu>(
+            title: 'No menus found',
+            message: 'Tap the + button to add a new menu',
             snapshot: snapshot,
             itemBuilder: (context, menu) {
               return Dismissible(

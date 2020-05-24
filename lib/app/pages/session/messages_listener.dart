@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/models/session.dart';
-import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
 import 'package:nearbymenus/app/pages/session/check_staff_authorization.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -46,9 +45,8 @@ class _MessagesListenerState extends State<MessagesListener> {
         Provider.of<FlutterLocalNotificationsPlugin>(context);
     return StreamBuilder<List<UserMessage>>(
         stream: database.userMessages(
-          session.currentRestaurant.id,
           database.userId,
-          session.userDetails.role,
+          session.role,
         ),
         //stream: database.userNotifications(database.userId),
         builder: (context, snapshot) {
@@ -63,7 +61,7 @@ class _MessagesListenerState extends State<MessagesListener> {
             final notificationsList = snapshot.data;
             notificationsList.forEach((message) {
               print('Message for ${message.toRole}');
-              if (message.toRole == session.userDetails.role &&
+              if (message.toRole == session.role &&
                   !message.delivered) {
                 _notifyUser(message);
                 UserMessage readMessage = UserMessage(
@@ -83,7 +81,7 @@ class _MessagesListenerState extends State<MessagesListener> {
               }
             });
           }
-          if (session.userDetails.role == ROLE_STAFF) {
+          if (session.role == ROLE_STAFF) {
             return CheckStaffAuthorization();
           } else {
             return widget.page;

@@ -3,7 +3,6 @@ import 'package:nearbymenus/app/common_widgets/function_not_allowed.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/models/authorizations.dart';
 import 'package:nearbymenus/app/models/session.dart';
-import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/home/home_page_staff.dart';
 import 'package:nearbymenus/app/pages/orders/order_history.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -24,7 +23,7 @@ class _CheckStaffAuthorizationState extends State<CheckStaffAuthorization> {
     database = Provider.of<Database>(context, listen: true);
     session.restaurantAccessGranted = false;
     return StreamBuilder<Authorizations>(
-      stream: database.authorizationsStream(session.userDetails.nearestRestaurantId),
+      stream: database.authorizationsStream(session.currentRestaurant.id),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(

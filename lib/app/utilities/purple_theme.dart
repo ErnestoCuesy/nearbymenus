@@ -416,6 +416,9 @@ class PurpleTheme {
       opacity: 1.0,
       size: 24.0,
     ),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      foregroundColor: Color(0xff000000),
+    ),
     accentIconTheme: IconThemeData(
       color: Color(0xff000000),
       opacity: 1.0,

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/notification_streams.dart';
 import 'package:nearbymenus/app/models/received_notification.dart';
 import 'package:nearbymenus/app/pages/landing/landing_page.dart';
@@ -39,6 +40,7 @@ class _PatronAndStaffAppState extends State<PatronAndStaffApp> {
   Widget build(BuildContext context) {
     // Below line disabled since the bottom android nav bar behaves funny
     // SystemChrome.setEnabledSystemUIOverlays([]);
+    final role = FlavourConfig.isPatron() ? ROLE_PATRON : ROLE_STAFF;
     if (widget.currentLocation != null) {
       return MultiProvider(
           providers: [
@@ -51,7 +53,7 @@ class _PatronAndStaffAppState extends State<PatronAndStaffApp> {
             Provider<DeviceInfo>(create: (context) => DeviceInfo()),
             Provider<AuthBase>(create: (context) => Auth()),
             Provider<Database>(create: (context) => FirestoreDatabase()),
-            Provider<Session>(create: (context) => Session(position: widget.currentLocation)),
+            Provider<Session>(create: (context) => Session(position: widget.currentLocation, role: role)),
           ],
           child: MaterialApp(
             title: 'Nearby Menus',

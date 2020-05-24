@@ -81,6 +81,8 @@ class _MenuItemPageState extends State<MenuItemPage> {
       stream: database.menuItems(widget.menu.id),
       builder: (context, snapshot) {
         return ListItemsBuilder<MenuItem>(
+            title: 'No menu items found',
+            message: 'Tap the + button to add a new menu item',
             snapshot: snapshot,
             itemBuilder: (context, item) {
               String adjustedDescription = item.description;

@@ -68,6 +68,8 @@ class _OptionItemPageState extends State<OptionItemPage> {
       stream: database.optionItems(widget.option.id),
       builder: (context, snapshot) {
         return ListItemsBuilder<OptionItem>(
+            title: 'No option items found',
+            message: 'Tap the + button to add a new option item',
             snapshot: snapshot,
             itemBuilder: (context, item) {
               return Dismissible(

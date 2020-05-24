@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
-import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/utilities/logo_image_asset.dart';
@@ -66,7 +65,7 @@ class _StaffAuthorizationPageState extends State<StaffAuthorizationPage> {
       timestamp: timestamp,
       fromUid: database.userId,
       toUid: session.currentRestaurant.managerId,
-      restaurantId: session.userDetails.nearestRestaurantId,
+      restaurantId: session.currentRestaurant.id,
       fromRole: ROLE_STAFF,
       toRole: ROLE_MANAGER,
       fromName: session.userDetails.name,

@@ -5,7 +5,6 @@ import 'package:nearbymenus/app/common_widgets/list_items_builder.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/session.dart';
-import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/orders/view_order.dart';
 import 'package:nearbymenus/app/pages/session/upsell_screen.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -34,7 +33,7 @@ class _OrderHistoryState extends State<OrderHistory> {
       session.currentRestaurant.id,
       database.userId,
     );
-    if (session.userDetails.role != ROLE_PATRON) {
+    if (session.role != ROLE_PATRON) {
       stream = database.restaurantOrders(
         session.currentRestaurant.id,
       );
@@ -47,14 +46,16 @@ class _OrderHistoryState extends State<OrderHistory> {
       builder: (context, snapshot) {
         blockedOrders = snapshot.data;
         return ListItemsBuilder<Order>(
+            title: 'Orders',
+            message: 'There are no orders',
             snapshot: snapshot,
             itemBuilder: (context, order) {
               return Card(
-                color: session.userDetails.role != ROLE_PATRON && order.isBlocked ? Colors.redAccent : Theme.of(context).canvasColor,
+                color: session.role != ROLE_PATRON && order.isBlocked ? Colors.redAccent : Theme.of(context).canvasColor,
                 margin: EdgeInsets.all(12.0),
                 child: ListTile(
                   isThreeLine: true,
-                  leading: session.userDetails.role != ROLE_PATRON && order.isBlocked ? Icon(Icons.lock) : Icon(Icons.receipt),
+                  leading: session.role != ROLE_PATRON && order.isBlocked ? Icon(Icons.lock) : Icon(Icons.receipt),
                   title: Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Column(
@@ -97,7 +98,7 @@ class _OrderHistoryState extends State<OrderHistory> {
                     f.format(order.orderTotal),
                     style: Theme.of(context).textTheme.headline6,
                   ),
-                  onTap: session.userDetails.role != ROLE_PATRON && order.isBlocked ? null : () => _viewOrder(context, order),
+                  onTap: session.role != ROLE_PATRON && order.isBlocked ? null : () => _viewOrder(context, order),
                 ),
               );
             });
@@ -171,7 +172,9 @@ class _OrderHistoryState extends State<OrderHistory> {
       key: _scaffoldKey,
       appBar: AppBar(
         title: Text(
-          widget.showBlocked ? 'Locked orders' : 'Orders',
+          widget.showBlocked
+              ? '${session.currentRestaurant.name} Locked orders'
+              : '${session.currentRestaurant.name} Orders',
           style: TextStyle(color: Theme.of(context).appBarTheme.color),
         ),
         actions: [

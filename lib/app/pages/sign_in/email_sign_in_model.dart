@@ -27,6 +27,7 @@ class EmailSignInModel with UserCredentialsValidators, ChangeNotifier {
 
   Future<void> submit() async {
     updateWith(submitted: true, isLoading: true);
+    session.userDetails = UserDetails(email: email);
     try {
       // await Future.delayed(Duration(seconds: 3)); // Simulate slow network
       switch (formType) {
@@ -43,7 +44,6 @@ class EmailSignInModel with UserCredentialsValidators, ChangeNotifier {
         }
         break;
       }
-      session.userDetails = UserDetails(email: email);
     } catch (e) {
       if (e.code == 'PASSWORD_RESET' || e.code == 'EMAIL_NOT_VERIFIED') {
         updateWith(formType: EmailSignInFormType.signIn);

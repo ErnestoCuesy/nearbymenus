@@ -99,7 +99,6 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
           restaurantOptions: restaurantOptions,
         ),
       );
-      session.userDetails.nearestRestaurantId = id;
       session.userDetails.orderOnHold = null;
       await database.setUserDetails(session.userDetails);
     } catch (e) {

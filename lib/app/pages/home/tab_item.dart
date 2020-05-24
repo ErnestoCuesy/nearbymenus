@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:nearbymenus/app/models/user_details.dart';
+import 'package:nearbymenus/app/models/session.dart';
 
 enum TabItem {
   restaurant,

@@ -23,7 +23,7 @@ abstract class Database {
   Future<void> setRestaurant(Restaurant restaurant);
   Future<void> setMessageDetails(UserMessage roleNotification);
   Stream<UserMessage> userMessage(String uid);
-  Stream<List<UserMessage>> userMessages(String restaurantId, String uid, String toRole);
+  Stream<List<UserMessage>> userMessages(String uid, String toRole);
   Stream<Authorizations> authorizationsStream(String restaurantId);
   Future<void> setAuthorization(String restaurantId, Authorizations authorizations);
   Future<List<Authorizations>> authorizationsSnapshot();
@@ -117,11 +117,10 @@ class FirestoreDatabase implements Database {
 
   // Used by messages listener and messages page widgets
   @override
-  Stream<List<UserMessage>> userMessages(String restaurantId, String uid, String toRole) => _service.collectionStream(
+  Stream<List<UserMessage>> userMessages(String uid, String toRole) => _service.collectionStream(
     path: APIPath.messages(),
-    queryBuilder: restaurantId != null
-        ? (query) => query.where('restaurantId', isEqualTo: restaurantId)
-                          .where('toUid', isEqualTo: uid)
+    queryBuilder: uid != null
+        ? (query) => query.where('toUid', isEqualTo: uid)
                           .where('toRole', isEqualTo: toRole)
         : null,
     builder: (data, documentId) => UserMessage.fromMap(data, documentId),

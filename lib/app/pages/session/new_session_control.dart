@@ -1,9 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
-import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/notification_streams.dart';
 import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
@@ -36,21 +32,6 @@ class _NewSessionControlState extends State<NewSessionControl> {
     super.dispose();
   }
 
-  Future<void> _confirmContinue(BuildContext context) async {
-    final didRequestSignOut = await PlatformAlertDialog(
-      title: 'User will be signed-off from the other device',
-      content: 'Are you sure you want to continue?',
-      cancelActionText: 'Exit',
-      defaultActionText: 'Continue',
-    ).show(context);
-    if (didRequestSignOut == true) {
-      userDetails.deviceName = deviceInfo.deviceName;
-      database.setUserDetails(userDetails);
-    } else {
-      exit(0);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
@@ -68,30 +49,18 @@ class _NewSessionControlState extends State<NewSessionControl> {
               ),
             );
         } else {
-          userDetails = snapshot.data;
-          if (userDetails.email == null || userDetails.email == '') {
-            userDetails.email = session.userDetails.email;
-          }
-          session.setUserDetails(userDetails);
-          session.currentOrder = null;
-          if (userDetails.orderOnHold != null || userDetails.orderOnHold.isNotEmpty) {
-            session.currentOrder = Order.fromMap(userDetails.orderOnHold, null);
-          }
-          print('User details: ${userDetails.toString()}');
-          if (userDetails.deviceName != '' &&
-              userDetails.deviceName != deviceInfo.deviceName) {
-            _confirmContinue(context);
-          }
-          if (FlavourConfig.isManager()) {
-            userDetails.role = ROLE_MANAGER;
-          } else if (FlavourConfig.isStaff()) {
-            userDetails.role = ROLE_STAFF;
-          } else {
-            userDetails.role = ROLE_PATRON;
-          }
-          database.setUserDetails(userDetails);
+//          userDetails = snapshot.data;
+//          if (userDetails.email == null || userDetails.email == '') {
+//            userDetails.email = session.userDetails.email;
+//          }
+//          session.currentOrder = null;
+//          if (userDetails.orderOnHold != null || userDetails.orderOnHold.isNotEmpty) {
+//            session.currentOrder = Order.fromMap(userDetails.orderOnHold, null);
+//          }
+//          print('User details: ${userDetails.toString()}');
+//          database.setUserDetails(userDetails);
           Widget widget, home;
-          switch (userDetails.role) {
+          switch (session.role) {
             case ROLE_PATRON:
               {
                 home = HomePagePatron(role: ROLE_PATRON,);

@@ -73,6 +73,8 @@ class _RestaurantPageState extends State<RestaurantPage> {
       stream: database.managerRestaurants(database.userId),
       builder: (context, snapshot) {
         return ListItemsBuilder<Restaurant>(
+            title: 'No restaurants found',
+            message: 'Tap the + button to add a new restaurant',
             snapshot: snapshot,
             itemBuilder: (context, restaurant) {
               return Dismissible(

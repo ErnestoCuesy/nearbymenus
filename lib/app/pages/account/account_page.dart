@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
-import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
-import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/session/upsell_screen.dart';
 import 'package:nearbymenus/app/pages/session/user_details_form.dart';
 import 'package:nearbymenus/app/services/auth.dart';
@@ -35,9 +34,7 @@ class _AccountPageState extends State<AccountPage> {
 
   Future<void> _signOut() async {
     try {
-      session.signOut();
       session.userDetails.orderOnHold = null;
-      session.userDetails.deviceName = '';
       database.setUserDetails(session.userDetails);
       await auth.signOut();
     } catch (e) {
@@ -75,9 +72,9 @@ class _AccountPageState extends State<AccountPage> {
         sectionTitle: 'Your details',
         cardTitle:
             session.userDetails.name + ' (${session.userDetails.email})' ?? '',
-        cardSubtitle: session.userDetails.address == null
+        cardSubtitle: session.userDetails.address1 == null
             ? 'Address unknown'
-            : '${session.userDetails.address} ${restaurant.restaurantLocation}',
+            : '${session.userDetails.address1}\n${session.userDetails.address2}\n${session.userDetails.address3}\n${session.userDetails.address4}',
         onPressed: () => Navigator.of(context)
             .push(MaterialPageRoute(builder: (BuildContext context) {
           return Scaffold(
@@ -92,7 +89,7 @@ class _AccountPageState extends State<AccountPage> {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Card(
-                  child: UserDetailsForm.create(context),
+                  child: UserDetailsForm.create(context: context, userDetails: session.userDetails),
                 ),
               ),
             ),
@@ -100,9 +97,9 @@ class _AccountPageState extends State<AccountPage> {
           );
         })),
       ),
-      // TODO in progress subscription details for managers
+      // TODO in progress bundle details for managers
       // SUBSCRIPTION
-      if (session.userDetails.role == ROLE_MANAGER)
+      if (FlavourConfig.isManager())
         _userDetailsSection(
           sectionTitle: 'Bundle details',
           cardTitle: session.subscription.subscriptionTypeString,
@@ -172,31 +169,15 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   Widget _buildContents(BuildContext context) {
-    return StreamBuilder<List<Restaurant>>(
-      stream: database.userRestaurant(session.userDetails.nearestRestaurantId),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.active) {
-          if (snapshot.hasData && snapshot.data.length > 0) {
-            restaurant = snapshot.data.elementAt(0);
-            session.currentRestaurant = restaurant;
-            session.restaurantsFound = true;
-          }
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: _buildAccountDetails(context),
-              ),
-            ),
-          );
-        } else {
-          return Center(
-            child: PlatformProgressIndicator(),
-          );
-        }
-      },
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: _buildAccountDetails(context),
+        ),
+      ),
     );
   }
 

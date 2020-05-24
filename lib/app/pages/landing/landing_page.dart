@@ -9,6 +9,17 @@ import 'package:provider/provider.dart';
 
 class LandingPage extends StatelessWidget {
 
+  void _setUser(Database database, Session session, UserAuth user) async {
+    database.setUserId(user.uid);
+    await database.userDetailsSnapshot(user.uid).then((value) {
+      if (value.email == null || value.email == '') {
+        database.setUserDetails(session.userDetails);
+      } else {
+        session.userDetails = value;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthBase>(context, listen: true);
@@ -23,7 +34,7 @@ class LandingPage extends StatelessWidget {
           if (user == null) {
             return SignInPage();
           }
-          database.setUserId(user.uid);
+          _setUser(database, session, user);
           return NewSessionControl();
         } else {
           return Scaffold(

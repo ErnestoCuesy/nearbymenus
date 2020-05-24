@@ -5,7 +5,6 @@ import 'package:nearbymenus/app/common_widgets/list_items_builder.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/models/authorizations.dart';
 import 'package:nearbymenus/app/models/session.dart';
-import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/utilities/format.dart';
@@ -57,14 +56,16 @@ class _MessagesPageState extends State<MessagesPage> {
   }
 
   Widget _buildContents(BuildContext context) {
+
     return StreamBuilder<List<UserMessage>>(
       stream: database.userMessages(
-        session.currentRestaurant.id,
         database.userId,
-        session.userDetails.role,
+        session.role,
       ),
       builder: (context, snapshot) {
         return ListItemsBuilder<UserMessage>(
+            title: 'Notifications',
+            message: 'You don\'t have notifications',
             snapshot: snapshot,
             itemBuilder: (context, message) {
               return Dismissible(

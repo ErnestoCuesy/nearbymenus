@@ -41,6 +41,7 @@ class ViewOrderModel with ChangeNotifier {
   void cancel() {
     order = null;
     session.userDetails.orderOnHold = null;
+    session.currentOrder = null;
     database.setUserDetails(session.userDetails);
   }
 

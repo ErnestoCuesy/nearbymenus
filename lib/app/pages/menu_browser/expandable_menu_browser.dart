@@ -13,6 +13,7 @@ import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
 class ExpandableMenuBrowser extends StatefulWidget {
+
   @override
   _ExpandableMenuBrowserState createState() => _ExpandableMenuBrowserState();
 }
@@ -20,10 +21,12 @@ class ExpandableMenuBrowser extends StatefulWidget {
 class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
   Session session;
   Database database;
+  Restaurant restaurant;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
   bool get orderOnHold =>
       session.currentOrder != null &&
+      session.currentOrder.restaurantId == session.currentRestaurant.id &&
       session.currentOrder.status == ORDER_ON_HOLD;
 
   Widget _buildContents(BuildContext context, Map<String, dynamic> menus,
@@ -43,81 +46,77 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
   @override
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
-    database = Provider.of<Database>(context, listen: true);
-    Restaurant restaurant;
     Map<String, dynamic> menus;
     Map<String, dynamic> options;
     Map<String, dynamic> sortedMenus = Map<String, dynamic>();
-    return StreamBuilder<List<Restaurant>>(
-      stream: database.userRestaurant(session.userDetails.nearestRestaurantId),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.active ||
-            !snapshot.hasData) {
-          return Center(child: PlatformProgressIndicator(),);
-        } else if (snapshot.data.length == 0) {
-          return Scaffold(
-            body: EmptyContent(
-              title: 'No restaurant selected',
-              message: 'You can search for restaurants in your profile page',
-            ),
-          );
-        }
-        restaurant = snapshot.data.elementAt(0);
-        session.currentRestaurant = restaurant;
-        menus = restaurant.restaurantMenus;
-        options = restaurant.restaurantOptions;
-        sortedMenus.clear();
-        menus.forEach((key, value) {
-          if (value['hidden'] == false) {
-            sortedMenus.putIfAbsent(value['sequence'].toString(), () => value);
-          }
-        });
-        var sortedKeys = sortedMenus.keys.toList()..sort();
-        return Scaffold(
-          key: _scaffoldKey,
-          appBar: AppBar(
-            title: Text(
-              '${restaurant.name}',
-              style: TextStyle(color: Theme.of(context).appBarTheme.color),
-            ),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.only(right: 26.0),
-                child: IconButton(
-                  icon: Icon(Icons.add_shopping_cart),
-                  onPressed: () async {
-                    if (orderOnHold) {
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
+    restaurant = session.currentRestaurant;
+    menus = restaurant.restaurantMenus;
+    options = restaurant.restaurantOptions;
+    sortedMenus.clear();
+    menus.forEach((key, value) {
+      if (value['hidden'] == false) {
+        sortedMenus.putIfAbsent(value['sequence'].toString(), () => value);
+      }
+    });
+    var sortedKeys = sortedMenus.keys.toList()..sort();
+    return Scaffold(
+      key: _scaffoldKey,
+      appBar: AppBar(
+        title: Text(
+          '${restaurant.name}',
+          style: TextStyle(color: Theme.of(context).appBarTheme.color),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 26.0),
+            child: IconButton(
+              icon: Icon(Icons.add_shopping_cart),
+              onPressed: () async {
+                if (session.userDetails.name == '' ||
+                    session.userDetails.address1 == '' ||
+                    session.userDetails.address2 == '') {
+                  await PlatformExceptionAlertDialog(
+                    title: 'No delivery details',
+                    exception: PlatformException(
+                      code: 'NO_DELIVERY_DETAILS',
+                      message:
+                      'Please enter your delivery details in your profile page.',
+                      details:
+                      'Please enter your delivery details in your profile page.',
+                    ),
+                  ).show(context);
+                } else {
+                  if (orderOnHold) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
                         fullscreenDialog: false,
                         builder: (context) => ViewOrder.create(
-                              context: context,
-                              scaffoldKey: _scaffoldKey,
-                              order: session.currentOrder,
-                          ),
+                          context: context,
+                          scaffoldKey: _scaffoldKey,
+                          order: session.currentOrder,
                         ),
-                      );
-                    } else {
-                      session.currentOrder = null;
-                      await PlatformExceptionAlertDialog(
-                        title: 'Empty Order',
-                        exception: PlatformException(
-                          code: 'ORDER_IS_EMPTY',
-                          message:
-                              'Please tap on the menu items you wish to order first.',
-                          details:
-                              'Please tap on the menu items you wish to order first.',
-                        ),
-                      ).show(context);
-                    }
-                  },
-                ),
-              ),
-            ],
+                      ),
+                    );
+                  } else {
+                    session.currentOrder = null;
+                    await PlatformExceptionAlertDialog(
+                      title: 'Empty Order',
+                      exception: PlatformException(
+                        code: 'ORDER_IS_EMPTY',
+                        message:
+                        'Please tap on the menu items you wish to order first.',
+                        details:
+                        'Please tap on the menu items you wish to order first.',
+                      ),
+                    ).show(context);
+                  }
+                }
+              },
+            ),
           ),
-          body: _buildContents(context, sortedMenus, options, sortedKeys),
-        );
-      },
+        ],
+      ),
+      body: _buildContents(context, sortedMenus, options, sortedKeys),
     );
   }
 }

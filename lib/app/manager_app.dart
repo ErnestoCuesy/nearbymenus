@@ -53,7 +53,7 @@ class _ManagerAppState extends State<ManagerApp> {
             Provider<DeviceInfo>(create: (context) => DeviceInfo()),
             Provider<AuthBase>(create: (context) => Auth()),
             Provider<Database>(create: (context) => FirestoreDatabase()),
-            Provider<Session>(create: (context) => Session(position: widget.currentLocation)),
+            Provider<Session>(create: (context) => Session(position: widget.currentLocation, role: ROLE_MANAGER)),
           ],
           child: MaterialApp(
             title: 'Nearby Menus',
