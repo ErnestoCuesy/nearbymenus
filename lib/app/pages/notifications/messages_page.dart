@@ -26,7 +26,7 @@ class _MessagesPageState extends State<MessagesPage> {
     await database.authorizationsSnapshot().then((authorizationsList) {
       if (authorizationsList.length > 0) {
         authorizationsList.forEach((authorization) {
-          if (authorization.id == session.nearestRestaurant.id) {
+          if (authorization.id == session.currentRestaurant.id) {
             authorizations = authorization;
           }
         });
@@ -59,7 +59,7 @@ class _MessagesPageState extends State<MessagesPage> {
   Widget _buildContents(BuildContext context) {
     return StreamBuilder<List<UserMessage>>(
       stream: database.userMessages(
-        session.nearestRestaurant.id,
+        session.currentRestaurant.id,
         database.userId,
         session.userDetails.role,
       ),
@@ -152,7 +152,7 @@ class _MessagesPageState extends State<MessagesPage> {
       authorizations.authorizedRoles.remove(message.fromUid);
       authorizations.authorizedNames.remove(message.fromUid);
     }
-    database.setAuthorization(session.nearestRestaurant.id, authorizations);
+    database.setAuthorization(session.currentRestaurant.id, authorizations);
     UserMessage readMessage = UserMessage(
       id: message.id,
       timestamp: message.timestamp,

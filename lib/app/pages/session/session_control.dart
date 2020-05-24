@@ -40,7 +40,7 @@ class _SessionControlState extends State<SessionControl> {
   @override
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
-    database = Provider.of<Database>(context, listen: true);
+    database = Provider.of<Database>(context, listen: false);
     deviceInfo = Provider.of<DeviceInfo>(context);
     notificationStreams = Provider.of<NotificationStreams>(context, listen: true);
     return StreamBuilder<UserDetails>(
@@ -75,7 +75,7 @@ class _SessionControlState extends State<SessionControl> {
             if ((userDetails.nearestRestaurantId == '' || userDetails.nearestRestaurantId == null) &&
                 (userDetails.role == ROLE_PATRON ||
                  userDetails.role == ROLE_STAFF)) {
-              return RestaurantQuery(role: userDetails.role,);
+              return RestaurantQuery();
             }
             if (userDetails.name == '') {
               return UserDetailsPage();
