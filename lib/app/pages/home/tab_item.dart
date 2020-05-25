@@ -61,7 +61,6 @@ abstract class RoleEnumBase {
 class PatronRoleEnum extends RoleEnumBase {
   List<TabItem> roleEnumList = const [
     TabItem.menu,
-    TabItem.myOrders,
     TabItem.messages,
     TabItem.userAccount,
   ];

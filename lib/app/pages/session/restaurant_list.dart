@@ -5,7 +5,7 @@ import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
-import 'package:nearbymenus/app/pages/menu_browser/expandable_menu_browser.dart';
+import 'package:nearbymenus/app/pages/restaurant/menu_and_orders.dart';
 import 'package:nearbymenus/app/pages/session/check_staff_authorization.dart';
 import 'package:nearbymenus/app/pages/session/restaurant_list_tile.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -42,12 +42,12 @@ class _RestaurantListState extends State<RestaurantList> {
     }
   }
 
-  void _expandableMenuBrowserPage(BuildContext context, int index) {
+  void _menuAndOrdersPage(BuildContext context, int index) {
     session.currentRestaurant = nearbyRestaurantsList[index];
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         fullscreenDialog: false,
-        builder: (context) => ExpandableMenuBrowser(),
+        builder: (context) => MenuAndOrders(),
       ),
     );
   }
@@ -81,7 +81,7 @@ class _RestaurantListState extends State<RestaurantList> {
                     // subtitle: _buildSubtitle(index),
                     onTap: () {
                       if (session.role == ROLE_PATRON) {
-                        _expandableMenuBrowserPage(context, index);
+                        _menuAndOrdersPage(context, index);
                       } else {
                         _staffAuthorizationPage(context, index);
                       }
