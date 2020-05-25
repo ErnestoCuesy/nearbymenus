@@ -21,9 +21,10 @@ class _RestaurantQueryState extends State<RestaurantQuery> {
     final database = Provider.of<Database>(context, listen: true);
     final session = Provider.of<Session>(context);
     final userCoordinates = session.position;
-    final useStaffFilter = false;
     bloc = NearRestaurantBloc(
-        source: database.patronRestaurants(), userCoordinates: userCoordinates, useStaffFilter: useStaffFilter);
+        source: database.patronRestaurants(),
+        userCoordinates: userCoordinates,
+    );
     return StreamBuilder<List<Restaurant>>(
       stream: bloc.stream,
       builder: (context, snapshot) {
@@ -45,7 +46,18 @@ class _RestaurantQueryState extends State<RestaurantQuery> {
             elevation: 2.0,
           ),
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          body: RestaurantList(scaffoldKey: _scaffoldKey, nearbyRestaurantsList: restaurantList, stillLoading: stillLoading,),
+          body: RefreshIndicator(
+            onRefresh: () async {
+              setState(() {
+
+              });
+            },
+            child: RestaurantList(
+              scaffoldKey: _scaffoldKey,
+              nearbyRestaurantsList: restaurantList,
+              stillLoading: stillLoading,
+            ),
+          ),
         );
       },
     );

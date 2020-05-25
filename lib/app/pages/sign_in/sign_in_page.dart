@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:nearbymenus/app/services/device_info.dart';
 import 'package:nearbymenus/app/utilities/logo_image_asset.dart';
 import 'package:provider/provider.dart';
 import 'email_sign_in_page.dart';
@@ -62,7 +61,7 @@ class SignInPage extends StatelessWidget {
     return Text(
       'Welcome',
       textAlign: TextAlign.center,
-      style: Theme.of(context).primaryTextTheme.display1,
+      style: Theme.of(context).primaryTextTheme.headline4,
     );
   }
 

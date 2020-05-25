@@ -3,7 +3,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
-import 'package:nearbymenus/app/pages/session/check_staff_authorization.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
@@ -81,11 +80,7 @@ class _MessagesListenerState extends State<MessagesListener> {
               }
             });
           }
-          if (session.role == ROLE_STAFF) {
-            return CheckStaffAuthorization();
-          } else {
-            return widget.page;
-          }
+          return widget.page;
         });
   }
 }

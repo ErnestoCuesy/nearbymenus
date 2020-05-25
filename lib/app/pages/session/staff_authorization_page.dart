@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -8,9 +10,8 @@ import 'package:provider/provider.dart';
 
 class StaffAuthorizationPage extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
-  final Restaurant restaurant;
 
-  const StaffAuthorizationPage({Key key, this.scaffoldKey, this.restaurant}) : super(key: key);
+  const StaffAuthorizationPage({Key key, this.scaffoldKey,}) : super(key: key);
 
   @override
   _StaffAuthorizationPageState createState() => _StaffAuthorizationPageState();
@@ -20,15 +21,14 @@ class _StaffAuthorizationPageState extends State<StaffAuthorizationPage> {
   Session session;
   Database database;
   bool staffRequestPending = false;
-  Restaurant get restaurant => widget.restaurant;
+  Restaurant get restaurant => session.currentRestaurant;
 
   List<Widget> _buildAccountDetails(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final imageAsset = Provider.of<LogoImageAsset>(context);
-    final staffAccessStatus = session.restaurantAccessGranted ? '' : 'not ';
     final staffAccessSubtitle =
-        'You are ${staffAccessStatus}allowed to access orders';
+        'You are not allowed to access orders';
     var restaurantStatusTitle = '';
     if (!session.restaurantAccessGranted) {
       restaurantStatusTitle = restaurant.acceptingStaffRequests
@@ -46,7 +46,7 @@ class _StaffAuthorizationPageState extends State<StaffAuthorizationPage> {
       ),
       // STAFF STATUS SECTION
       _userDetailsSection(
-        sectionTitle: 'Restaurant status',
+        sectionTitle: '${session.currentRestaurant.name} access status',
         cardTitle: staffAccessSubtitle,
         cardSubtitle: restaurantStatusTitle,
         onPressed: session.currentRestaurant.acceptingStaffRequests &&
@@ -58,27 +58,41 @@ class _StaffAuthorizationPageState extends State<StaffAuthorizationPage> {
     ];
   }
 
-  void _requestRestaurantAccess(BuildContext context) {
-    final double timestamp = dateFromCurrentDate() / 1.0;
-    database.setMessageDetails(UserMessage(
-      id: documentIdFromCurrentDate(),
-      timestamp: timestamp,
-      fromUid: database.userId,
-      toUid: session.currentRestaurant.managerId,
-      restaurantId: session.currentRestaurant.id,
-      fromRole: ROLE_STAFF,
-      toRole: ROLE_MANAGER,
-      fromName: session.userDetails.name,
-      delivered: false,
-      type: 'Access to ${session.currentRestaurant.name}',
-      authFlag: false,
-    ));
-    Navigator.of(context).pop();
-    widget.scaffoldKey.currentState.showSnackBar(
-      SnackBar(
-        content: Text('Access request sent, pending approval... please wait'),
-      ),
-    );
+  Future<void> _requestRestaurantAccess(BuildContext context) async {
+    if (session.userDetails.name == null ||
+        session.userDetails.name == '') {
+        await PlatformExceptionAlertDialog(
+            title: 'Empty user name',
+            exception: PlatformException(
+            code: 'USERNAME_IS_EMPTY',
+            message:
+            'Please enter your name in the profile page before requesting access.',
+            details:
+            'Please enter your name in the profile page before requesting access',
+        ),
+      ).show(context);
+    } else {
+      final double timestamp = dateFromCurrentDate() / 1.0;
+      database.setMessageDetails(UserMessage(
+        id: documentIdFromCurrentDate(),
+        timestamp: timestamp,
+        fromUid: database.userId,
+        toUid: session.currentRestaurant.managerId,
+        restaurantId: session.currentRestaurant.id,
+        fromRole: ROLE_STAFF,
+        toRole: ROLE_MANAGER,
+        fromName: session.userDetails.name,
+        delivered: false,
+        type: 'Access to ${session.currentRestaurant.name}',
+        authFlag: false,
+      ));
+      Navigator.of(context).pop();
+      widget.scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text('Access request sent, pending approval... please wait'),
+        ),
+      );
+    }
   }
 
   Widget _userDetailsSection(
@@ -108,7 +122,7 @@ class _StaffAuthorizationPageState extends State<StaffAuthorizationPage> {
               cardSubtitle,
             ),
             trailing: IconButton(
-              icon: Icon(Icons.edit),
+              icon: Icon(Icons.error_outline),
               onPressed: onPressed,
             ),
           ),

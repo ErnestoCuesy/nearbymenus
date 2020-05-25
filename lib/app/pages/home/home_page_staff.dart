@@ -11,9 +11,8 @@ import 'package:provider/provider.dart';
 
 class HomePageStaff extends StatefulWidget {
   final String role;
-  final Widget ordersPage;
 
-  const HomePageStaff({Key key, this.role, this.ordersPage}) : super(key: key);
+  const HomePageStaff({Key key, this.role}) : super(key: key);
 
   @override
   _HomePageStaffState createState() => _HomePageStaffState();
@@ -30,7 +29,6 @@ class _HomePageStaffState extends State<HomePageStaff> {
 
   final Map<TabItem, GlobalKey<NavigatorState>> navigatorKeys = {
     TabItem.restaurant: GlobalKey<NavigatorState>(),
-    TabItem.manageOrders: GlobalKey<NavigatorState>(),
     TabItem.messages: GlobalKey<NavigatorState>(),
     TabItem.userAccount: GlobalKey<NavigatorState>()
   };
@@ -38,9 +36,8 @@ class _HomePageStaffState extends State<HomePageStaff> {
   Map<TabItem, WidgetBuilder> get widgetBuilders {
     return {
       TabItem.restaurant: (_) => RestaurantQuery(),
-      TabItem.manageOrders: (_) => widget.ordersPage,
       TabItem.messages: (_) => MessagesPage(),
-      TabItem.userAccount: (_) => AccountPage(auth: auth, session: session, database: database,)
+      TabItem.userAccount: (_) => AccountPage()
     };
   }
 

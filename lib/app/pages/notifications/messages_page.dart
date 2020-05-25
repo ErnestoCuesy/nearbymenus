@@ -21,11 +21,11 @@ class _MessagesPageState extends State<MessagesPage> {
   Authorizations authorizations =
       Authorizations(authorizedRoles: {}, authorizedNames: {});
 
-  void _getAuthorizations() async {
+  void _getAuthorizations(UserMessage message) async {
     await database.authorizationsSnapshot().then((authorizationsList) {
       if (authorizationsList.length > 0) {
         authorizationsList.forEach((authorization) {
-          if (authorization.id == session.currentRestaurant.id) {
+          if (authorization.id == message.restaurantId) {
             authorizations = authorization;
           }
         });
@@ -127,8 +127,10 @@ class _MessagesPageState extends State<MessagesPage> {
                       children: [
                         CupertinoSwitch(
                           value: message.authFlag,
-                          onChanged: (flag) =>
-                              _changeAuthorization(message, flag),
+                          onChanged: (flag) {
+                            _getAuthorizations(message);
+                            _changeAuthorization(message, flag);
+                          }
                         ),
                       ],
                     ),
@@ -153,7 +155,7 @@ class _MessagesPageState extends State<MessagesPage> {
       authorizations.authorizedRoles.remove(message.fromUid);
       authorizations.authorizedNames.remove(message.fromUid);
     }
-    database.setAuthorization(session.currentRestaurant.id, authorizations);
+    database.setAuthorization(message.restaurantId, authorizations);
     UserMessage readMessage = UserMessage(
       id: message.id,
       timestamp: message.timestamp,
@@ -174,7 +176,6 @@ class _MessagesPageState extends State<MessagesPage> {
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
-    _getAuthorizations();
     return Scaffold(
       appBar: AppBar(
         title: Text(

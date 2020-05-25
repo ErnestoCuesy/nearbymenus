@@ -11,26 +11,17 @@ import 'package:nearbymenus/app/utilities/logo_image_asset.dart';
 import 'package:provider/provider.dart';
 
 class AccountPage extends StatefulWidget {
-  final AuthBase auth;
-  final Session session;
-  final Database database;
-
-  const AccountPage({Key key, this.auth, this.session, this.database})
-      : super(key: key);
 
   @override
   _AccountPageState createState() => _AccountPageState();
 }
 
 class _AccountPageState extends State<AccountPage> {
+  AuthBase auth;
+  Session session;
+  Database database;
   Restaurant restaurant = Restaurant(
       name: '', restaurantLocation: '', acceptingStaffRequests: false);
-  bool get restaurantFound => widget.session.restaurantsFound;
-
-  Auth get auth => widget.auth;
-  Session get session => widget.session;
-  Database get database => widget.database;
-  bool staffRequestPending = false;
 
   Future<void> _signOut() async {
     try {
@@ -74,7 +65,10 @@ class _AccountPageState extends State<AccountPage> {
             session.userDetails.name + ' (${session.userDetails.email})' ?? '',
         cardSubtitle: session.userDetails.address1 == null
             ? 'Address unknown'
-            : '${session.userDetails.address1}\n${session.userDetails.address2}\n${session.userDetails.address3}\n${session.userDetails.address4}',
+            : '${session.userDetails.address1}\n'
+            '${session.userDetails.address2}\n'
+            '${session.userDetails.address3}\n'
+            '${session.userDetails.address4}',
         onPressed: () => Navigator.of(context)
             .push(MaterialPageRoute(builder: (BuildContext context) {
           return Scaffold(
@@ -89,7 +83,10 @@ class _AccountPageState extends State<AccountPage> {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Card(
-                  child: UserDetailsForm.create(context: context, userDetails: session.userDetails),
+                  child: UserDetailsForm.create(
+                      context: context,
+                      userDetails: session.userDetails,
+                  ),
                 ),
               ),
             ),
@@ -183,6 +180,9 @@ class _AccountPageState extends State<AccountPage> {
 
   @override
   Widget build(BuildContext context) {
+    auth = Provider.of<AuthBase>(context);
+    session = Provider.of<Session>(context);
+    database = Provider.of<Database>(context);
     var accountText = 'Your profile';
     return Scaffold(
       appBar: AppBar(

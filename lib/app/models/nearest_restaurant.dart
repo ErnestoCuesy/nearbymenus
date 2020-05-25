@@ -14,10 +14,9 @@ class NearestRestaurant {
 class NearRestaurantBloc {
   final Future<List<Restaurant>> source;
   final Position userCoordinates;
-  final bool useStaffFilter;
   final _stream = StreamController<List<Restaurant>>();
 
-  NearRestaurantBloc({this.source, this.userCoordinates, this.useStaffFilter}) {
+  NearRestaurantBloc({this.source, this.userCoordinates,}) {
     List<Restaurant> resList = List<Restaurant>();
     source.then((rest) {
       rest.forEach((res) async {

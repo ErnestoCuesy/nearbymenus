@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:nearbymenus/app/common_widgets/function_not_allowed.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/models/authorizations.dart';
 import 'package:nearbymenus/app/models/session.dart';
-import 'package:nearbymenus/app/pages/home/home_page_staff.dart';
 import 'package:nearbymenus/app/pages/orders/order_history.dart';
+import 'package:nearbymenus/app/pages/session/staff_authorization_page.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
 class CheckStaffAuthorization extends StatefulWidget {
+  final GlobalKey<ScaffoldState> scaffoldKey;
+
+  const CheckStaffAuthorization({Key key, this.scaffoldKey}) : super(key: key);
+
   @override
   _CheckStaffAuthorizationState createState() => _CheckStaffAuthorizationState();
 }
@@ -36,13 +39,10 @@ class _CheckStaffAuthorizationState extends State<CheckStaffAuthorization> {
           final Authorizations authorizations = snapshot.data;
           if (authorizations.authorizedRoles[database.userId] == 'Staff') {
             session.restaurantAccessGranted = true;
-            return HomePageStaff(role: ROLE_STAFF, ordersPage: OrderHistory(showBlocked: false,),);
-          } else {
-            session.restaurantAccessGranted = false;
-            return HomePageStaff(role: ROLE_STAFF, ordersPage: FunctionNotAllowed(),);
+            return OrderHistory(showBlocked: false);
           }
         }
-        return Placeholder();
+        return StaffAuthorizationPage(scaffoldKey: widget.scaffoldKey,);
       }
     );
   }

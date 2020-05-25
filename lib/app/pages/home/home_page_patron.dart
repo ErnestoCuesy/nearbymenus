@@ -40,7 +40,7 @@ class _HomePagePatronState extends State<HomePagePatron> {
       TabItem.menu: (_) => RestaurantQuery(),
       TabItem.myOrders: (_) => OrderHistory(showBlocked: false,),
       TabItem.messages: (_) => MessagesPage(),
-      TabItem.userAccount: (_) => AccountPage(auth: auth, session: session, database: database,)
+      TabItem.userAccount: (_) => AccountPage()
     };
   }
 

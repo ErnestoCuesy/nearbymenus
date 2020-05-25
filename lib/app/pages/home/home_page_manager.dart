@@ -42,7 +42,7 @@ class _HomePageManagerState extends State<HomePageManager> {
       TabItem.manageOrders: (_) => OrderHistory(showBlocked: false,),
       TabItem.blockedOrders: (_) => OrderHistory(showBlocked: true,),
       TabItem.messages: (_) => MessagesPage(),
-      TabItem.userAccount: (_) => AccountPage(auth: auth, session: session, database: database,)
+      TabItem.userAccount: (_) => AccountPage()
     };
   }
 

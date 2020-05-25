@@ -7,7 +7,6 @@ import 'package:nearbymenus/app/models/received_notification.dart';
 import 'package:nearbymenus/app/pages/landing/splash_screen.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
-import 'package:nearbymenus/app/services/device_info.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/services/iap_manager.dart';
 import 'package:nearbymenus/app/utilities/app_theme.dart';
@@ -50,7 +49,6 @@ class _ManagerAppState extends State<ManagerApp> {
             ),
             Provider<LogoImageAsset>(create: (context) => LogoImageAsset()),
             Provider<IAPManagerBase>(create: (context) => IAPManagerMock(userID: 'test@test.com')),
-            Provider<DeviceInfo>(create: (context) => DeviceInfo()),
             Provider<AuthBase>(create: (context) => Auth()),
             Provider<Database>(create: (context) => FirestoreDatabase()),
             Provider<Session>(create: (context) => Session(position: widget.currentLocation, role: ROLE_MANAGER)),
