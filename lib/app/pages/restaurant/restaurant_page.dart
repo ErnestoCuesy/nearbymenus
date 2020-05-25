@@ -96,7 +96,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
                           restaurant.name,
                           style: Theme.of(context).textTheme.headline6,
                         ),
-                        Text(restaurant.restaurantLocation),
+                        Text(restaurant.address1),
                       ],
                     ),
                     // subtitle: Text('${restaurant.restaurantLocation}'),

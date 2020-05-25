@@ -21,7 +21,7 @@ class _AccountPageState extends State<AccountPage> {
   Session session;
   Database database;
   Restaurant restaurant = Restaurant(
-      name: '', restaurantLocation: '', acceptingStaffRequests: false);
+      name: '', address1: '', acceptingStaffRequests: false);
 
   Future<void> _signOut() async {
     try {

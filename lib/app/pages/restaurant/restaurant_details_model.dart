@@ -14,7 +14,10 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
   String id;
   String managerId;
   String name;
-  String restaurantLocation;
+  String address1;
+  String address2;
+  String address3;
+  String address4;
   String typeOfFood;
   Position coordinates;
   int deliveryRadius;
@@ -27,7 +30,7 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
   bool acceptingStaffRequests;
   bool acceptCash;
   bool acceptCard;
-  bool acceptZapper;
+  bool acceptOther;
   Map<dynamic, dynamic> restaurantMenus;
   Map<dynamic, dynamic> restaurantOptions;
   bool isLoading;
@@ -40,7 +43,10 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     this.id,
     this.managerId,
     this.name,
-    this.restaurantLocation,
+    this.address1,
+    this.address2,
+    this.address3,
+    this.address4,
     this.typeOfFood,
     this.coordinates,
     this.deliveryRadius,
@@ -53,7 +59,7 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     this.acceptingStaffRequests = false,
     this.acceptCash = false,
     this.acceptCard = false,
-    this.acceptZapper = false,
+    this.acceptOther = false,
     this.restaurantMenus,
     this.restaurantOptions,
     this.isLoading = false,
@@ -71,7 +77,10 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
           id: id,
           managerId: database.userId,
           name: name,
-          restaurantLocation: restaurantLocation,
+          address1: address1,
+          address2: address2,
+          address3: address3,
+          address4: address4,
           typeOfFood: typeOfFood,
           coordinates: useCurrentLocation ? session.position : coordinates,
           deliveryRadius: deliveryRadius,
@@ -84,7 +93,7 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
           acceptingStaffRequests: acceptingStaffRequests,
           acceptCash: acceptCash,
           acceptCard: acceptCard,
-          acceptZapper: acceptZapper,
+          acceptOther: acceptOther,
           restaurantFlags: {
             'open': open,
             'active': active,
@@ -93,7 +102,7 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
           paymentFlags: {
             'Cash': acceptCash,
             'Card': acceptCard,
-            'Zapper': acceptZapper,
+            'Other': acceptOther,
           },
           restaurantMenus: restaurantMenus,
           restaurantOptions: restaurantOptions,
@@ -113,7 +122,7 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
   bool get canSave {
     bool canSubmitFlag = false;
     if (restaurantNameValidator.isValid(name) &&
-        restaurantLocationValidator.isValid(restaurantLocation) &&
+        restaurantAddress1Validator.isValid(address1) &&
         typeOfFoodValidator.isValid(typeOfFood) &&
         deliveryRadiusValidator.isValid(deliveryRadius) &&
         telephoneNumberValidator.isValid(telephoneNumber) &&
@@ -130,10 +139,10 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     return showErrorText ? invalidRestaurantNameErrorText : null;
   }
 
-  String get restaurantLocationErrorText {
+  String get restaurantAddress1ErrorText {
     bool showErrorText =
-        !restaurantLocationValidator.isValid(restaurantLocation);
-    return showErrorText ? invalidRestaurantLocationErrorText : null;
+        !restaurantAddress1Validator.isValid(address1);
+    return showErrorText ? invalidRestaurantAddress1ErrorText : null;
   }
 
   String get typeOfFoodErrorText {
@@ -153,8 +162,17 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
 
   void updateRestaurantName(String name) => updateWith(name: name);
 
-  void updateRestaurantLocation(String restaurantLocation) =>
-      updateWith(restaurantLocation: restaurantLocation);
+  void updateAddress1(String address1) =>
+      updateWith(address1: address1);
+
+  void updateAddress2(String address2) =>
+      updateWith(address2: address2);
+
+  void updateAddress3(String address3) =>
+      updateWith(address3: address3);
+
+  void updateAddress4(String address4) =>
+      updateWith(address4: address4);
 
   void updateTypeOfFood(String typeOfFood) =>
       updateWith(typeOfFood: typeOfFood);
@@ -187,12 +205,15 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
 
   void updateAcceptCard(bool acceptCard) => updateWith(acceptCard: acceptCard);
 
-  void updateAcceptZapper(bool acceptZapper) =>
-      updateWith(acceptZapper: acceptZapper);
+  void updateAcceptOther(bool acceptOther) =>
+      updateWith(acceptOther: acceptOther);
 
   void updateWith({
     String name,
-    String restaurantLocation,
+    String address1,
+    String address2,
+    String address3,
+    String address4,
     String typeOfFood,
     Position coordinates,
     int deliveryRadius,
@@ -205,12 +226,15 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     bool acceptingStaffRequests,
     bool acceptCash,
     bool acceptCard,
-    bool acceptZapper,
+    bool acceptOther,
     bool isLoading,
     bool submitted,
   }) {
     this.name = name ?? this.name;
-    this.restaurantLocation = restaurantLocation ?? this.restaurantLocation;
+    this.address1 = address1 ?? this.address1;
+    this.address2 = address2 ?? this.address2;
+    this.address3 = address3 ?? this.address3;
+    this.address4 = address4 ?? this.address4;
     this.typeOfFood = typeOfFood ?? this.typeOfFood;
     this.coordinates = coordinates ?? this.coordinates;
     this.deliveryRadius = deliveryRadius ?? this.deliveryRadius;
@@ -224,7 +248,7 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
         acceptingStaffRequests ?? this.acceptingStaffRequests;
     this.acceptCash = acceptCash ?? this.acceptCash;
     this.acceptCard = acceptCard ?? this.acceptCard;
-    this.acceptZapper = acceptZapper ?? this.acceptZapper;
+    this.acceptOther = acceptOther ?? this.acceptOther;
     this.isLoading = isLoading ?? this.isLoading;
     this.submitted = this.submitted;
     dataHasChanged = true;

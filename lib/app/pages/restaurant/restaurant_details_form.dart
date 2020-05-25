@@ -27,7 +27,10 @@ class RestaurantDetailsForm extends StatefulWidget {
         id: restaurant.id ?? '',
         managerId: restaurant.managerId ?? '',
         name: restaurant.name ?? '',
-        restaurantLocation: restaurant.restaurantLocation ?? '',
+        address1: restaurant.address1 ?? '',
+        address2: restaurant.address2 ?? '',
+        address3: restaurant.address3 ?? '',
+        address4: restaurant.address4 ?? '',
         typeOfFood: restaurant.typeOfFood ?? '',
         coordinates: restaurant.coordinates ?? session.position,
         deliveryRadius: restaurant.deliveryRadius ?? 0,
@@ -40,7 +43,7 @@ class RestaurantDetailsForm extends StatefulWidget {
         acceptingStaffRequests: restaurant.acceptingStaffRequests ?? false,
         acceptCash: restaurant.acceptCash ?? false,
         acceptCard: restaurant.acceptCard ?? false,
-        acceptZapper: restaurant.acceptZapper ?? false,
+        acceptOther: restaurant.acceptOther ?? false,
         restaurantMenus: restaurant.restaurantMenus ?? {},
         restaurantOptions: restaurant.restaurantOptions ?? {},
       ),
@@ -59,13 +62,19 @@ class RestaurantDetailsForm extends StatefulWidget {
 class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
   final TextEditingController _restaurantNameController = TextEditingController();
   final TextEditingController _typeOfFoodController = TextEditingController();
-  final TextEditingController _restaurantLocationController = TextEditingController();
+  final TextEditingController _restaurantAddress1Controller = TextEditingController();
+  final TextEditingController _restaurantAddress2Controller = TextEditingController();
+  final TextEditingController _restaurantAddress3Controller = TextEditingController();
+  final TextEditingController _restaurantAddress4Controller = TextEditingController();
   final TextEditingController _deliveryRadiusController = TextEditingController();
   final TextEditingController _notesController = TextEditingController();
   final TextEditingController _telephoneNumberController = TextEditingController();
   final FocusNode _restaurantNameFocusNode = FocusNode();
   final FocusNode _typeOfFoodFocusNode = FocusNode();
-  final FocusNode _restaurantLocationFocusNode = FocusNode();
+  final FocusNode _restaurantAddress1FocusNode = FocusNode();
+  final FocusNode _restaurantAddress2FocusNode = FocusNode();
+  final FocusNode _restaurantAddress3FocusNode = FocusNode();
+  final FocusNode _restaurantAddress4FocusNode = FocusNode();
   final FocusNode _deliveryRadiusFocusNode = FocusNode();
   final FocusNode _notesFocusNode = FocusNode();
   final FocusNode _telephoneNumberFocusNode = FocusNode();
@@ -85,7 +94,10 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
     if (model != null) {
       _restaurantNameController.text = model.name ?? null;
       _typeOfFoodController.text = model.typeOfFood ?? null;
-      _restaurantLocationController.text = model.restaurantLocation ?? null;
+      _restaurantAddress1Controller.text = model.address1 ?? null;
+      _restaurantAddress2Controller.text = model.address2 ?? null;
+      _restaurantAddress3Controller.text = model.address3 ?? null;
+      _restaurantAddress4Controller.text = model.address4 ?? null;
       _deliveryRadiusController.text = model.deliveryRadius.toString() ?? null;
       _notesController.text = model.notes ?? null;
       _telephoneNumberController.text = model.telephoneNumber ?? null;
@@ -98,12 +110,18 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
   void dispose() {
     _restaurantNameController.dispose();
     _typeOfFoodController.dispose();
-    _restaurantLocationController.dispose();
+    _restaurantAddress1Controller.dispose();
+    _restaurantAddress2Controller.dispose();
+    _restaurantAddress3Controller.dispose();
+    _restaurantAddress4Controller.dispose();
     _deliveryRadiusController.dispose();
     _notesController.dispose();
     _telephoneNumberController.dispose();
     _restaurantNameFocusNode.dispose();
-    _restaurantLocationFocusNode.dispose();
+    _restaurantAddress1FocusNode.dispose();
+    _restaurantAddress2FocusNode.dispose();
+    _restaurantAddress3FocusNode.dispose();
+    _restaurantAddress4FocusNode.dispose();
     _typeOfFoodFocusNode.dispose();
     _deliveryRadiusFocusNode.dispose();
     _notesFocusNode.dispose();
@@ -142,15 +160,36 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
 
   void _typeOfFoodEditingComplete() {
     final newFocus = model.typeOfFoodValidator.isValid(model.typeOfFood)
-        ? _restaurantLocationFocusNode
+        ? _restaurantAddress1FocusNode
         : _typeOfFoodFocusNode;
     FocusScope.of(context).requestFocus(newFocus);
   }
 
-  void _restaurantLocationEditingComplete() {
-    final newFocus = model.restaurantLocationValidator.isValid(model.restaurantLocation)
+  void _restaurantAddress1EditingComplete() {
+    final newFocus = model.restaurantAddress1Validator.isValid(model.address1)
+        ? _restaurantAddress2FocusNode
+        : _restaurantAddress1FocusNode;
+    FocusScope.of(context).requestFocus(newFocus);
+  }
+
+  void _restaurantAddress2EditingComplete() {
+    final newFocus = model.restaurantAddress1Validator.isValid(model.address1)
+        ? _restaurantAddress3FocusNode
+        : _restaurantAddress2FocusNode;
+    FocusScope.of(context).requestFocus(newFocus);
+  }
+
+  void _restaurantAddress3EditingComplete() {
+    final newFocus = model.restaurantAddress1Validator.isValid(model.address1)
+        ? _restaurantAddress4FocusNode
+        : _restaurantAddress3FocusNode;
+    FocusScope.of(context).requestFocus(newFocus);
+  }
+
+  void _restaurantAddress4EditingComplete() {
+    final newFocus = model.restaurantAddress1Validator.isValid(model.address1)
         ? _deliveryRadiusFocusNode
-        : _restaurantLocationFocusNode;
+        : _restaurantAddress4FocusNode;
     FocusScope.of(context).requestFocus(newFocus);
   }
 
@@ -172,9 +211,6 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
     FocusScope.of(context).requestFocus(_hoursFromFocusNode);
   }
 
-
-  // TODO add a use current location check box and a way to refresh if user moves around
-
   List<Widget> _buildChildren() {
     return [
       _buildRestaurantNameTextField(),
@@ -185,7 +221,19 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       SizedBox(
         height: 8.0,
       ),
-      _buildRestaurantLocationTextField(),
+      _buildRestaurantAddress1TextField(),
+      SizedBox(
+        height: 8.0,
+      ),
+      _buildRestaurantAddress2TextField(),
+      SizedBox(
+        height: 8.0,
+      ),
+      _buildRestaurantAddress3TextField(),
+      SizedBox(
+        height: 8.0,
+      ),
+      _buildRestaurantAddress4TextField(),
       SizedBox(
         height: 8.0,
       ),
@@ -216,7 +264,7 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
         children: <Widget>[
           _buildAcceptCashCheckBox(),
           _buildAcceptCardCheckBox(),
-          _buildAcceptZapperCheckBox()
+          _buildAcceptOtherCheckBox()
         ],
       ),
       SizedBox(
@@ -294,7 +342,6 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       cursorColor: Colors.black,
       decoration: InputDecoration(
         labelText: 'Restaurant\'s name',
-        hintText: 'i.e.: Johnny\'s',
         errorText: model.restaurantNameErrorText,
         enabled: model.isLoading == false,
       ),
@@ -317,7 +364,7 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       cursorColor: Colors.black,
       decoration: InputDecoration(
         labelText: 'Type of cuisine',
-        hintText: 'i.e: Mexican',
+        hintText: 'Mexican, Indian, etc.',
         errorText: model.typeOfFoodErrorText,
         enabled: model.isLoading == false,
       ),
@@ -331,17 +378,16 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
     );
   }
 
-  TextField _buildRestaurantLocationTextField() {
+  TextField _buildRestaurantAddress1TextField() {
     return TextField(
       style: Theme.of(context).inputDecorationTheme.labelStyle,
-      controller: _restaurantLocationController,
-      focusNode: _restaurantLocationFocusNode,
+      controller: _restaurantAddress1Controller,
+      focusNode: _restaurantAddress1FocusNode,
       textCapitalization: TextCapitalization.words,
       cursorColor: Colors.black,
       decoration: InputDecoration(
-        labelText: 'Restaurant\'s complex name',
-        hintText: 'i.e.: Lonehill Village Estate',
-        errorText: model.restaurantLocationErrorText,
+        labelText: 'Restaurant\'s mall, estate name or street where is located',
+        errorText: model.restaurantAddress1ErrorText,
         enabled: model.isLoading == false,
       ),
       autocorrect: false,
@@ -349,8 +395,71 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       enableInteractiveSelection: false,
       keyboardType: TextInputType.text,
       textInputAction: TextInputAction.next,
-      onChanged: model.updateRestaurantLocation,
-      onEditingComplete: () => _restaurantLocationEditingComplete(),
+      onChanged: model.updateAddress1,
+      onEditingComplete: () => _restaurantAddress1EditingComplete(),
+    );
+  }
+
+  TextField _buildRestaurantAddress2TextField() {
+    return TextField(
+      style: Theme.of(context).inputDecorationTheme.labelStyle,
+      controller: _restaurantAddress2Controller,
+      focusNode: _restaurantAddress2FocusNode,
+      textCapitalization: TextCapitalization.words,
+      cursorColor: Colors.black,
+      decoration: InputDecoration(
+        labelText: 'Number and street',
+        enabled: model.isLoading == false,
+      ),
+      autocorrect: false,
+      enableSuggestions: false,
+      enableInteractiveSelection: false,
+      keyboardType: TextInputType.text,
+      textInputAction: TextInputAction.next,
+      onChanged: model.updateAddress2,
+      onEditingComplete: () => _restaurantAddress2EditingComplete(),
+    );
+  }
+
+  TextField _buildRestaurantAddress3TextField() {
+    return TextField(
+      style: Theme.of(context).inputDecorationTheme.labelStyle,
+      controller: _restaurantAddress3Controller,
+      focusNode: _restaurantAddress3FocusNode,
+      textCapitalization: TextCapitalization.words,
+      cursorColor: Colors.black,
+      decoration: InputDecoration(
+        labelText: 'Suburb',
+        enabled: model.isLoading == false,
+      ),
+      autocorrect: false,
+      enableSuggestions: false,
+      enableInteractiveSelection: false,
+      keyboardType: TextInputType.text,
+      textInputAction: TextInputAction.next,
+      onChanged: model.updateAddress3,
+      onEditingComplete: () => _restaurantAddress3EditingComplete(),
+    );
+  }
+
+  TextField _buildRestaurantAddress4TextField() {
+    return TextField(
+      style: Theme.of(context).inputDecorationTheme.labelStyle,
+      controller: _restaurantAddress4Controller,
+      focusNode: _restaurantAddress4FocusNode,
+      textCapitalization: TextCapitalization.words,
+      cursorColor: Colors.black,
+      decoration: InputDecoration(
+        labelText: 'Province',
+        enabled: model.isLoading == false,
+      ),
+      autocorrect: false,
+      enableSuggestions: false,
+      enableInteractiveSelection: false,
+      keyboardType: TextInputType.text,
+      textInputAction: TextInputAction.next,
+      onChanged: model.updateAddress4,
+      onEditingComplete: () => _restaurantAddress4EditingComplete(),
     );
   }
 
@@ -384,7 +493,6 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       cursorColor: Colors.black,
       decoration: InputDecoration(
         labelText: 'Telephone number',
-        hintText: 'i.e.: 082123456',
         enabled: model.isLoading == false,
       ),
       autocorrect: false,
@@ -406,7 +514,7 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       cursorColor: Colors.black,
       decoration: InputDecoration(
         labelText: 'Notice to patrons',
-        hintText: 'i.e.: Residents only',
+        hintText: 'Residents only, delivery only, closed on holidays, etc.',
         enabled: model.isLoading == false,
       ),
       autocorrect: false,
@@ -423,10 +531,8 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
     return DateTimePicker(
       labelText: 'Open from',
       selectedDate: null,
-      // selectedTime: model.workingHoursFrom,
       selectedTime: _openFrom,
       onSelecedtDate: null,
-      // onSelectedTime: (value) => model.updateWorkingHoursFrom(value),
       onSelectedTime: (time) {
         print('Hours from: ${time.toString()}');
         model.updateWorkingHoursFrom(time);
@@ -473,11 +579,11 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
     );
   }
 
-  Widget _buildAcceptZapperCheckBox() {
+  Widget _buildAcceptOtherCheckBox() {
     return CheckboxListTile(
-      title: const Text('Zapper accepted'),
-      value: model.acceptZapper,
-      onChanged: model.updateAcceptZapper,
+      title: const Text('Other'),
+      value: model.acceptOther,
+      onChanged: model.updateAcceptOther,
       secondary: const Icon(Icons.flash_on),
     );
   }

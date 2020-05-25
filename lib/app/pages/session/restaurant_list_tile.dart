@@ -43,7 +43,52 @@ class RestaurantListTile extends StatelessWidget {
                 ),
               ),
               Text(
-                restaurant.restaurantLocation,
+                restaurant.address1,
+              ),
+            ],
+          ),
+          if (restaurant.address2 != '')
+          Row(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Icon(
+                  Icons.arrow_right,
+                  size: 20.0,
+                ),
+              ),
+              Text(
+                restaurant.address2,
+              ),
+            ],
+          ),
+          if (restaurant.address3 != '')
+          Row(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Icon(
+                  Icons.arrow_right,
+                  size: 20.0,
+                ),
+              ),
+              Text(
+                restaurant.address3,
+              ),
+            ],
+          ),
+          if (restaurant.address4 != '')
+          Row(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Icon(
+                  Icons.arrow_right,
+                  size: 20.0,
+                ),
+              ),
+              Text(
+                restaurant.address4,
               ),
             ],
           ),
@@ -132,7 +177,7 @@ class RestaurantListTile extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(4.0),
               child: Text(
-                'Payment on delivery: ',
+                'Payment options: ',
               ),
             ),
             if (restaurant.acceptCash)
@@ -148,7 +193,7 @@ class RestaurantListTile extends StatelessWidget {
                   size: 14.0,
                 ),
               ),
-            if (restaurant.acceptZapper)
+            if (restaurant.acceptOther)
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Icon(

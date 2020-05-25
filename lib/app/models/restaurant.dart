@@ -7,7 +7,10 @@ class Restaurant {
   final String id;
   final String managerId;
   final String name;
-  final String restaurantLocation;
+  final String address1;
+  final String address2;
+  final String address3;
+  final String address4;
   final String typeOfFood;
   final Position coordinates;
   final int deliveryRadius;
@@ -20,7 +23,7 @@ class Restaurant {
   final bool acceptingStaffRequests;
   final bool acceptCash;
   final bool acceptCard;
-  final bool acceptZapper;
+  final bool acceptOther;
   final Map<String, dynamic> restaurantFlags;
   final Map<String, dynamic> paymentFlags;
   final Map<dynamic, dynamic> restaurantMenus;
@@ -30,7 +33,10 @@ class Restaurant {
     this.id,
     this.managerId,
     this.name,
-    this.restaurantLocation,
+    this.address1,
+    this.address2,
+    this.address3,
+    this.address4,
     this.typeOfFood,
     this.coordinates,
     this.deliveryRadius,
@@ -43,7 +49,7 @@ class Restaurant {
     this.acceptingStaffRequests,
     this.acceptCash,
     this.acceptCard,
-    this.acceptZapper,
+    this.acceptOther,
     this.restaurantFlags,
     this.paymentFlags,
     this.restaurantMenus,
@@ -65,7 +71,10 @@ class Restaurant {
         managerId: value['managerId'],
         name: value['name'],
         typeOfFood: value['typeOfFood'],
-        restaurantLocation: value['restaurantLocation'],
+        address1: value['address1'],
+        address2: value['address2'],
+        address3: value['address3'],
+        address4: value['address4'],
         coordinates: Position(
             latitude: geoPoint.latitude, longitude: geoPoint.longitude),
         deliveryRadius: deliveryRadius,
@@ -78,7 +87,7 @@ class Restaurant {
         acceptingStaffRequests: value['restaurantFlags']['acceptingStaffRequests'],
         acceptCash: value['paymentFlags']['Cash'],
         acceptCard: value['paymentFlags']['Card'],
-        acceptZapper: value['paymentFlags']['Zapper'],
+        acceptOther: value['paymentFlags']['Other'],
         restaurantFlags: value['restaurantFlags'],
         paymentFlags: value['paymentFlags'],
         restaurantMenus: value['restaurantMenus'] ?? {},
@@ -94,7 +103,10 @@ class Restaurant {
       'managerId': managerId,
       'name': name,
       'typeOfFood': typeOfFood,
-      'restaurantLocation': restaurantLocation,
+      'address1': address1,
+      'address2': address2,
+      'address3': address3,
+      'address4': address4,
       'coordinates': geoPoint,
       'deliveryRadius': deliveryRadius,
       'hoursFromHours': workingHoursFrom.hour,
