@@ -9,7 +9,7 @@ class PurpleTheme {
     primaryColorLight: Color(0xffe1bee7),
     primaryColorDark: Color(0xff7b1fa2),
     accentColor: Color(0xff9c27b0),
-    accentColorBrightness: Brightness.dark,
+    accentColorBrightness: Brightness.light,
     canvasColor: Color(0xfffafafa),
     scaffoldBackgroundColor: Color(0xfffafafa),
     bottomAppBarColor: Color(0xffffffff),
@@ -24,7 +24,7 @@ class PurpleTheme {
     toggleableActiveColor: Color(0xff8e24aa),
     secondaryHeaderColor: Color(0xfff3e5f5),
     textSelectionColor: Color(0xffce93d8),
-    cursorColor: Color(0xff4285f4),
+    cursorColor: Color(0xffba68c8),
     textSelectionHandleColor: Color(0xffba68c8),
     backgroundColor: Color(0xffce93d8),
     dialogBackgroundColor: Color(0xffffffff),
@@ -60,62 +60,62 @@ class PurpleTheme {
         error: Color(0xffd32f2f),
         onPrimary: Color(0xffffffff),
         onSecondary: Color(0xffffffff),
-        onSurface: Color(0xff000000),
+        onSurface: Color(0xffffffff),
         onBackground: Color(0xffffffff),
         onError: Color(0xffffffff),
         brightness: Brightness.light,
       ),
     ),
     textTheme: TextTheme(
-      display4: TextStyle(
+      headline1: TextStyle(
         color: Color(0x8a000000),
         fontSize: 96.0,
         fontWeight: FontWeight.w300,
         fontStyle: FontStyle.normal,
       ),
-      display3: TextStyle(
+      headline2: TextStyle(
         color: Color(0x8a000000),
         fontSize: 60.0,
         fontWeight: FontWeight.w300,
         fontStyle: FontStyle.normal,
       ),
-      display2: TextStyle(
+      headline3: TextStyle(
         color: Color(0x8a000000),
         fontSize: 48.0,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      display1: TextStyle(
+      headline4: TextStyle(
         color: Color(0x8a000000),
         fontSize: 34.0,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      headline: TextStyle(
+      headline5: TextStyle(
         color: Color(0xdd000000),
         fontSize: 24.0,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      title: TextStyle(
+      headline6: TextStyle(
         color: Color(0xdd000000),
         fontSize: 20.0,
         fontWeight: FontWeight.w500,
         fontStyle: FontStyle.normal,
       ),
-      subhead: TextStyle(
+      subtitle1: TextStyle(
         color: Color(0xdd000000),
         fontSize: 16.0,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      body2: TextStyle(
+      bodyText1: TextStyle(
         color: Color(0xdd000000),
         fontSize: 14.0,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      body1: TextStyle(
+      bodyText2: TextStyle(
         color: Color(0xdd000000),
         fontSize: 16.0,
         fontWeight: FontWeight.w400,
@@ -128,12 +128,12 @@ class PurpleTheme {
         fontStyle: FontStyle.normal,
       ),
       button: TextStyle(
-        color: Color(0xdd000000),
+        color: Color(0xffffffff),
         fontSize: 14.0,
         fontWeight: FontWeight.w500,
         fontStyle: FontStyle.normal,
       ),
-      subtitle: TextStyle(
+      subtitle2: TextStyle(
         color: Color(0xff000000),
         fontSize: 14.0,
         fontWeight: FontWeight.w500,
@@ -147,55 +147,55 @@ class PurpleTheme {
       ),
     ),
     primaryTextTheme: TextTheme(
-      display4: TextStyle(
+      headline1: TextStyle(
         color: Color(0x8a000000),
         fontSize: 96.0,
         fontWeight: FontWeight.w300,
         fontStyle: FontStyle.normal,
       ),
-      display3: TextStyle(
+      headline2: TextStyle(
         color: Color(0x8a000000),
         fontSize: 60.0,
         fontWeight: FontWeight.w300,
         fontStyle: FontStyle.normal,
       ),
-      display2: TextStyle(
+      headline3: TextStyle(
         color: Color(0x8a000000),
         fontSize: 48.0,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      display1: TextStyle(
+      headline4: TextStyle(
         color: Color(0x8a000000),
         fontSize: 34.0,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      headline: TextStyle(
+      headline5: TextStyle(
         color: Color(0xdd000000),
         fontSize: 24.0,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      title: TextStyle(
+      headline6: TextStyle(
         color: Color(0xdd000000),
         fontSize: 20.0,
         fontWeight: FontWeight.w500,
         fontStyle: FontStyle.normal,
       ),
-      subhead: TextStyle(
+      subtitle1: TextStyle(
         color: Color(0xdd000000),
         fontSize: 16.0,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      body2: TextStyle(
+      bodyText1: TextStyle(
         color: Color(0xdd000000),
         fontSize: 14.0,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      body1: TextStyle(
+      bodyText2: TextStyle(
         color: Color(0xdd000000),
         fontSize: 16.0,
         fontWeight: FontWeight.w400,
@@ -208,12 +208,12 @@ class PurpleTheme {
         fontStyle: FontStyle.normal,
       ),
       button: TextStyle(
-        color: Color(0xdd000000),
+        color: Color(0xffffffff),
         fontSize: 14.0,
         fontWeight: FontWeight.w500,
         fontStyle: FontStyle.normal,
       ),
-      subtitle: TextStyle(
+      subtitle2: TextStyle(
         color: Color(0xff000000),
         fontSize: 14.0,
         fontWeight: FontWeight.w500,
@@ -227,55 +227,55 @@ class PurpleTheme {
       ),
     ),
     accentTextTheme: TextTheme(
-      display4: TextStyle(
+      headline1: TextStyle(
         color: Color(0x8a000000),
         fontSize: 96.0,
         fontWeight: FontWeight.w300,
         fontStyle: FontStyle.normal,
       ),
-      display3: TextStyle(
+      headline2: TextStyle(
         color: Color(0x8a000000),
         fontSize: 60.0,
         fontWeight: FontWeight.w300,
         fontStyle: FontStyle.normal,
       ),
-      display2: TextStyle(
+      headline3: TextStyle(
         color: Color(0x8a000000),
         fontSize: 48.0,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      display1: TextStyle(
+      headline4: TextStyle(
         color: Color(0x8a000000),
         fontSize: 34.0,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      headline: TextStyle(
+      headline5: TextStyle(
         color: Color(0xdd000000),
         fontSize: 24.0,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      title: TextStyle(
+      headline6: TextStyle(
         color: Color(0xdd000000),
         fontSize: 20.0,
         fontWeight: FontWeight.w500,
         fontStyle: FontStyle.normal,
       ),
-      subhead: TextStyle(
+      subtitle1: TextStyle(
         color: Color(0xdd000000),
         fontSize: 16.0,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      body2: TextStyle(
+      bodyText1: TextStyle(
         color: Color(0xdd000000),
         fontSize: 14.0,
         fontWeight: FontWeight.w400,
         fontStyle: FontStyle.normal,
       ),
-      body1: TextStyle(
+      bodyText2: TextStyle(
         color: Color(0xdd000000),
         fontSize: 16.0,
         fontWeight: FontWeight.w400,
@@ -288,12 +288,12 @@ class PurpleTheme {
         fontStyle: FontStyle.normal,
       ),
       button: TextStyle(
-        color: Color(0xdd000000),
+        color: Color(0xffffffff),
         fontSize: 14.0,
         fontWeight: FontWeight.w500,
         fontStyle: FontStyle.normal,
       ),
-      subtitle: TextStyle(
+      subtitle2: TextStyle(
         color: Color(0xff000000),
         fontSize: 14.0,
         fontWeight: FontWeight.w500,
@@ -332,7 +332,7 @@ class PurpleTheme {
         fontStyle: FontStyle.normal,
       ),
       errorMaxLines: null,
-      hasFloatingPlaceholder: true,
+      floatingLabelBehavior: FloatingLabelBehavior.never,
       isDense: false,
       contentPadding:
       EdgeInsets.only(top: 12.0, bottom: 12.0, left: 0.0, right: 0.0),
@@ -417,10 +417,10 @@ class PurpleTheme {
       size: 24.0,
     ),
     floatingActionButtonTheme: FloatingActionButtonThemeData(
-      foregroundColor: Color(0xff000000),
+      foregroundColor: Color(0xffffffff),
     ),
     accentIconTheme: IconThemeData(
-      color: Color(0xff000000),
+      color: Color(0xffffffff),
       opacity: 1.0,
       size: 24.0,
     ),

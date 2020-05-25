@@ -12,7 +12,7 @@ class FormSubmitButton extends CustomRaisedButton {
           context: context,
           child: Text(
             text,
-            style: Theme.of(context).primaryTextTheme.headline,
+            style: Theme.of(context).primaryTextTheme.headline5,
           ),
           height: 44.0,
           textColor: Theme.of(context).accentColor,
