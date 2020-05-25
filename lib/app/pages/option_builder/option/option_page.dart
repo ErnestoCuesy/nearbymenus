@@ -16,10 +16,6 @@ import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
 class OptionPage extends StatefulWidget {
-  final Restaurant restaurant;
-
-  const OptionPage({Key key, this.restaurant,})
-      : super(key: key);
 
   @override
   _OptionPageState createState() => _OptionPageState();
@@ -28,13 +24,14 @@ class OptionPage extends StatefulWidget {
 class _OptionPageState extends State<OptionPage> {
   Session session;
   Database database;
+  Restaurant get restaurant => session.currentRestaurant;
 
   void _createOptionDetailsPage(BuildContext context, Option option) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         fullscreenDialog: false,
         builder: (context) => OptionDetailsPage(
-          restaurant: widget.restaurant,
+          restaurant: restaurant,
           option: option,
         ),
       ),
@@ -44,8 +41,8 @@ class _OptionPageState extends State<OptionPage> {
   Future<void> _deleteOption(BuildContext context, Option option) async {
     try {
       await database.deleteOption(option);
-      widget.restaurant.restaurantOptions.remove(option.id);
-      Restaurant.setRestaurant(database, widget.restaurant);
+      restaurant.restaurantOptions.remove(option.id);
+      Restaurant.setRestaurant(database, restaurant);
     } on PlatformException catch (e) {
       PlatformExceptionAlertDialog(
         title: 'Operation failed',
@@ -58,15 +55,15 @@ class _OptionPageState extends State<OptionPage> {
     var message = '';
     var inUse = false;
     var hasChildren = false;
-    if (widget.restaurant.restaurantOptions != null && widget.restaurant.restaurantOptions.isNotEmpty) {
-      if (widget.restaurant.restaurantOptions[option.id]['usedByMenuItems']
+    if (restaurant.restaurantOptions != null && restaurant.restaurantOptions.isNotEmpty) {
+      if (restaurant.restaurantOptions[option.id]['usedByMenuItems']
           .length > 0) {
         inUse = true;
         message =
         'Please first unselect this option from the menu items that are using it.';
       }
       if (!inUse) {
-        widget.restaurant.restaurantOptions[option.id].forEach((key, value) {
+        restaurant.restaurantOptions[option.id].forEach((key, value) {
           if (key
               .toString()
               .length > 20) {
@@ -97,7 +94,7 @@ class _OptionPageState extends State<OptionPage> {
 
   Widget _buildContents(BuildContext context) {
     return StreamBuilder<List<Option>>(
-      stream: database.restaurantOptions(widget.restaurant.id),
+      stream: database.restaurantOptions(restaurant.id),
       builder: (context, snapshot) {
         return ListItemsBuilder<Option>(
             title: 'No options found',
@@ -128,7 +125,7 @@ class _OptionPageState extends State<OptionPage> {
                       onPressed: () => Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (BuildContext context) => OptionItemPage(
-                            restaurant: widget.restaurant,
+                            restaurant: restaurant,
                             option: option,
                           ),
                         ),
@@ -152,7 +149,7 @@ class _OptionPageState extends State<OptionPage> {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            '${widget.restaurant.name}',
+            '${restaurant.name}',
             style: TextStyle(color: Theme.of(context).appBarTheme.color),
           ),
         ),
@@ -169,7 +166,7 @@ class _OptionPageState extends State<OptionPage> {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            '${widget.restaurant.name}',
+            '${restaurant.name}',
             style: TextStyle(color: Theme.of(context).appBarTheme.color),
           ),
           actions: <Widget>[

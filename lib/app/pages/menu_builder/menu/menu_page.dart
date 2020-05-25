@@ -16,10 +16,6 @@ import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
 class MenuPage extends StatefulWidget {
-  final Restaurant restaurant;
-
-  const MenuPage({Key key, this.restaurant,})
-      : super(key: key);
 
   @override
   _MenuPageState createState() => _MenuPageState();
@@ -28,13 +24,14 @@ class MenuPage extends StatefulWidget {
 class _MenuPageState extends State<MenuPage> {
   Session session;
   Database database;
+  Restaurant get restaurant => session.currentRestaurant;
 
   void _createMenuDetailsPage(BuildContext context, Menu menu) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         fullscreenDialog: false,
         builder: (context) => MenuDetailsPage(
-          restaurant: widget.restaurant,
+          restaurant: restaurant,
           menu: menu,
         ),
       ),
@@ -44,8 +41,8 @@ class _MenuPageState extends State<MenuPage> {
   Future<void> _deleteMenu(BuildContext context, Menu menu) async {
     try {
       await database.deleteMenu(menu);
-      widget.restaurant.restaurantMenus.remove(menu.id);
-      Restaurant.setRestaurant(database, widget.restaurant);
+      restaurant.restaurantMenus.remove(menu.id);
+      Restaurant.setRestaurant(database, restaurant);
     } on PlatformException catch (e) {
       PlatformExceptionAlertDialog(
         title: 'Operation failed',
@@ -56,7 +53,7 @@ class _MenuPageState extends State<MenuPage> {
 
   Future<bool> _confirmDismiss(BuildContext context, Menu menu) async {
     var hasStuff = false;
-    widget.restaurant.restaurantMenus[menu.id].forEach((key, value) {
+    restaurant.restaurantMenus[menu.id].forEach((key, value) {
       if (key.toString().length > 20){
         hasStuff = true;
       }
@@ -82,7 +79,7 @@ class _MenuPageState extends State<MenuPage> {
 
   Widget _buildContents(BuildContext context) {
     return StreamBuilder<List<Menu>>(
-      stream: database.restaurantMenus(widget.restaurant.id),
+      stream: database.restaurantMenus(restaurant.id),
       builder: (context, snapshot) {
         return ListItemsBuilder<Menu>(
             title: 'No menus found',
@@ -117,7 +114,7 @@ class _MenuPageState extends State<MenuPage> {
                       onPressed: () => Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (BuildContext context) => MenuItemPage(
-                            restaurant: widget.restaurant,
+                            restaurant: restaurant,
                             menu: menu,
                           ),
                         ),
@@ -141,7 +138,7 @@ class _MenuPageState extends State<MenuPage> {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            '${widget.restaurant.name}',
+            '${restaurant.name}',
             style: TextStyle(color: Theme.of(context).appBarTheme.color),
           ),
         ),
@@ -158,7 +155,7 @@ class _MenuPageState extends State<MenuPage> {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            '${widget.restaurant.name}',
+            '${restaurant.name}',
             style: TextStyle(color: Theme.of(context).appBarTheme.color),
           ),
           actions: <Widget>[

@@ -30,8 +30,6 @@ class _HomePageManagerState extends State<HomePageManager> {
 
   final Map<TabItem, GlobalKey<NavigatorState>> navigatorKeys = {
     TabItem.restaurant: GlobalKey<NavigatorState>(),
-    TabItem.manageOrders: GlobalKey<NavigatorState>(),
-    TabItem.blockedOrders: GlobalKey<NavigatorState>(),
     TabItem.messages: GlobalKey<NavigatorState>(),
     TabItem.userAccount: GlobalKey<NavigatorState>()
   };
@@ -39,8 +37,6 @@ class _HomePageManagerState extends State<HomePageManager> {
   Map<TabItem, WidgetBuilder> get widgetBuilders {
     return {
       TabItem.restaurant: (_) => RestaurantPage(),
-      TabItem.manageOrders: (_) => OrderHistory(showBlocked: false,),
-      TabItem.blockedOrders: (_) => OrderHistory(showBlocked: true,),
       TabItem.messages: (_) => MessagesPage(),
       TabItem.userAccount: (_) => AccountPage()
     };
