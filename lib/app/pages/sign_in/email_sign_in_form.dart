@@ -37,6 +37,13 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
   EmailSignInModel get model => widget.model;
 
   @override
+  void initState() {
+    super.initState();
+    _emailController.text = model.email;
+    _passwordController.text = model.password;
+  }
+
+  @override
   void dispose() {
     print('dispose called');
     _emailController.dispose();
@@ -76,8 +83,6 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
 
   void _toggleFormType(EmailSignInFormType toggleForm) {
     model.toggleFormType(toggleForm);
-    // _emailController.clear();
-    // _passwordController.clear();
   }
 
   List<Widget> _buildChildren() {

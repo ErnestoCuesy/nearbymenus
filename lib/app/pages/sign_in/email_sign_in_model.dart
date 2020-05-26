@@ -127,8 +127,6 @@ class EmailSignInModel with UserCredentialsValidators, ChangeNotifier {
 
   void toggleFormType(EmailSignInFormType toggleForm) {
     updateWith(
-      email: '',
-      password: '',
       formType: toggleForm,
       isLoading: false,
       submitted: false,

@@ -386,7 +386,8 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       textCapitalization: TextCapitalization.words,
       cursorColor: Colors.black,
       decoration: InputDecoration(
-        labelText: 'Restaurant\'s mall, estate name or street where is located',
+        labelText: 'Restaurant\'s location',
+        hintText: 'Shopping mall, estate name or street address',
         errorText: model.restaurantAddress1ErrorText,
         enabled: model.isLoading == false,
       ),
