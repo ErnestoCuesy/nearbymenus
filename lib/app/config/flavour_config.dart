@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
 enum Flavour { PATRON, MANAGER, STAFF }
-enum ColorTheme { PURPLE, BROWN, GREENISH, ORANGE, GREEN }
+enum ColorTheme { PURPLE, ORANGE, GREEN }
 
 class StringUtils {
   static String enumName(String enumToString) {
@@ -22,7 +22,7 @@ class FlavourConfig {
       {@required Flavour flavour,
       @required ColorTheme colorTheme,
       Color bannerColor: Colors.blue,}) {
-    _instance ??= FlavourConfig._internal(
+      _instance ??= FlavourConfig._internal(
       flavour,
       colorTheme,
       StringUtils.enumName(flavour.toString()),
