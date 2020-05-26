@@ -14,7 +14,6 @@ class RestaurantQuery extends StatefulWidget {
 
 class _RestaurantQueryState extends State<RestaurantQuery> {
   NearRestaurantBloc bloc;
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +36,6 @@ class _RestaurantQueryState extends State<RestaurantQuery> {
           stillLoading = false;
         }
         return Scaffold(
-          key: _scaffoldKey,
           appBar: AppBar(
             title: Text(
               'Restaurants near you',
@@ -53,7 +51,6 @@ class _RestaurantQueryState extends State<RestaurantQuery> {
               });
             },
             child: RestaurantList(
-              scaffoldKey: _scaffoldKey,
               nearbyRestaurantsList: restaurantList,
               stillLoading: stillLoading,
             ),

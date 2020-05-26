@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/session/user_details_model.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
@@ -20,11 +21,17 @@ class UserDetailsForm extends StatefulWidget {
   }) {
     final database = Provider.of<Database>(context);
     final session = Provider.of<Session>(context);
+    String role = ROLE_PATRON;
+    if (FlavourConfig.isManager()) {
+      role = ROLE_MANAGER;
+    } else if (FlavourConfig.isStaff()) {
+      role = ROLE_STAFF;
+    }
     return ChangeNotifierProvider<UserDetailsModel>(
       create: (context) => UserDetailsModel(
           session: session,
           database: database,
-          role: session.role,
+          role: role,
           email: userDetails.email,
           userName: userDetails.name,
           userAddress1: userDetails.address1,

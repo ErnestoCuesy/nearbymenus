@@ -51,7 +51,7 @@ class _ManagerAppState extends State<ManagerApp> {
             Provider<IAPManagerBase>(create: (context) => IAPManagerMock(userID: 'test@test.com')),
             Provider<AuthBase>(create: (context) => Auth()),
             Provider<Database>(create: (context) => FirestoreDatabase()),
-            Provider<Session>(create: (context) => Session(position: widget.currentLocation, role: ROLE_MANAGER)),
+            Provider<Session>(create: (context) => Session(position: widget.currentLocation)),
           ],
           child: MaterialApp(
             title: 'Nearby Menus',

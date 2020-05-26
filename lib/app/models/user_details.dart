@@ -1,6 +1,7 @@
 class UserDetails {
   String email;
   String name;
+  String role;
   String address1;
   String address2;
   String address3;
@@ -10,6 +11,7 @@ class UserDetails {
   UserDetails({
     this.email = '',
     this.name = '',
+    this.role = '',
     this.address1 = '',
     this.address2 = '',
     this.address3 = '',
@@ -24,6 +26,7 @@ class UserDetails {
     return UserDetails(
         email: data['email'],
         name: data['name'],
+        role: data['role'] ?? '',
         address1: data['address1'],
         address2: data['address2'],
         address3: data['address3'],
@@ -36,6 +39,7 @@ class UserDetails {
     return {
       'email': email,
       'name': name,
+      'role': role,
       'address1': address1,
       'address2': address2,
       'address3': address3,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -16,9 +17,9 @@ class MessagesListener extends StatefulWidget {
 }
 
 class _MessagesListenerState extends State<MessagesListener> {
-  Session session;
   Database database;
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  String role = ROLE_PATRON;
 
   Future<void> _notifyUser(UserMessage message) async {
     // TODO temp notifications code for testing
@@ -38,14 +39,18 @@ class _MessagesListenerState extends State<MessagesListener> {
 
   @override
   Widget build(BuildContext context) {
-    session = Provider.of<Session>(context);
     database = Provider.of<Database>(context, listen: true);
     flutterLocalNotificationsPlugin =
         Provider.of<FlutterLocalNotificationsPlugin>(context);
+    if (FlavourConfig.isManager()) {
+      role = ROLE_MANAGER;
+    } else if (FlavourConfig.isStaff()) {
+      role = ROLE_STAFF;
+    }
     return StreamBuilder<List<UserMessage>>(
         stream: database.userMessages(
           database.userId,
-          session.role,
+          role,
         ),
         //stream: database.userNotifications(database.userId),
         builder: (context, snapshot) {
@@ -60,7 +65,7 @@ class _MessagesListenerState extends State<MessagesListener> {
             final notificationsList = snapshot.data;
             notificationsList.forEach((message) {
               print('Message for ${message.toRole}');
-              if (message.toRole == session.role &&
+              if (message.toRole == role &&
                   !message.delivered) {
                 _notifyUser(message);
                 UserMessage readMessage = UserMessage(

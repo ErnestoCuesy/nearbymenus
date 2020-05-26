@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/pages/restaurant/menu_and_orders.dart';
 import 'package:nearbymenus/app/pages/session/check_staff_authorization.dart';
@@ -13,11 +14,10 @@ import 'package:nearbymenus/app/models/session.dart';
 import 'package:provider/provider.dart';
 
 class RestaurantList extends StatefulWidget {
-  final GlobalKey<ScaffoldState> scaffoldKey;
   final List<Restaurant> nearbyRestaurantsList;
   final bool stillLoading;
 
-  const RestaurantList({Key key, this.scaffoldKey, this.nearbyRestaurantsList, this.stillLoading}) : super(key: key);
+  const RestaurantList({Key key, this.nearbyRestaurantsList, this.stillLoading}) : super(key: key);
   @override
   _RestaurantListState createState() => _RestaurantListState();
 }
@@ -25,7 +25,7 @@ class RestaurantList extends StatefulWidget {
 class _RestaurantListState extends State<RestaurantList> {
   Session session;
   Database database;
-
+  String role = ROLE_PATRON;
   List<Restaurant> get nearbyRestaurantsList => widget.nearbyRestaurantsList;
 
   Future<void> _confirmContinue(BuildContext context) async {
@@ -57,7 +57,7 @@ class _RestaurantListState extends State<RestaurantList> {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         fullscreenDialog: false,
-        builder: (context) => CheckStaffAuthorization(scaffoldKey: widget.scaffoldKey,),
+        builder: (context) => CheckStaffAuthorization(),
       ),
     );
   }
@@ -66,6 +66,11 @@ class _RestaurantListState extends State<RestaurantList> {
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context, listen: true);
+    if (FlavourConfig.isManager()) {
+      role = ROLE_MANAGER;
+    } else if (FlavourConfig.isStaff()) {
+      role = ROLE_STAFF;
+    }
     if (nearbyRestaurantsList.length > 0) {
       return ListView.builder(
               itemCount: nearbyRestaurantsList.length,
@@ -78,12 +83,13 @@ class _RestaurantListState extends State<RestaurantList> {
                       restaurant: nearbyRestaurantsList[index],
                       restaurantFound: true,
                     ),
-                    // subtitle: _buildSubtitle(index),
                     onTap: () {
-                      if (session.role == ROLE_PATRON) {
+                      if (role == ROLE_PATRON) {
                         _menuAndOrdersPage(context, index);
                       } else {
-                        _staffAuthorizationPage(context, index);
+                        if (nearbyRestaurantsList[index].acceptingStaffRequests) {
+                          _staffAuthorizationPage(context, index);
+                        }
                       }
                     },
                   ),

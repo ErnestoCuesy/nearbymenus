@@ -28,9 +28,9 @@ class _ExpandableListViewState extends State<ExpandableListView> {
 
   Map<String, dynamic> get menu => widget.menu;
 
-  void _addMenuItemToOrder(String menuCode, Map<String, dynamic> menuItem) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
+  void _addMenuItemToOrder(BuildContext context, String menuCode, Map<String, dynamic> menuItem) async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute<String>(
         fullscreenDialog: false,
         builder: (context) => AddToOrder.create(
           context: context,
@@ -40,11 +40,15 @@ class _ExpandableListViewState extends State<ExpandableListView> {
         ),
       ),
     );
-    Scaffold.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Item added to the order.'),
-      ),
-    );
+    if (result == 'Yes') {
+      Scaffold.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text('Item added to the order.'),
+          ),
+        );
+    }
   }
 
   String _menuCode(String menuName) {
@@ -179,7 +183,7 @@ class _ExpandableListViewState extends State<ExpandableListView> {
                       style: Theme.of(context).textTheme.headline6,
                     ),
                     onTap: () =>
-                        _addMenuItemToOrder(_menuCode(menuName), menuItem),
+                        _addMenuItemToOrder(context, _menuCode(menuName), menuItem),
                   ),
                 );
               },

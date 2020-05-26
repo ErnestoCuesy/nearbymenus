@@ -12,15 +12,12 @@ const String ROLE_CHECK_SUBSCRIPTION = 'Subscription';
 
 class Session {
   final Position position;
-  final String role;
   UserDetails userDetails = UserDetails();
   Restaurant currentRestaurant;
-  bool restaurantsFound = false;
   Subscription subscription = Subscription();
-  bool restaurantAccessGranted = false;
   Order currentOrder;
 
-  Session({this.position, this.role});
+  Session({this.position});
 
   void setUserDetails(UserDetails userDetails) {
     this.userDetails = userDetails;

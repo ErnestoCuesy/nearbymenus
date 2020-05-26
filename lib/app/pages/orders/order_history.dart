@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/common_widgets/list_items_builder.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/orders/view_order.dart';
@@ -27,19 +28,22 @@ class _OrderHistoryState extends State<OrderHistory> {
   Stream<List<Order>> stream;
   List<Order> blockedOrders;
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  String role = ROLE_PATRON;
 
   Widget _buildContents(BuildContext context) {
+    String lockedString = '';
     stream = database.userOrders(
       session.currentRestaurant.id,
       database.userId,
     );
-    if (session.role != ROLE_PATRON) {
+    if (role != ROLE_PATRON) {
       stream = database.restaurantOrders(
         session.currentRestaurant.id,
       );
     }
     if (widget.showBlocked) {
       stream =  database.blockedOrders(database.userId);
+      lockedString = 'locked';
     }
     return StreamBuilder<List<Order>>(
       stream: stream,
@@ -47,15 +51,15 @@ class _OrderHistoryState extends State<OrderHistory> {
         blockedOrders = snapshot.data;
         return ListItemsBuilder<Order>(
             title: 'Orders',
-            message: 'There are no orders',
+            message: 'There are no $lockedString orders',
             snapshot: snapshot,
             itemBuilder: (context, order) {
               return Card(
-                color: session.role != ROLE_PATRON && order.isBlocked ? Colors.redAccent : Theme.of(context).canvasColor,
+                color: role != ROLE_PATRON && order.isBlocked ? Colors.redAccent : Theme.of(context).canvasColor,
                 margin: EdgeInsets.all(12.0),
                 child: ListTile(
                   isThreeLine: true,
-                  leading: session.role != ROLE_PATRON && order.isBlocked ? Icon(Icons.lock) : Icon(Icons.receipt),
+                  leading: role != ROLE_PATRON && order.isBlocked ? Icon(Icons.lock) : Icon(Icons.receipt),
                   title: Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Column(
@@ -98,7 +102,7 @@ class _OrderHistoryState extends State<OrderHistory> {
                     f.format(order.orderTotal),
                     style: Theme.of(context).textTheme.headline6,
                   ),
-                  onTap: session.role != ROLE_PATRON && order.isBlocked ? null : () => _viewOrder(context, order),
+                  onTap: role != ROLE_PATRON && order.isBlocked ? null : () => _viewOrder(context, order),
                 ),
               );
             });
@@ -168,6 +172,11 @@ class _OrderHistoryState extends State<OrderHistory> {
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
+    if (FlavourConfig.isManager()) {
+      role = ROLE_MANAGER;
+    } else if (FlavourConfig.isStaff()) {
+      role = ROLE_STAFF;
+    }
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(

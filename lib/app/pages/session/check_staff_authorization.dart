@@ -8,9 +8,6 @@ import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
 class CheckStaffAuthorization extends StatefulWidget {
-  final GlobalKey<ScaffoldState> scaffoldKey;
-
-  const CheckStaffAuthorization({Key key, this.scaffoldKey}) : super(key: key);
 
   @override
   _CheckStaffAuthorizationState createState() => _CheckStaffAuthorizationState();
@@ -24,7 +21,6 @@ class _CheckStaffAuthorizationState extends State<CheckStaffAuthorization> {
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context, listen: true);
-    session.restaurantAccessGranted = false;
     return StreamBuilder<Authorizations>(
       stream: database.authorizationsStream(session.currentRestaurant.id),
       builder: (context, snapshot) {
@@ -38,11 +34,10 @@ class _CheckStaffAuthorizationState extends State<CheckStaffAuthorization> {
         if (snapshot.hasData) {
           final Authorizations authorizations = snapshot.data;
           if (authorizations.authorizedRoles[database.userId] == 'Staff') {
-            session.restaurantAccessGranted = true;
             return OrderHistory(showBlocked: false);
           }
         }
-        return StaffAuthorizationPage(scaffoldKey: widget.scaffoldKey,);
+        return StaffAuthorizationPage();
       }
     );
   }

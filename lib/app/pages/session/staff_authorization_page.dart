@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:nearbymenus/app/common_widgets/custom_raised_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/models/session.dart';
-import 'package:nearbymenus/app/utilities/logo_image_asset.dart';
 import 'package:provider/provider.dart';
 
 class StaffAuthorizationPage extends StatefulWidget {
-  final GlobalKey<ScaffoldState> scaffoldKey;
-
-  const StaffAuthorizationPage({Key key, this.scaffoldKey,}) : super(key: key);
 
   @override
   _StaffAuthorizationPageState createState() => _StaffAuthorizationPageState();
@@ -22,39 +19,47 @@ class _StaffAuthorizationPageState extends State<StaffAuthorizationPage> {
   Database database;
   bool staffRequestPending = false;
   Restaurant get restaurant => session.currentRestaurant;
+  double buttonSize = 180.0;
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   List<Widget> _buildAccountDetails(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    final imageAsset = Provider.of<LogoImageAsset>(context);
     final staffAccessSubtitle =
         'You are not allowed to access orders';
-    var restaurantStatusTitle = '';
-    if (!session.restaurantAccessGranted) {
-      restaurantStatusTitle = restaurant.acceptingStaffRequests
-          ? 'Tap to request access'
-          : 'Restaurant is not accepting staff requests at the moment';
-    }
     return [
-      Container(
-        width: screenWidth / 4,
-        height: screenHeight / 4,
-        child: imageAsset.image,
+      Text(
+          '${restaurant.name}',
+          style: Theme.of(context).primaryTextTheme.headline4
       ),
       SizedBox(
         height: 16.0,
       ),
-      // STAFF STATUS SECTION
-      _userDetailsSection(
-        sectionTitle: '${session.currentRestaurant.name} access status',
-        cardTitle: staffAccessSubtitle,
-        cardSubtitle: restaurantStatusTitle,
-        onPressed: session.currentRestaurant.acceptingStaffRequests &&
-            !staffRequestPending &&
-            !session.restaurantAccessGranted
-            ? () => _requestRestaurantAccess(context)
-            : null,
+      Text(
+          staffAccessSubtitle,
+          style: Theme.of(context).primaryTextTheme.headline6
       ),
+      SizedBox(
+      height: 32.0,
+      ),
+      CustomRaisedButton(
+            height: buttonSize,
+            width: buttonSize,
+            color: Theme.of(context).buttonTheme.colorScheme.surface,
+        onPressed: () => _requestRestaurantAccess(context),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Request Access',
+              style: Theme.of(context).accentTextTheme.headline6,
+            ),
+            SizedBox(height: 16.0,),
+            Icon(
+              Icons.error_outline,
+              size: 36.0,
+            ),
+          ],
+        )
+      )
     ];
   }
 
@@ -86,62 +91,13 @@ class _StaffAuthorizationPageState extends State<StaffAuthorizationPage> {
         type: 'Access to ${session.currentRestaurant.name}',
         authFlag: false,
       ));
-      Navigator.of(context).pop();
-      widget.scaffoldKey.currentState.showSnackBar(
+      //Navigator.of(context).pop();
+      _scaffoldKey.currentState.showSnackBar(
         SnackBar(
           content: Text('Access request sent, pending approval... please wait'),
         ),
       );
     }
-  }
-
-  Widget _userDetailsSection(
-      {String sectionTitle,
-        String cardTitle,
-        String cardSubtitle,
-        VoidCallback onPressed}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(left: 16.0, top: 8.0),
-          child: Text(
-            sectionTitle,
-            style: Theme.of(context).primaryTextTheme.headline5,
-          ),
-        ),
-        SizedBox(
-          height: 8.0,
-        ),
-        Card(
-          child: ListTile(
-            title: Text(
-              cardTitle,
-            ),
-            subtitle: Text(
-              cardSubtitle,
-            ),
-            trailing: IconButton(
-              icon: Icon(Icons.error_outline),
-              onPressed: onPressed,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildContents(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: _buildAccountDetails(context),
-        ),
-      ),
-    );
   }
 
   @override
@@ -150,13 +106,19 @@ class _StaffAuthorizationPageState extends State<StaffAuthorizationPage> {
     database = Provider.of<Database>(context);
     var accountText = 'Your access status';
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text(
           accountText,
           style: Theme.of(context).primaryTextTheme.headline6,
         ),
       ),
-      body: _buildContents(context),
+      body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: _buildAccountDetails(context),
+          ),
+      ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     );
   }

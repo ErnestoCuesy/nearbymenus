@@ -74,12 +74,12 @@ class _MenuAndOrdersState extends State<MenuAndOrders> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Order history',
+              'Orders',
               style: Theme.of(context).accentTextTheme.headline6,
             ),
             SizedBox(height: 16.0,),
             Icon(
-              Icons.update,
+              Icons.assignment,
               size: 36.0,
             ),
           ],

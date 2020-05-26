@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nearbymenus/app/common_widgets/list_items_builder.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/authorizations.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
@@ -16,10 +17,10 @@ class MessagesPage extends StatefulWidget {
 }
 
 class _MessagesPageState extends State<MessagesPage> {
-  Session session;
   Database database;
   Authorizations authorizations =
       Authorizations(authorizedRoles: {}, authorizedNames: {});
+  String role = ROLE_PATRON;
 
   void _getAuthorizations(UserMessage message) async {
     await database.authorizationsSnapshot().then((authorizationsList) {
@@ -56,11 +57,15 @@ class _MessagesPageState extends State<MessagesPage> {
   }
 
   Widget _buildContents(BuildContext context) {
-
+    if (FlavourConfig.isManager()) {
+      role = ROLE_MANAGER;
+    } else if (FlavourConfig.isStaff()) {
+      role = ROLE_STAFF;
+    }
     return StreamBuilder<List<UserMessage>>(
       stream: database.userMessages(
         database.userId,
-        session.role,
+        role,
       ),
       builder: (context, snapshot) {
         return ListItemsBuilder<UserMessage>(
@@ -174,7 +179,6 @@ class _MessagesPageState extends State<MessagesPage> {
 
   @override
   Widget build(BuildContext context) {
-    session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
     return Scaffold(
       appBar: AppBar(

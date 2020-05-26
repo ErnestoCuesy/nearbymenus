@@ -92,7 +92,9 @@ class _ViewOrderState extends State<ViewOrder> {
 
   void _save(BuildContext context) {
     model.save();
-    scaffoldKey.currentState.showSnackBar(
+    scaffoldKey.currentState
+      ..removeCurrentSnackBar()
+      ..showSnackBar(
       SnackBar(
         content: Text(
             'Order successfully placed at ${session.currentRestaurant.name}!'

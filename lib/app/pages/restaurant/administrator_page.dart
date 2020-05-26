@@ -131,7 +131,7 @@ class _AdministratorPageState extends State<AdministratorPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'All orders',
+                  'All Orders',
                   style: Theme.of(context).accentTextTheme.headline6,
                 ),
                 SizedBox(height: 8.0,),
@@ -158,7 +158,7 @@ class _AdministratorPageState extends State<AdministratorPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Locked orders',
+                  'Locked Orders',
                   style: Theme.of(context).accentTextTheme.headline6,
                 ),
                 SizedBox(height: 8.0,),

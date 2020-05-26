@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:nearbymenus/app/models/session.dart';
 
 enum TabItem {
   restaurant,
@@ -12,23 +11,8 @@ enum TabItem {
 abstract class RoleEnumBase {
   List<TabItem> roleEnumList;
   
-  static RoleEnumBase getRoleTabItems(String role) {
-    RoleEnumBase items;
-    switch (role) {
-      case ROLE_PATRON: {
-        items = PatronRoleEnum();
-      }
-      break;
-      case ROLE_MANAGER: {
-        items = ManagerRoleEnum();
-      }
-      break;
-      case ROLE_STAFF: {
-        items = StaffRoleEnum();
-      }
-      break;
-    }
-    return items;
+  static RoleEnumBase getRoleTabItems() {
+    return RoleEnum();
   }
 
   static List<BottomNavigationBarItem> itemsForRole(BuildContext context, TabItem currentTab, RoleEnumBase roleTabItems) {
@@ -55,23 +39,7 @@ abstract class RoleEnumBase {
 
 }
 
-class PatronRoleEnum extends RoleEnumBase {
-  List<TabItem> roleEnumList = const [
-    TabItem.menu,
-    TabItem.messages,
-    TabItem.userAccount,
-  ];
-}
-
-class ManagerRoleEnum extends RoleEnumBase {
-  final List<TabItem> roleEnumList = const [
-    TabItem.restaurant,
-    TabItem.messages,
-    TabItem.userAccount,
-  ];
-}
-
-class StaffRoleEnum extends RoleEnumBase {
+class RoleEnum extends RoleEnumBase {
   List<TabItem> roleEnumList = const [
     TabItem.restaurant,
     TabItem.messages,
@@ -88,8 +56,6 @@ class TabItemData {
   static const Map<TabItem, TabItemData> allTabs = {
     TabItem.restaurant:
     TabItemData(title: 'Restaurants', icon: Icons.home),
-    TabItem.menu:
-    TabItemData(title: 'Menu', icon: Icons.fastfood),
     TabItem.messages:
     TabItemData(title: 'Messages', icon: Icons.message),
     TabItem.userAccount:

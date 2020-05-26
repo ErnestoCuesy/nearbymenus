@@ -60,7 +60,7 @@ class _AddToOrderState extends State<AddToOrder> {
 
   void _save() {
     model.save();
-    Navigator.of(context).pop();
+    Navigator.pop(context, 'Yes');
   }
 
   Widget _buildContents(BuildContext context) {

@@ -88,7 +88,12 @@ class _RestaurantPageState extends State<RestaurantPage> {
                   margin: EdgeInsets.all(12.0),
                   child: ListTile(
                     isThreeLine: true,
-                    leading: Icon(Icons.restaurant),
+                    leading: IconButton(
+                      onPressed: () => _createRestaurantDetailsPage(context, restaurant),
+                      icon: Icon(
+                        Icons.edit,
+                      ),
+                    ),
                     title: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
@@ -129,12 +134,9 @@ class _RestaurantPageState extends State<RestaurantPage> {
                         );
                       },
                       icon: Icon(
-                        Icons.more_vert,
+                        Icons.arrow_forward,
                       ),
                     ),
-                    //trailing: Icon(Icons.edit),
-                    onTap: () =>
-                        _createRestaurantDetailsPage(context, restaurant),
                   ),
                 ),
               );

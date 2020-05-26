@@ -38,6 +38,7 @@ class UserDetailsModel with UserDetailsValidators, ChangeNotifier {
     final userDetails = UserDetails(
       email: email,
       name: userName,
+      role: role,
       address1: userAddress1,
       address2: userAddress2,
       address3: userAddress3,

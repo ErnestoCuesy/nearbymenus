@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 
 class RestaurantListTile extends StatelessWidget {
@@ -26,9 +27,40 @@ class RestaurantListTile extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            restaurant.name,
-            style: Theme.of(context).textTheme.headline5,
+          Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Container(
+                  width: 300.00,
+                  child: Text(
+                    restaurant.name,
+                    style: Theme.of(context).textTheme.headline5,
+                  ),
+                ),
+                if (!restaurant.acceptingStaffRequests && FlavourConfig.isStaff())
+                Container(
+                  width: 30.00,
+                    child: Icon(
+                      Icons.remove_circle,
+                      color: Colors.red,
+                    ),
+                ),
+                if (restaurant.acceptingStaffRequests  && FlavourConfig.isStaff())
+                  Container(
+                    width: 30.00,
+                    child: Icon(
+                      Icons.check_circle_outline,
+                      color: Colors.green,
+                    ),
+                  ),
+                if (FlavourConfig.isPatron())
+                  Container(
+                    width: 30.00,
+                  )
+              ],
+            ),
           ),
           SizedBox(
             height: 8.0,
@@ -38,27 +70,12 @@ class RestaurantListTile extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(4.0),
                 child: Icon(
-                  Icons.home,
+                  Icons.location_on,
                   size: 20.0,
                 ),
               ),
               Text(
-                restaurant.address1,
-              ),
-            ],
-          ),
-          if (restaurant.address2 != '')
-          Row(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Icon(
-                  Icons.arrow_right,
-                  size: 20.0,
-                ),
-              ),
-              Text(
-                restaurant.address2,
+                '${restaurant.address1}, ${restaurant.address2}',
               ),
             ],
           ),
@@ -73,22 +90,7 @@ class RestaurantListTile extends StatelessWidget {
                 ),
               ),
               Text(
-                restaurant.address3,
-              ),
-            ],
-          ),
-          if (restaurant.address4 != '')
-          Row(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Icon(
-                  Icons.arrow_right,
-                  size: 20.0,
-                ),
-              ),
-              Text(
-                restaurant.address4,
+                '${restaurant.address3}, ${restaurant.address4}',
               ),
             ],
           ),
