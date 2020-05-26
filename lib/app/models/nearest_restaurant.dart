@@ -8,7 +8,6 @@ class NearestRestaurant {
   final double distance;
 
   NearestRestaurant({this.id, this.restaurant, this.distance});
-
 }
 
 class NearRestaurantBloc {
@@ -16,16 +15,24 @@ class NearRestaurantBloc {
   final Position userCoordinates;
   final _stream = StreamController<List<Restaurant>>();
 
-  NearRestaurantBloc({this.source, this.userCoordinates,}) {
+  NearRestaurantBloc({
+    this.source,
+    this.userCoordinates,
+  }) {
     List<Restaurant> resList = List<Restaurant>();
     source.then((rest) {
       rest.forEach((res) async {
-        await Geolocator().distanceBetween(userCoordinates.latitude, userCoordinates.longitude, res.coordinates.latitude, res.coordinates.longitude).then((distance) {
+        await Geolocator().distanceBetween(
+          userCoordinates.latitude,
+          userCoordinates.longitude,
+          res.coordinates.latitude,
+          res.coordinates.longitude,
+        ).then((distance) {
           if (res.active && distance < res.deliveryRadius) {
             resList.add(res);
           }
         });
-      _stream.add(resList);
+        _stream.add(resList);
       });
     });
   }
@@ -35,5 +42,4 @@ class NearRestaurantBloc {
   void dispose() {
     _stream.close();
   }
-
 }
