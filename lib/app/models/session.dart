@@ -20,7 +20,7 @@ class Session {
   Session({this.position});
 
   void setUserDetails(UserDetails userDetails) {
-    this.userDetails = userDetails;
+    this.userDetails = userDetails != null ? userDetails : this.userDetails;
   }
 
   void setSubscription(Subscription subscription) {
