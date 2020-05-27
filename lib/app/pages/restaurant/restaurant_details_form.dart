@@ -132,7 +132,7 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
     super.dispose();
   }
 
-  Future<void> _save() async {
+  Future<void> _save(BuildContext context) async {
     try {
       // await Future.delayed(Duration(seconds: 3)); // Simulate slow network
       final useCurrentLocation = await PlatformAlertDialog(
@@ -211,7 +211,7 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
     FocusScope.of(context).requestFocus(_hoursFromFocusNode);
   }
 
-  List<Widget> _buildChildren() {
+  List<Widget> _buildChildren(BuildContext context) {
     return [
       _buildRestaurantNameTextField(),
       SizedBox(
@@ -323,9 +323,9 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
         context: context,
         text: model.primaryButtonText,
         color: model.canSave
-            ? Theme.of(context).primaryColor
+            ? Theme.of(context).backgroundColor
             : Theme.of(context).disabledColor,
-        onPressed: model.canSave ? _save : null,
+        onPressed: model.canSave ? () => _save(context) : null,
       ),
       SizedBox(
         height: 8.0,
@@ -494,6 +494,7 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       cursorColor: Colors.black,
       decoration: InputDecoration(
         labelText: 'Telephone number',
+        errorText: model.telephoneNumberErrorText,
         enabled: model.isLoading == false,
       ),
       autocorrect: false,
@@ -619,7 +620,7 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
-          children: _buildChildren(),
+          children: _buildChildren(context),
         ),
       ),
     );

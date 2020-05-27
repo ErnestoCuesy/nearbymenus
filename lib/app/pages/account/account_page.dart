@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
+import 'package:nearbymenus/app/pages/orders/order_history.dart';
 import 'package:nearbymenus/app/pages/session/upsell_screen.dart';
 import 'package:nearbymenus/app/pages/session/user_details_form.dart';
 import 'package:nearbymenus/app/services/auth.dart';
@@ -99,7 +100,7 @@ class _AccountPageState extends State<AccountPage> {
       if (FlavourConfig.isManager())
         _userDetailsSection(
           sectionTitle: 'Bundle details',
-          cardTitle: session.subscription.subscriptionTypeString,
+          cardTitle: 'Orders left: ',
           cardSubtitle:
               'Last purchase was on: ${session.subscription.latestExpirationDate}',
           onPressed: () {
@@ -115,6 +116,17 @@ class _AccountPageState extends State<AccountPage> {
             });
           },
         ),
+      if (FlavourConfig.isManager())
+        _userDetailsSection(
+          sectionTitle: 'Locked orders',
+          cardTitle: 'Tap to see and unlock orders across all your restaurants',
+          cardSubtitle: '',
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (BuildContext context) => OrderHistory(showBlocked: true,),
+            ),
+          ),
+        ),
     ];
   }
 
@@ -125,7 +137,7 @@ class _AccountPageState extends State<AccountPage> {
         ordersLeft = value;
       }
     }).catchError((_) => null);
-    print('Orders left: $ordersLeft');
+    print('Orders left: ');
     return ordersLeft;
   }
 
@@ -156,7 +168,7 @@ class _AccountPageState extends State<AccountPage> {
               cardSubtitle,
             ),
             trailing: IconButton(
-              icon: Icon(Icons.edit),
+              icon: Icon(Icons.arrow_forward),
               onPressed: onPressed,
             ),
           ),

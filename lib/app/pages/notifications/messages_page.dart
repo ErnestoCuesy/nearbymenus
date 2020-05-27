@@ -69,8 +69,8 @@ class _MessagesPageState extends State<MessagesPage> {
       ),
       builder: (context, snapshot) {
         return ListItemsBuilder<UserMessage>(
-            title: 'Notifications',
-            message: 'You don\'t have notifications',
+            title: 'Messages',
+            message: 'You don\'t have messages',
             snapshot: snapshot,
             itemBuilder: (context, message) {
               return Dismissible(

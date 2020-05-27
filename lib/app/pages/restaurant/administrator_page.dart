@@ -86,34 +86,7 @@ class _AdministratorPageState extends State<AdministratorPage> {
         ],
       ),
       SizedBox(
-        height: 8.0,
-      ),
-      CustomRaisedButton(
-        height: buttonSize,
-        width: buttonSize,
-        color: Theme.of(context).buttonTheme.colorScheme.surface,
-        onPressed: () => Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (BuildContext context) => ExpandableMenuBrowser(),
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Menu Browser',
-              style: Theme.of(context).accentTextTheme.headline6,
-            ),
-            SizedBox(height: 8.0,),
-            Icon(
-              Icons.import_contacts,
-              size: 36.0,
-            ),
-          ],
-        ),
-      ),
-      SizedBox(
-        height: 8.0,
+        height: 16.0,
       ),
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -124,19 +97,19 @@ class _AdministratorPageState extends State<AdministratorPage> {
             color: Theme.of(context).buttonTheme.colorScheme.surface,
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (BuildContext context) => OrderHistory(showBlocked: false,),
+                builder: (BuildContext context) => ExpandableMenuBrowser(),
               ),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'All Orders',
+                  'Menu Browser',
                   style: Theme.of(context).accentTextTheme.headline6,
                 ),
                 SizedBox(height: 8.0,),
                 Icon(
-                  Icons.assignment,
+                  Icons.import_contacts,
                   size: 36.0,
                 ),
               ],
@@ -151,19 +124,19 @@ class _AdministratorPageState extends State<AdministratorPage> {
             color: Theme.of(context).buttonTheme.colorScheme.surface,
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (BuildContext context) => OrderHistory(showBlocked: true,),
+                builder: (BuildContext context) => OrderHistory(showBlocked: false,),
               ),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Locked Orders',
+                  'Orders',
                   style: Theme.of(context).accentTextTheme.headline6,
                 ),
                 SizedBox(height: 8.0,),
                 Icon(
-                  Icons.lock,
+                  Icons.assignment,
                   size: 36.0,
                 ),
               ],
