@@ -7,7 +7,7 @@ import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/orders/view_order.dart';
-import 'package:nearbymenus/app/pages/session/upsell_screen.dart';
+import 'package:nearbymenus/app/pages/user/upsell_screen.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/utilities/format.dart';
 import 'package:provider/provider.dart';

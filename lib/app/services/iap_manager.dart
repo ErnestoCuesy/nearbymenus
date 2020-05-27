@@ -202,7 +202,7 @@ class IAPManager implements IAPManagerBase {
   Future<void> init() async {
     Purchases.setDebugLogsEnabled(true);
     // TODO add user ID below
-    await Purchases.setup("FoiMDaBFSSGwOphzusDBzgaRIuhFytmt");
+    await Purchases.setup("AeegEYeSxBwqtfZXZtbeMWVTOnAhyxiA");
     // await Purchases.setAllowSharingStoreAccount(true);
     // Purchases.addAttributionData({}, PurchasesAttributionNetwork.facebook);
     _purchaserInfo = await Purchases.getPurchaserInfo();

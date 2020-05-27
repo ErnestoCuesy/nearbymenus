@@ -98,7 +98,7 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       _restaurantAddress2Controller.text = model.address2 ?? null;
       _restaurantAddress3Controller.text = model.address3 ?? null;
       _restaurantAddress4Controller.text = model.address4 ?? null;
-      _deliveryRadiusController.text = model.deliveryRadius.toString() ?? null;
+      _deliveryRadiusController.text = model.deliveryRadius.toString() ?? 0;
       _notesController.text = model.notes ?? null;
       _telephoneNumberController.text = model.telephoneNumber ?? null;
       _openFrom = model.workingHoursFrom ?? null;
@@ -471,7 +471,7 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       focusNode: _deliveryRadiusFocusNode,
       cursorColor: Colors.black,
       decoration: InputDecoration(
-        labelText: 'Restaurant discovery radius (in metres)',
+        labelText: 'Discovery radius (in metres)',
         hintText: 'i.e.: 1000',
         errorText: model.deliveryRadiusErrorText,
         enabled: model.isLoading == false,

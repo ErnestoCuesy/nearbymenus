@@ -6,9 +6,9 @@ import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
-import 'package:nearbymenus/app/pages/restaurant/menu_and_orders.dart';
-import 'package:nearbymenus/app/pages/session/check_staff_authorization.dart';
-import 'package:nearbymenus/app/pages/session/restaurant_list_tile.dart';
+import 'package:nearbymenus/app/pages/restaurant/menu_and_orders_page.dart';
+import 'package:nearbymenus/app/pages/restaurant/check_staff_authorization.dart';
+import 'package:nearbymenus/app/pages/restaurant/restaurant_list_tile.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:provider/provider.dart';
@@ -47,7 +47,7 @@ class _RestaurantListState extends State<RestaurantList> {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         fullscreenDialog: false,
-        builder: (context) => MenuAndOrders(),
+        builder: (context) => MenuAndOrdersPage(),
       ),
     );
   }

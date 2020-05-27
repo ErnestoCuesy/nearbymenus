@@ -48,7 +48,7 @@ class _ManagerAppState extends State<ManagerApp> {
                 selectNotificationSubject: widget.selectNotificationSubject),
             ),
             Provider<LogoImageAsset>(create: (context) => LogoImageAsset()),
-            Provider<IAPManagerBase>(create: (context) => IAPManagerMock(userID: 'test@test.com')),
+            Provider<IAPManagerBase>(create: (context) => IAPManager(userID: 'test@test.com')),
             Provider<AuthBase>(create: (context) => Auth()),
             Provider<Database>(create: (context) => FirestoreDatabase()),
             Provider<Session>(create: (context) => Session(position: widget.currentLocation)),

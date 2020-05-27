@@ -5,14 +5,14 @@ import 'package:nearbymenus/app/pages/menu_browser/expandable_menu_browser.dart'
 import 'package:nearbymenus/app/pages/orders/order_history.dart';
 import 'package:provider/provider.dart';
 
-class MenuAndOrders extends StatefulWidget {
+class MenuAndOrdersPage extends StatefulWidget {
 
   @override
-  _MenuAndOrdersState createState() =>
-      _MenuAndOrdersState();
+  _MenuAndOrdersPageState createState() =>
+      _MenuAndOrdersPageState();
 }
 
-class _MenuAndOrdersState extends State<MenuAndOrders> {
+class _MenuAndOrdersPageState extends State<MenuAndOrdersPage> {
   Session session;
 
   void _expandableMenuBrowserPage(BuildContext context) {

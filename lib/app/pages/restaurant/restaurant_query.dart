@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/models/nearest_restaurant.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
-import 'package:nearbymenus/app/pages/session/restaurant_list.dart';
+import 'package:nearbymenus/app/pages/restaurant/restaurant_list.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:provider/provider.dart';

@@ -36,7 +36,6 @@ lib/generated_plugin_registrant.dart
 # API keys and signing files
 android/key.properties
 android/app/google-services.json
-android/app/src/dev/google-services.json
 ios/Runner/GoogleService-Info.plist
 
 # Exceptions to above rules.

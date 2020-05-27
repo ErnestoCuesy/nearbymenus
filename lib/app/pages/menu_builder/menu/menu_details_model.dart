@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/models/menu.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
-import 'package:nearbymenus/app/pages/sign_in/validators.dart';
+import 'package:nearbymenus/app/utilities/validators.dart';
 import 'package:nearbymenus/app/services/database.dart';
 
 class MenuDetailsModel with RestaurantMenuValidators, ChangeNotifier {

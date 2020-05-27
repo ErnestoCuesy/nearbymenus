@@ -1,6 +1,6 @@
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
-import 'package:nearbymenus/app/pages/sign_in/validators.dart';
+import 'package:nearbymenus/app/utilities/validators.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:flutter/foundation.dart';
 

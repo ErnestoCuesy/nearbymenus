@@ -3,8 +3,8 @@ import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/pages/orders/order_history.dart';
-import 'package:nearbymenus/app/pages/session/upsell_screen.dart';
-import 'package:nearbymenus/app/pages/session/user_details_form.dart';
+import 'package:nearbymenus/app/pages/user/upsell_screen.dart';
+import 'package:nearbymenus/app/pages/user/user_details_form.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/models/session.dart';
@@ -100,7 +100,7 @@ class _AccountPageState extends State<AccountPage> {
       if (FlavourConfig.isManager())
         _userDetailsSection(
           sectionTitle: 'Bundle details',
-          cardTitle: 'Orders left: ',
+          cardTitle: 'Orders left: ${session.subscription.purchaserInfo.entitlements.active}',
           cardSubtitle:
               'Last purchase was on: ${session.subscription.latestExpirationDate}',
           onPressed: () {

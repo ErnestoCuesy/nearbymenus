@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
-import 'package:nearbymenus/app/pages/sign_in/validators.dart';
+import 'package:nearbymenus/app/utilities/validators.dart';
 import 'package:nearbymenus/app/services/database.dart';
 
 class UserDetailsModel with UserDetailsValidators, ChangeNotifier {

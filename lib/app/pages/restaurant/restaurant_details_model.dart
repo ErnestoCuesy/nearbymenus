@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
-import 'package:nearbymenus/app/pages/sign_in/validators.dart';
+import 'package:nearbymenus/app/utilities/validators.dart';
 import 'package:nearbymenus/app/services/database.dart';
 
 class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
@@ -108,8 +108,6 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
           restaurantOptions: restaurantOptions,
         ),
       );
-      session.userDetails.orderOnHold = null;
-      await database.setUserDetails(session.userDetails);
     } catch (e) {
       print(e);
       updateWith(isLoading: false);

@@ -4,7 +4,7 @@ import 'package:nearbymenus/app/models/option.dart';
 import 'package:nearbymenus/app/models/option_item.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
-import 'package:nearbymenus/app/pages/sign_in/validators.dart';
+import 'package:nearbymenus/app/utilities/validators.dart';
 import 'package:nearbymenus/app/services/database.dart';
 
 class OptionItemDetailsModel with OptionItemValidators, ChangeNotifier {

@@ -26,6 +26,14 @@ class NumericFieldValidator implements NumberValidator{
   }
 }
 
+class GreaterThanZeroValidator implements NumberValidator{
+  @override
+  bool isValid(int value) {
+    if (value == null || value.toString().isEmpty || value.isNaN || value < 1) return false;
+    return true;
+  }
+}
+
 class DoubleNumericFieldValidator implements DoubleNumberValidator{
   @override
   bool isValid(double value) {
@@ -54,12 +62,12 @@ class RestaurantDetailsValidators {
   final StringValidator restaurantNameValidator = NonEmptyStringValidator();
   final StringValidator restaurantAddress1Validator = NonEmptyStringValidator();
   final StringValidator typeOfFoodValidator = NonEmptyStringValidator();
-  final NumberValidator deliveryRadiusValidator = NumericFieldValidator();
+  final NumberValidator deliveryRadiusValidator = GreaterThanZeroValidator();
   final StringValidator telephoneNumberValidator = NonEmptyStringValidator();
   final String invalidRestaurantNameErrorText = 'Restaurant name can\'t be empty';
   final String invalidRestaurantAddress1ErrorText = 'Restaurant address can\'t be empty';
   final String invalidTypeOfFoodErrorText = 'Type of food can\'t be empty';
-  final String invalidDeliveryRadiusErrorText = 'Delivery radius can\'t be empty';
+  final String invalidDeliveryRadiusErrorText = 'Discovery radius must be greater than zero';
   final String invalidTelephoneNumberErrorText = 'Telephone number can\'t be empty';
 }
 

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
-import 'package:nearbymenus/app/pages/account/account_page.dart';
+import 'package:nearbymenus/app/pages/user/account_page.dart';
 import 'package:nearbymenus/app/pages/home/cupertino_home_scaffold.dart';
 import 'package:nearbymenus/app/pages/home/tab_item.dart';
-import 'package:nearbymenus/app/pages/notifications/messages_page.dart';
+import 'package:nearbymenus/app/pages/messages/messages_page.dart';
 import 'package:nearbymenus/app/pages/restaurant/restaurant_page.dart';
-import 'package:nearbymenus/app/pages/session/restaurant_query.dart';
+import 'package:nearbymenus/app/pages/restaurant/restaurant_query.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
