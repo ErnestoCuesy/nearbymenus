@@ -39,22 +39,13 @@ class RestaurantListTile extends StatelessWidget {
                     style: Theme.of(context).textTheme.headline5,
                   ),
                 ),
-                if (!restaurant.acceptingStaffRequests && FlavourConfig.isStaff())
+                if (FlavourConfig.isStaff())
                 Container(
                   width: 30.00,
                     child: Icon(
-                      Icons.remove_circle,
-                      color: Colors.red,
+                      Icons.arrow_forward,
                     ),
                 ),
-                if (restaurant.acceptingStaffRequests  && FlavourConfig.isStaff())
-                  Container(
-                    width: 30.00,
-                    child: Icon(
-                      Icons.check_circle_outline,
-                      color: Colors.green,
-                    ),
-                  ),
                 if (FlavourConfig.isPatron())
                   Container(
                     width: 30.00,

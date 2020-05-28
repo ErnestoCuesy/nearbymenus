@@ -87,9 +87,9 @@ class _RestaurantListState extends State<RestaurantList> {
                       if (role == ROLE_PATRON) {
                         _menuAndOrdersPage(context, index);
                       } else {
-                        if (nearbyRestaurantsList[index].acceptingStaffRequests) {
+                        //if (nearbyRestaurantsList[index].acceptingStaffRequests) {
                           _staffAuthorizationPage(context, index);
-                        }
+                        //}
                       }
                     },
                   ),

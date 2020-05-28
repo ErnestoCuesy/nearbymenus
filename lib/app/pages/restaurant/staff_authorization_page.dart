@@ -23,8 +23,12 @@ class _StaffAuthorizationPageState extends State<StaffAuthorizationPage> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   List<Widget> _buildAccountDetails(BuildContext context) {
-    final staffAccessSubtitle =
+    String staffAccessSubtitle =
         'You are not allowed to access orders';
+    if (!restaurant.acceptingStaffRequests) {
+      staffAccessSubtitle =
+      'Restaurant is not accepting staff requests';
+    }
     return [
       Text(
           '${restaurant.name}',
@@ -40,6 +44,7 @@ class _StaffAuthorizationPageState extends State<StaffAuthorizationPage> {
       SizedBox(
       height: 32.0,
       ),
+      if (restaurant.acceptingStaffRequests)
       CustomRaisedButton(
             height: buttonSize,
             width: buttonSize,
