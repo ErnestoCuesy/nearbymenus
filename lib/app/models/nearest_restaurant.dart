@@ -11,7 +11,7 @@ class NearestRestaurant {
 }
 
 class NearRestaurantBloc {
-  final Future<List<Restaurant>> source;
+  final Stream<List<Restaurant>> source;
   final Position userCoordinates;
   final _stream = StreamController<List<Restaurant>>();
 
@@ -20,7 +20,8 @@ class NearRestaurantBloc {
     this.userCoordinates,
   }) {
     List<Restaurant> resList = List<Restaurant>();
-    source.then((rest) {
+    source.forEach((rest) {
+      resList.clear();
       rest.forEach((res) async {
         await Geolocator().distanceBetween(
           userCoordinates.latitude,
@@ -39,7 +40,4 @@ class NearRestaurantBloc {
 
   Stream<List<Restaurant>> get stream => _stream.stream;
 
-  void dispose() {
-    _stream.close();
-  }
 }

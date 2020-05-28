@@ -44,26 +44,13 @@ class _RestaurantQueryState extends State<RestaurantQuery> {
             elevation: 2.0,
           ),
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          body: RefreshIndicator(
-            onRefresh: () async {
-              setState(() {
-
-              });
-            },
-            child: RestaurantList(
-              nearbyRestaurantsList: restaurantList,
-              stillLoading: stillLoading,
-            ),
+          body: RestaurantList(
+            nearbyRestaurantsList: restaurantList,
+            stillLoading: stillLoading,
           ),
         );
       },
     );
-  }
-
-  @override
-  void dispose() {
-    bloc.dispose();
-    super.dispose();
   }
 
 }
