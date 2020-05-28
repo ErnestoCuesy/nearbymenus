@@ -323,7 +323,7 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
         context: context,
         text: model.primaryButtonText,
         color: model.canSave
-            ? Theme.of(context).backgroundColor
+            ? Theme.of(context).primaryColor
             : Theme.of(context).disabledColor,
         onPressed: model.canSave ? () => _save(context) : null,
       ),

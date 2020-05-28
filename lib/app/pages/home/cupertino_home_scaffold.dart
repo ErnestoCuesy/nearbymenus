@@ -22,7 +22,7 @@ class CupertinoHomeScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoTabScaffold(
       tabBar: CupertinoTabBar(
-        backgroundColor: Theme.of(context).backgroundColor,
+        backgroundColor: Theme.of(context).primaryColor,
         activeColor: Theme.of(context).accentColor,
         items: RoleEnumBase.itemsForRole(context, currentTab, roleTabItems),
         onTap: (index) => onSelectTab(roleTabItems.roleEnumList[index]),

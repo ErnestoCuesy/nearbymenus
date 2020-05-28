@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
 enum Flavour { PATRON, MANAGER, STAFF }
-enum ColorTheme { PURPLE, ORANGE, GREEN }
+enum ColorTheme { BLACK, ORANGE, GREEN }
 
 class StringUtils {
   static String enumName(String enumToString) {
