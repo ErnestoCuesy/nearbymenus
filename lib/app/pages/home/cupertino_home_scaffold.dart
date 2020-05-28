@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/pages/home/tab_item.dart';
 
 class CupertinoHomeScaffold extends StatelessWidget {
@@ -22,7 +23,9 @@ class CupertinoHomeScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoTabScaffold(
       tabBar: CupertinoTabBar(
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: FlavourConfig.isManager()
+            ?  Theme.of(context).primaryColor
+            : Theme.of(context).backgroundColor,
         activeColor: Theme.of(context).accentColor,
         items: RoleEnumBase.itemsForRole(context, currentTab, roleTabItems),
         onTap: (index) => onSelectTab(roleTabItems.roleEnumList[index]),

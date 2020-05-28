@@ -1,8 +1,9 @@
 const int ORDER_ON_HOLD = 0;
 const int ORDER_PLACED = 1;
-const int ORDER_IN_PROGRESS = 2;
+const int ORDER_ACCEPTED = 2;
 const int ORDER_DISPATCHED = 3;
-const int ORDER_CANCELLED = 4;
+const int ORDER_REJECTED = 4;
+const int ORDER_CANCELLED = 5;
 
 class Order {
   final String id;
@@ -96,20 +97,23 @@ class Order {
   String get statusString {
     String stString = '';
     switch (status) {
-      case 0:
+      case ORDER_ON_HOLD:
         stString = 'On hold';
         break;
-      case 1:
+      case ORDER_PLACED:
         stString = 'Placed, pending';
         break;
-      case 2:
-        stString = 'In progress';
+      case ORDER_ACCEPTED:
+        stString = 'Accepted, in progress';
         break;
-      case 3:
-        stString = 'Dispatched';
+      case ORDER_DISPATCHED:
+        stString = 'Completed, dispatched';
         break;
-      case 4:
-        stString = 'Cancelled';
+      case ORDER_REJECTED:
+        stString = 'Rejected by staff';
+        break;
+      case ORDER_CANCELLED:
+        stString = 'Cancelled by patron';
         break;
     }
     return stString;

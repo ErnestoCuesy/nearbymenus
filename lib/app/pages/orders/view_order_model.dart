@@ -38,6 +38,16 @@ class ViewOrderModel with ChangeNotifier {
     }
   }
 
+  void processOrder(int newOrderStatus) {
+    try {
+      order.status = newOrderStatus;
+      database.setOrder(order);
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
   void cancel() {
     order = null;
     session.userDetails.orderOnHold = null;

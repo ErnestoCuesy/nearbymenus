@@ -263,6 +263,57 @@ class _ViewOrderState extends State<ViewOrder> {
                       ],
                     ),
                   ),
+                  // ORDER PROCESSING
+                  if (model.order.status != ORDER_ON_HOLD &&
+                      session.userDetails.role != ROLE_PATRON)
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          SizedBox(
+                            width: 200.0,
+                            child: FormSubmitButton(
+                              context: context,
+                              text: 'ACCEPT',
+                              color: Theme.of(context).primaryColor,
+                              onPressed: () => _processOrder(ORDER_ACCEPTED),
+                            ),
+                          ),
+                          SizedBox(height: 16.0,),
+                          SizedBox(
+                            width: 200.0,
+                            child: FormSubmitButton(
+                              context: context,
+                              text: 'DISPATCH',
+                              color: Theme.of(context).primaryColor,
+                              onPressed: () => _processOrder(ORDER_DISPATCHED),
+                            ),
+                          ),
+                          SizedBox(height: 16.0,),
+                          SizedBox(
+                            width: 200.0,
+                            child: FormSubmitButton(
+                              context: context,
+                              text: 'REJECT',
+                              color: Theme.of(context).primaryColor,
+                              onPressed: () => _processOrder(ORDER_REJECTED),
+                            ),
+                          ),
+                          SizedBox(height: 16.0,),
+                          SizedBox(
+                            width: 200.0,
+                            child: FormSubmitButton(
+                              context: context,
+                              text: 'CANCEL',
+                              color: Theme.of(context).primaryColor,
+                              onPressed: () => _processOrder(ORDER_CANCELLED),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -270,6 +321,11 @@ class _ViewOrderState extends State<ViewOrder> {
         ),
       ),
     );
+  }
+
+  void _processOrder(int newOrderStatus) {
+    model.processOrder(newOrderStatus);
+    Navigator.of(context).pop();
   }
 
   Widget _notesField(BuildContext context, String notes) {
