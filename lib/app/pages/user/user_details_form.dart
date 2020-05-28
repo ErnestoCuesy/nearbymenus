@@ -118,21 +118,21 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
   }
 
   void _userAddress2EditingComplete() {
-    final newFocus = model.userAddressValidator.isValid(model.userAddress1)
+    final newFocus = model.userAddressValidator.isValid(model.userAddress2)
         ? _userAddress3FocusNode
         : _userAddress2FocusNode;
     FocusScope.of(context).requestFocus(newFocus);
   }
 
   void _userAddress3EditingComplete() {
-    final newFocus = model.userAddressValidator.isValid(model.userAddress1)
+    final newFocus = model.userAddressValidator.isValid(model.userAddress3)
         ? _userAddress4FocusNode
         : _userAddress3FocusNode;
     FocusScope.of(context).requestFocus(newFocus);
   }
 
   void _userAddress4EditingComplete() {
-    final newFocus = model.userAddressValidator.isValid(model.userAddress1)
+    final newFocus = model.userAddressValidator.isValid(model.userAddress4)
         ? _save()
         : _userAddress4FocusNode;
     FocusScope.of(context).requestFocus(newFocus);
@@ -205,7 +205,7 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
       decoration: InputDecoration(
         labelText: 'House or unit number',
         hintText: '123',
-        errorText: model.userAddressErrorText,
+        errorText: model.userAddress1ErrorText,
         enabled: model.isLoading == false,
       ),
       autocorrect: false,
@@ -228,7 +228,7 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
       decoration: InputDecoration(
         labelText: 'Street or estate name',
         hintText: 'Fifth Avenue',
-        errorText: model.userAddressErrorText,
+        errorText: model.userAddress2ErrorText,
         enabled: model.isLoading == false,
       ),
       autocorrect: false,

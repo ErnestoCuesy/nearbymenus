@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
+import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
+import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/orders/order_history.dart';
 import 'package:nearbymenus/app/pages/user/upsell_screen.dart';
 import 'package:nearbymenus/app/pages/user/user_details_form.dart';
@@ -212,7 +214,17 @@ class _AccountPageState extends State<AccountPage> {
           ),
         ],
       ),
-      body: _buildContents(context),
+      body: StreamBuilder<UserDetails>(
+        stream: database.userDetailsStream(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.active || !snapshot.hasData) {
+            return PlatformProgressIndicator();
+          } else {
+            session.userDetails = snapshot.data;
+            return _buildContents(context);
+          }
+        }
+      ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     );
   }

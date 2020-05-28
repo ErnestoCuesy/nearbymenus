@@ -72,8 +72,13 @@ class UserDetailsModel with UserDetailsValidators, ChangeNotifier {
     return showErrorText ? invalidUsernameErrorText : null;
   }
 
-  String get userAddressErrorText {
+  String get userAddress1ErrorText {
     bool showErrorText = !userAddressValidator.isValid(userAddress1);
+    return showErrorText ? invalidAddressErrorText : null;
+  }
+
+  String get userAddress2ErrorText {
+    bool showErrorText = !userAddressValidator.isValid(userAddress2);
     return showErrorText ? invalidAddressErrorText : null;
   }
 
