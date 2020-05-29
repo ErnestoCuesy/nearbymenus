@@ -2,14 +2,6 @@ import 'dart:async';
 import 'package:geolocator/geolocator.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 
-class NearestRestaurant {
-  final String id;
-  final Restaurant restaurant;
-  final double distance;
-
-  NearestRestaurant({this.id, this.restaurant, this.distance});
-}
-
 class NearRestaurantBloc {
   final Stream<List<Restaurant>> source;
   final Position userCoordinates;

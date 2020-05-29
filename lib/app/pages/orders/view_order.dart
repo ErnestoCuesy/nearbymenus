@@ -13,15 +13,17 @@ import 'package:nearbymenus/app/utilities/format.dart';
 import 'package:provider/provider.dart';
 
 class ViewOrder extends StatefulWidget {
+  final Function callBack;
   final ViewOrderModel model;
   final GlobalKey<ScaffoldState> scaffoldKey;
 
-  const ViewOrder({Key key, this.model, this.scaffoldKey}) : super(key: key);
+  const ViewOrder({Key key, this.callBack, this.model, this.scaffoldKey}) : super(key: key);
 
   static Widget create({
     BuildContext context,
     GlobalKey<ScaffoldState> scaffoldKey,
     Order order,
+    Function callBack,
   }) {
     final database = Provider.of<Database>(context);
     final session = Provider.of<Session>(context);
@@ -33,6 +35,7 @@ class ViewOrder extends StatefulWidget {
       ),
       child: Consumer<ViewOrderModel>(
         builder: (context, model, _) => ViewOrder(
+          callBack: callBack,
           scaffoldKey: scaffoldKey,
           model: model,
         ),
@@ -73,12 +76,19 @@ class _ViewOrderState extends State<ViewOrder> {
     if (model.order.status != ORDER_ON_HOLD) {
       return false;
     }
-    return await PlatformAlertDialog(
+    bool result = await PlatformAlertDialog(
       title: 'Confirm order item deletion',
       content: 'Do you really want to delete this order item?',
       cancelActionText: 'No',
       defaultActionText: 'Yes',
     ).show(context);
+    return result;
+  }
+
+  void _deleteItem(int index) {
+    model.deleteOrderItem(index);
+    scaffoldKey.currentState.removeCurrentSnackBar();
+    widget.callBack();
   }
 
   Future<bool> _confirmCancelOrder(BuildContext context) async {
@@ -88,6 +98,23 @@ class _ViewOrderState extends State<ViewOrder> {
       cancelActionText: 'No',
       defaultActionText: 'Yes',
     ).show(context);
+  }
+
+  void _cancelOrder(BuildContext context) async {
+    final bool cancelOrder = await _confirmCancelOrder(context);
+    if (cancelOrder) {
+      model.cancel();
+      scaffoldKey.currentState
+        ..removeCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+                'Order cancelled'
+            ),
+          ),
+        );
+      Navigator.of(context).pop();
+    }
   }
 
   void _save(BuildContext context) {
@@ -102,6 +129,7 @@ class _ViewOrderState extends State<ViewOrder> {
       ),
     );
     Navigator.of(context).pop();
+    widget.callBack();
   }
 
   Widget _buildContents(BuildContext context) {
@@ -169,7 +197,7 @@ class _ViewOrderState extends State<ViewOrder> {
                             key: Key('${orderItem['id']}'),
                             direction: DismissDirection.endToStart,
                             confirmDismiss: (_) => _confirmDismiss(context),
-                            onDismissed: (direction) => model.deleteOrderItem(index),
+                            onDismissed: (direction) => _deleteItem(index),
                             child: Card(
                               child: ListTile(
                                 isThreeLine: false,
@@ -242,13 +270,7 @@ class _ViewOrderState extends State<ViewOrder> {
                           context: context,
                           text: 'Cancel',
                           color: Theme.of(context).primaryColor,
-                          onPressed: () async {
-                            final bool cancelOrder = await _confirmCancelOrder(context);
-                            if (cancelOrder) {
-                              model.cancel();
-                              Navigator.of(context).pop();
-                            }
-                          },
+                          onPressed: () => _cancelOrder(context),
                         ),
                         Builder(
                           builder: (context) => FormSubmitButton(

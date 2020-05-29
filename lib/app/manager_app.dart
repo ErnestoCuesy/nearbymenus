@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:nearbymenus/app/models/notification_streams.dart';
+import 'package:nearbymenus/app/services/notification_streams.dart';
 import 'package:nearbymenus/app/models/received_notification.dart';
 import 'package:nearbymenus/app/pages/landing/splash_screen.dart';
 import 'package:nearbymenus/app/services/auth.dart';

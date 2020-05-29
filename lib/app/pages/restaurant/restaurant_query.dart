@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nearbymenus/app/models/nearest_restaurant.dart';
+import 'package:nearbymenus/app/services/near_restaurant_bloc.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/pages/restaurant/restaurant_list.dart';
 import 'package:nearbymenus/app/services/database.dart';

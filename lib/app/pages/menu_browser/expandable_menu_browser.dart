@@ -22,10 +22,13 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
   Restaurant restaurant;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
+
   bool get orderOnHold =>
-      session.currentOrder != null &&
+      session.currentOrder.orderItems.length > 0 &&
       session.currentOrder.restaurantId == session.currentRestaurant.id &&
       session.currentOrder.status == ORDER_ON_HOLD;
+
+  int get _numberOfItems => session.currentOrder.orderItems.length;
 
   Widget _buildContents(BuildContext context, Map<String, dynamic> menus,
       Map<String, dynamic> options, dynamic sortedKeys) {
@@ -34,6 +37,7 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
       itemBuilder: (BuildContext context, int index) {
         final menu = menus[sortedKeys[index]];
         return ExpandableListView(
+          callBack: _callBack,
           menu: menu,
           options: options,
         );
@@ -41,12 +45,80 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
     );
   }
 
+  void _callBack() {
+    setState(() {
+
+    });
+  }
+
+  void _shoppingCartAction(BuildContext context) async {
+    if (session.userDetails.name == '' ||
+        session.userDetails.address1 == '' ||
+        session.userDetails.address2 == '') {
+      await PlatformExceptionAlertDialog(
+        title: 'No delivery details',
+        exception: PlatformException(
+          code: 'NO_DELIVERY_DETAILS',
+          message:
+          'Please enter your delivery details in your profile page.',
+          details:
+          'Please enter your delivery details in your profile page.',
+        ),
+      ).show(context);
+    } else {
+      if (orderOnHold) {
+        Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            fullscreenDialog: false,
+            builder: (context) => ViewOrder.create(
+              context: context,
+              order: session.currentOrder,
+              scaffoldKey: _scaffoldKey,
+              callBack: _callBack,
+            ),
+          ),
+        );
+      } else {
+        session.currentOrder = null;
+        await PlatformExceptionAlertDialog(
+          title: 'Empty Order',
+          exception: PlatformException(
+            code: 'ORDER_IS_EMPTY',
+            message:
+            'Please tap on the menu items you wish to order first.',
+            details:
+            'Please tap on the menu items you wish to order first.',
+          ),
+        ).show(context);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
+    database = Provider.of<Database>(context);
     Map<String, dynamic> menus;
     Map<String, dynamic> options;
     Map<String, dynamic> sortedMenus = Map<String, dynamic>();
+    final double timestamp = dateFromCurrentDate() / 1.0;
+    var orderNumber = documentIdFromCurrentDate();
+    if (session.currentOrder == null) {
+      session.currentOrder = Order(
+          id: orderNumber,
+          restaurantId: session.currentRestaurant.id,
+          restaurantName: session.currentRestaurant.name,
+          managerId: session.currentRestaurant.managerId,
+          userId: database.userId,
+          timestamp: timestamp,
+          status: ORDER_ON_HOLD,
+          name: session.userDetails.name,
+          deliveryAddress: '${session.userDetails.address1} ${session.userDetails.address2} ${session.userDetails.address3} ${session.userDetails.address4}',
+          paymentMethod: '',
+          orderItems: List<Map<String, dynamic>>(),
+          notes: ''
+      );
+    }
     restaurant = session.currentRestaurant;
     menus = restaurant.restaurantMenus;
     options = restaurant.restaurantOptions;
@@ -57,64 +129,50 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
       }
     });
     var sortedKeys = sortedMenus.keys.toList()..sort();
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        title: Text(
-          '${restaurant.name}',
-          style: TextStyle(color: Theme.of(context).appBarTheme.color),
+    return Stack(
+      children: <Widget>[
+        Scaffold(
+          key: _scaffoldKey,
+          appBar: AppBar(
+            title: Text(
+              '${restaurant.name}',
+              style: TextStyle(color: Theme.of(context).appBarTheme.color),
+            ),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 26.0),
+                child: IconButton(
+                  icon: Icon(Icons.add_shopping_cart, size: 32.0,),
+                  onPressed: () => _shoppingCartAction(context),
+                ),
+              ),
+            ],
+          ),
+          body: _buildContents(context, sortedMenus, options, sortedKeys),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 26.0),
-            child: IconButton(
-              icon: Icon(Icons.add_shopping_cart),
-              onPressed: () async {
-                if (session.userDetails.name == '' ||
-                    session.userDetails.address1 == '' ||
-                    session.userDetails.address2 == '') {
-                  await PlatformExceptionAlertDialog(
-                    title: 'No delivery details',
-                    exception: PlatformException(
-                      code: 'NO_DELIVERY_DETAILS',
-                      message:
-                      'Please enter your delivery details in your profile page.',
-                      details:
-                      'Please enter your delivery details in your profile page.',
-                    ),
-                  ).show(context);
-                } else {
-                  if (orderOnHold) {
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        fullscreenDialog: false,
-                        builder: (context) => ViewOrder.create(
-                          context: context,
-                          scaffoldKey: _scaffoldKey,
-                          order: session.currentOrder,
-                        ),
-                      ),
-                    );
-                  } else {
-                    session.currentOrder = null;
-                    await PlatformExceptionAlertDialog(
-                      title: 'Empty Order',
-                      exception: PlatformException(
-                        code: 'ORDER_IS_EMPTY',
-                        message:
-                        'Please tap on the menu items you wish to order first.',
-                        details:
-                        'Please tap on the menu items you wish to order first.',
-                      ),
-                    ).show(context);
-                  }
-                }
-              },
+        if (_numberOfItems > 0)
+        Positioned(
+          right: 18,
+          top: 5,
+          child: Container(
+            height: 20.0,
+            width: 20.0,
+            alignment: Alignment.center,
+            margin: EdgeInsets.only(top: 35.0, right: 5.0),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12.0),
+                color: Colors.red
+            ),
+            child: Text(
+              _numberOfItems.toString(),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12.0,
+              ),
             ),
           ),
-        ],
-      ),
-      body: _buildContents(context, sortedMenus, options, sortedKeys),
+        ),
+      ]
     );
   }
 }

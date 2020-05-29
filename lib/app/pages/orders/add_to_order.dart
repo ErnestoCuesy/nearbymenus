@@ -58,9 +58,9 @@ class _AddToOrderState extends State<AddToOrder> {
 
   AddToOrderModel get model => widget.model;
 
-  void _save() {
+  void _save(BuildContext context) {
     model.save();
-    Navigator.pop(context, 'Yes');
+    Navigator.of(context).pop('Yes');
   }
 
   Widget _buildContents(BuildContext context) {
@@ -123,7 +123,7 @@ class _AddToOrderState extends State<AddToOrder> {
                     color: model.canSave
                         ? Theme.of(context).primaryColor
                         : Theme.of(context).disabledColor,
-                    onPressed: model.canSave ? _save : null,
+                    onPressed: model.canSave ? () => _save(context) : null,
                   ),
                   SizedBox(
                     height: 16.0,
