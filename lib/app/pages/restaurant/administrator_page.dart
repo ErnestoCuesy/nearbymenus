@@ -24,7 +24,7 @@ class _AdministratorPageState extends State<AdministratorPage> {
     return [
       Text(
         '${restaurant.name}',
-        style: Theme.of(context).primaryTextTheme.headline4
+        style: Theme.of(context).accentTextTheme.headline4
       ),
       SizedBox(
         height: 32.0,
@@ -50,7 +50,7 @@ class _AdministratorPageState extends State<AdministratorPage> {
                 ),
                 SizedBox(height: 8.0,),
                 Icon(
-                  Icons.build,
+                  Icons.format_list_bulleted,
                   size: 36.0,
                 ),
               ],
