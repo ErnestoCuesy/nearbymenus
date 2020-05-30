@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
-import 'package:nearbymenus/app/pages/home/home_page.dart';
+import 'package:nearbymenus/app/pages/home/home_page_manager.dart';
+import 'package:nearbymenus/app/pages/home/home_page_staff_and_patron.dart';
 import 'package:nearbymenus/app/pages/messages/messages_listener.dart';
 import 'package:nearbymenus/app/pages/sign_in/sign_in_page.dart';
 import 'package:nearbymenus/app/services/auth.dart';
@@ -45,7 +46,11 @@ class LandingPage extends StatelessWidget {
             return SignInPage();
           }
           _setUser(database, session, user);
-          return MessagesListener(page: HomePage());
+          if (FlavourConfig.isManager()) {
+            return MessagesListener(page: HomePageManager());
+          } else {
+            return HomePageStaffAndPatron();
+          }
         } else {
           return Scaffold(
             body: Center(
