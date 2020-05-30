@@ -40,7 +40,9 @@ abstract class Database {
   Stream<UserDetails> userDetailsStream();
   Stream<Authorizations> authorizationsStream(String restaurantId);
   Stream<List<Restaurant>> managerRestaurants(String restaurantId);
-  Stream<List<UserMessage>> userMessages(String uid, String toRole);
+  Stream<List<UserMessage>> managerMessages(String uid, String toRole);
+  Stream<List<UserMessage>> staffMessages(String restaurantId, String toRole);
+  Stream<List<UserMessage>> patronMessages(String restaurantId, String uid);
   Stream<List<Restaurant>> patronRestaurants();
   Stream<List<Menu>> restaurantMenus(String restaurantId);
   Stream<List<MenuItem>> menuItems(String menuItemId);
@@ -193,11 +195,31 @@ class FirestoreDatabase implements Database {
   );
 
   @override
-  Stream<List<UserMessage>> userMessages(String uid, String toRole) => _service.collectionStream(
+  Stream<List<UserMessage>> managerMessages(String uid, String toRole) => _service.collectionStream(
     path: APIPath.messages(),
     queryBuilder: uid != null
         ? (query) => query.where('toUid', isEqualTo: uid)
                           .where('toRole', isEqualTo: toRole)
+        : null,
+    builder: (data, documentId) => UserMessage.fromMap(data, documentId),
+  );
+
+  @override
+  Stream<List<UserMessage>> staffMessages(String restaurantId, String toRole) => _service.collectionStream(
+    path: APIPath.messages(),
+    queryBuilder: uid != null
+        ? (query) => query.where('restaurantId', isEqualTo: restaurantId)
+        .where('toRole', isEqualTo: toRole)
+        : null,
+    builder: (data, documentId) => UserMessage.fromMap(data, documentId),
+  );
+
+  @override
+  Stream<List<UserMessage>> patronMessages(String restaurantId, String uid) => _service.collectionStream(
+    path: APIPath.messages(),
+    queryBuilder: uid != null
+        ? (query) => query.where('restaurantId', isEqualTo: restaurantId)
+        .where('toUid', isEqualTo: uid)
         : null,
     builder: (data, documentId) => UserMessage.fromMap(data, documentId),
   );
