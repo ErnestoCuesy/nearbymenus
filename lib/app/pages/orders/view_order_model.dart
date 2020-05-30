@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/session.dart';
+import 'package:nearbymenus/app/models/user_message.dart';
 import 'package:nearbymenus/app/services/database.dart';
 
 class ViewOrderModel with ChangeNotifier {
@@ -21,10 +22,13 @@ class ViewOrderModel with ChangeNotifier {
   Future<void> save() async {
     updateWith(isLoading: true, submitted: true);
     _submitOrder();
+    _sendMessage();
   }
 
   Future<void> _submitOrder() async {
     try {
+      order.id = documentIdFromCurrentDate();
+      order.timestamp = dateFromCurrentDate() / 1.0;
       order.status = ORDER_PLACED;
       database.setOrderTransaction(session.currentRestaurant.managerId,
           session.currentRestaurant.id,
@@ -36,6 +40,24 @@ class ViewOrderModel with ChangeNotifier {
       print(e);
       rethrow;
     }
+  }
+
+  Future<void> _sendMessage() async {
+    final double timestamp = dateFromCurrentDate() / 1.0;
+    database.setMessageDetails(UserMessage(
+      id: documentIdFromCurrentDate(),
+      timestamp: timestamp,
+      fromUid: database.userId,
+      toUid: session.currentRestaurant.managerId,
+      restaurantId: session.currentRestaurant.id,
+      fromRole: ROLE_PATRON,
+      toRole: ROLE_STAFF,
+      fromName: session.userDetails.name,
+      delivered: false,
+      type: 'New order to ${session.currentRestaurant.name}',
+      authFlag: false,
+    ));
+
   }
 
   void processOrder(int newOrderStatus) {
