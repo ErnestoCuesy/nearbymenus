@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/order_item.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -34,29 +33,9 @@ class AddToOrderModel with ChangeNotifier {
   }
 
   void _addMenuItemToOrder() {
-    final double timestamp = dateFromCurrentDate() / 1.0;
-    var orderNumber = documentIdFromCurrentDate();
-    if (session.currentOrder == null) {
-      session.currentOrder = Order(
-          id: orderNumber,
-          restaurantId: session.currentRestaurant.id,
-          restaurantName: session.currentRestaurant.name,
-          managerId: session.currentRestaurant.managerId,
-          userId: database.userId,
-          timestamp: timestamp,
-          status: ORDER_ON_HOLD,
-          name: session.userDetails.name,
-          deliveryAddress: '${session.userDetails.address1} ${session.userDetails.address2} ${session.userDetails.address3} ${session.userDetails.address4}',
-          paymentMethod: '',
-          orderItems: List<Map<String, dynamic>>(),
-          notes: ''
-      );
-    } else {
-      orderNumber = session.currentOrder.id;
-    }
     final orderItem = OrderItem(
       id: documentIdFromCurrentDate(),
-      orderId: orderNumber,
+      orderId: session.currentOrder.id,
       menuCode: menuCode,
       name: item['name'],
       quantity: quantity,
@@ -65,7 +44,6 @@ class AddToOrderModel with ChangeNotifier {
       options: tempMenuItemOptions,
     ).toMap();
     session.currentOrder.orderItems.add(orderItem);
-    session.currentOrder.status = ORDER_ON_HOLD;
     session.userDetails.orderOnHold = session.currentOrder.toMap();
     database.setUserDetails(session.userDetails);
   }
