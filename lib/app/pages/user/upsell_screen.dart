@@ -60,10 +60,12 @@ class _UpsellScreenState extends State<UpsellScreen> {
             'Buy a bundle to unlock your orders',
           ),
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: buildPackages(context),
+        body: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: buildPackages(context),
+            ),
           ),
         ));
   }
