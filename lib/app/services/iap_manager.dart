@@ -60,6 +60,7 @@ abstract class IAPManagerBase {
   Stream<Subscription> get onSubscriptionChanged;
   SubscriptionType get subscriptionType;
   void purchasePackage(Package package);
+  Future<void> purchaseProduct(String productIdentifier);
 
   static String parseErrorCode(PurchasesErrorCode errorCode) {
     switch (errorCode) {
@@ -176,6 +177,10 @@ class IAPManagerMock implements IAPManagerBase {
   }
 
   @override
+  Future<void> purchaseProduct(String productIdentifier) async {
+  }
+
+  @override
   SubscriptionType get subscriptionType => _subscription.subscriptionType;
 
   void streamSubscription({PurchaserInfo pi, Offerings of}) {
@@ -234,5 +239,18 @@ class IAPManager implements IAPManagerBase {
       controller.addError(IAPManagerBase.parseErrorCode(errorCode));
     }
   }
-  
+
+  @override
+  Future<void> purchaseProduct(String productIdentifier) async {
+    try {
+      await Purchases.purchaseProduct(productIdentifier, type: PurchaseType.inapp);
+      // Don't have to add anything to the stream as the listener above
+      // will pick-up the subscription change and add it to the stream
+    } on PlatformException catch (e) {
+      var errorCode = PurchasesErrorHelper.getErrorCode(e);
+      controller.addError(IAPManagerBase.parseErrorCode(errorCode));
+      rethrow;
+    }
+  }
+
 }
