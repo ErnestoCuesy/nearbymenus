@@ -324,6 +324,7 @@ class _ViewOrderState extends State<ViewOrder> {
                             ),
                           ),
                           SizedBox(height: 16.0,),
+                          if (_canCancelOrder())
                           SizedBox(
                             width: 200.0,
                             child: FormSubmitButton(
@@ -343,6 +344,10 @@ class _ViewOrderState extends State<ViewOrder> {
         ),
       ),
     );
+  }
+
+  bool _canCancelOrder() {
+    return false;
   }
 
   void _processOrder(int newOrderStatus) {
