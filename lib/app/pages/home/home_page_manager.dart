@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/pages/user/account_page.dart';
 import 'package:nearbymenus/app/pages/home/cupertino_home_scaffold.dart';
 import 'package:nearbymenus/app/pages/home/tab_item.dart';
 import 'package:nearbymenus/app/pages/messages/messages_page.dart';
 import 'package:nearbymenus/app/pages/restaurant/restaurant_page.dart';
-import 'package:nearbymenus/app/pages/restaurant/restaurant_query.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
-class HomePage extends StatefulWidget {
+class HomePageManager extends StatefulWidget {
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _HomePageManagerState createState() => _HomePageManagerState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageManagerState extends State<HomePageManager> {
 
   AuthBase auth;
   Database database;
@@ -31,9 +29,7 @@ class _HomePageState extends State<HomePage> {
 
   Map<TabItem, WidgetBuilder> get widgetBuilders {
     return {
-      TabItem.restaurant: (_) => FlavourConfig.isManager()
-          ? RestaurantPage()
-          : RestaurantQuery(),
+      TabItem.restaurant: (_) => RestaurantPage(),
       TabItem.messages: (_) => MessagesPage(),
       TabItem.userAccount: (_) => AccountPage()
     };

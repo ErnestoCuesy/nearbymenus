@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 
 enum TabItem {
   restaurant,
@@ -12,7 +13,11 @@ abstract class RoleEnumBase {
   List<TabItem> roleEnumList;
   
   static RoleEnumBase getRoleTabItems() {
-    return RoleEnum();
+    if (FlavourConfig.isManager()) {
+      return RoleEnumManager();
+    } else {
+      return RoleEnumStaffAndPatron();
+    }
   }
 
   static List<BottomNavigationBarItem> itemsForRole(BuildContext context, TabItem currentTab, RoleEnumBase roleTabItems) {
@@ -39,10 +44,17 @@ abstract class RoleEnumBase {
 
 }
 
-class RoleEnum extends RoleEnumBase {
+class RoleEnumManager extends RoleEnumBase {
   List<TabItem> roleEnumList = const [
     TabItem.restaurant,
     TabItem.messages,
+    TabItem.userAccount,
+  ];
+}
+
+class RoleEnumStaffAndPatron extends RoleEnumBase {
+  List<TabItem> roleEnumList = const [
+    TabItem.restaurant,
     TabItem.userAccount,
   ];
 }
