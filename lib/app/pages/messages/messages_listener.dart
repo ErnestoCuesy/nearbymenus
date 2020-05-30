@@ -17,9 +17,9 @@ class MessagesListener extends StatefulWidget {
 }
 
 class _MessagesListenerState extends State<MessagesListener> {
+  Session session;
   Database database;
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
-  String role = ROLE_PATRON;
 
   Future<void> _notifyUser(UserMessage message) async {
     // TODO temp notifications code for testing
@@ -39,19 +39,24 @@ class _MessagesListenerState extends State<MessagesListener> {
 
   @override
   Widget build(BuildContext context) {
+    session = Provider.of<Session>(context);
     database = Provider.of<Database>(context, listen: true);
     flutterLocalNotificationsPlugin =
         Provider.of<FlutterLocalNotificationsPlugin>(context);
+    String role = '';
+    Stream<List<UserMessage>> _stream;
     if (FlavourConfig.isManager()) {
       role = ROLE_MANAGER;
+      _stream = database.managerMessages(database.userId, ROLE_MANAGER);
     } else if (FlavourConfig.isStaff()) {
       role = ROLE_STAFF;
+      _stream = database.staffMessages(session.currentRestaurant.id, ROLE_STAFF);
+    } else {
+      _stream = database.patronMessages(session.currentRestaurant.id, database.userId);
+      role = ROLE_PATRON;
     }
     return StreamBuilder<List<UserMessage>>(
-        stream: database.userMessages(
-          database.userId,
-          role,
-        ),
+        stream: _stream,
         //stream: database.userNotifications(database.userId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

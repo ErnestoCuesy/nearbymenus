@@ -63,7 +63,7 @@ class _MessagesPageState extends State<MessagesPage> {
       role = ROLE_STAFF;
     }
     return StreamBuilder<List<UserMessage>>(
-      stream: database.userMessages(
+      stream: database.managerMessages(
         database.userId,
         role,
       ),
