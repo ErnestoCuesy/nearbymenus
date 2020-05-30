@@ -6,13 +6,13 @@ const int ORDER_REJECTED = 4;
 const int ORDER_CANCELLED = 5;
 
 class Order {
-  final String id;
+  String id;
   int orderNumber;
   final String restaurantId;
   final String restaurantName;
   final String managerId;
   final String userId;
-  final double timestamp;
+  double timestamp;
   int status;
   final String name;
   final String deliveryAddress;
