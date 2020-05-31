@@ -14,22 +14,6 @@ class PurchaseButton extends StatelessWidget {
 
   PurchaseButton({Key key, this.package, this.blockedOrders}) : super(key: key);
 
-  Future<void> _setBundleAndUnlock(BuildContext context, int ordersInBundle) async {
-    final database = Provider.of<Database>(context);
-    final bundleUpdateDate = documentIdFromCurrentDate();
-    try {
-      await database.setBundleCounterTransaction(database.userId, ordersInBundle);
-      database.setBundle(database.userId, Bundle(
-              id: bundleUpdateDate,
-              purchaseDate: bundleUpdateDate,
-              rcInfo: 'RevenueCat stuff',
-              ordersInBundle: ordersInBundle,
-          ));
-    } catch (e) {
-      print('DB Bundle set and unlock failed: $e');
-    }
-  }
-
   Future<void> _buyPackage(BuildContext context) async {
     final iap = Provider.of<IAPManagerBase>(context, listen: false);
     String message = '';
@@ -37,8 +21,9 @@ class PurchaseButton extends StatelessWidget {
       message = 'You can unlock your orders now.';
     }
     try {
-      iap.purchasePackage(package);
-      _setBundleAndUnlock(context, 5);
+      print('Trying to buy: ${package.product.identifier}');
+      await iap.purchaseProduct(package.product.identifier);
+      //_setBundleAndUnlock(context, 5);
       await PlatformExceptionAlertDialog(
         title: 'Thank you!',
         exception: PlatformException(
@@ -47,7 +32,7 @@ class PurchaseButton extends StatelessWidget {
           details:  'Your purchase was successful. $message',
         ),
       ).show(context);
-    } catch (e) {
+    } on PlatformException catch (e) {
       print('IAP purchase failed: $e');
     }
   }
@@ -66,9 +51,10 @@ class PurchaseButton extends StatelessWidget {
             Text(
               "${package.product.description}",
               style: Theme.of(context).accentTextTheme.headline6,
+              textAlign: TextAlign.center,
             ),
             Text(
-                "Buy - (${package.product.priceString})",
+                "Buy for ${package.product.priceString}",
                 style: Theme.of(context).accentTextTheme.headline6,
             ),
           ],

@@ -11,7 +11,7 @@ description: Nearby Menus mobile app for Flutter.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+2
+version: 1.0.0+3
 
 environment:
   sdk: ">=2.5.0 <3.0.0"
@@ -33,7 +33,7 @@ dependencies:
   location: ^2.3.5
   permission_handler: ^4.4.0+hotfix.2
   provider: ^3.1.0+1
-  purchases_flutter: ^1.1.0
+  purchases_flutter: ^1.1.1
   responsive_framework: ^0.0.4
   rxdart: ^0.22.4
 

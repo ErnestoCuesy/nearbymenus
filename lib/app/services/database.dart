@@ -55,6 +55,7 @@ abstract class Database {
   Future<UserDetails> userDetailsSnapshot(String uid);
   Future<List<Authorizations>> authorizationsSnapshot();
   Future<int> ordersLeft(String uid);
+  Future<List<Bundle>> bundlesSnapshot(String managerId);
 }
 
 String documentIdFromCurrentDate() => DateTime.now().toIso8601String();
@@ -311,6 +312,12 @@ class FirestoreDatabase implements Database {
   Future<int> ordersLeft(String managerUid) => _service.documentSnapshot(
     path: APIPath.bundleOrdersCounter(managerUid),
     builder: (data, documentId) => data['ordersLeft'],
+  );
+
+  @override
+  Future<List<Bundle>> bundlesSnapshot(String managerId) => _service.collectionSnapshot(
+    path: APIPath.bundles(managerId),
+    builder: (data, documentId) => Bundle.fromMap(data, documentId),
   );
 
 }

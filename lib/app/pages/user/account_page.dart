@@ -25,6 +25,8 @@ class _AccountPageState extends State<AccountPage> {
   Database database;
   Restaurant restaurant = Restaurant(
       name: '', address1: '', acceptingStaffRequests: false);
+  int _ordersLeft;
+  String _lastBundlePurchase;
 
   Future<void> _signOut() async {
     try {
@@ -102,20 +104,19 @@ class _AccountPageState extends State<AccountPage> {
       if (FlavourConfig.isManager())
         _userDetailsSection(
           sectionTitle: 'Bundle details',
-          cardTitle: 'Orders left: ${session.subscription.purchaserInfo.entitlements.active}',
+          cardTitle: 'Orders left: $_ordersLeft',
           cardSubtitle:
-              'Last purchase was on: ${session.subscription.latestExpirationDate}',
+              'Last purchase was on: $_lastBundlePurchase',
           onPressed: () {
-            _ordersLeft().then((value) {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                    fullscreenDialog: false,
-                    builder: (context) => UpsellScreen(
-                          ordersLeft: value,
-                          blockedOrders: null,
-                        )),
-              );
-            });
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                  fullscreenDialog: false,
+                  builder: (context) => UpsellScreen(
+                        ordersLeft: _ordersLeft,
+                        blockedOrders: null,
+                      ),
+              ),
+            );
           },
         ),
       if (FlavourConfig.isManager())
@@ -132,15 +133,28 @@ class _AccountPageState extends State<AccountPage> {
     ];
   }
 
-  Future<int> _ordersLeft() async {
+  Future<int> _loadOrdersLeft() async {
     int ordersLeft;
     await database.ordersLeft(database.userId).then((value) {
       if (value != null) {
         ordersLeft = value;
       }
-    }).catchError((_) => null);
-    print('Orders left: ');
+    });
+    print('Orders left: $ordersLeft');
     return ordersLeft;
+  }
+
+  Future<String> _loadLastBundlePurchased() async {
+    String lastBundlePurchased = 'No bundles purchased yet';
+    await database.bundlesSnapshot(database.userId).then((bundles) {
+      if (bundles != null) {
+        bundles.removeWhere((element) => element.id == null);
+        bundles.sort((a, b) => b.id.compareTo(a.id));
+        lastBundlePurchased = bundles[0].id;
+      }
+    });
+    print('Last bundle purchased: $lastBundlePurchased');
+    return lastBundlePurchased;
   }
 
   Widget _userDetailsSection(
@@ -155,7 +169,7 @@ class _AccountPageState extends State<AccountPage> {
           padding: const EdgeInsets.only(left: 16.0, top: 8.0),
           child: Text(
             sectionTitle,
-            style: Theme.of(context).primaryTextTheme.headline5,
+            style: Theme.of(context).accentTextTheme.headline5,
           ),
         ),
         SizedBox(
@@ -197,6 +211,8 @@ class _AccountPageState extends State<AccountPage> {
     auth = Provider.of<AuthBase>(context);
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
+    _loadOrdersLeft().then((value) => _ordersLeft = value);
+    _loadLastBundlePurchased().then((value) => _lastBundlePurchase = value);
     var accountText = 'Your profile';
     return Scaffold(
       appBar: AppBar(

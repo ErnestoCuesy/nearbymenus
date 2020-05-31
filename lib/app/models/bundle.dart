@@ -1,10 +1,9 @@
 class Bundle {
   final String id;
-  final String purchaseDate;
-  final String rcInfo;
+  final String bundleCode;
   final int ordersInBundle;
 
-  Bundle({this.id, this.purchaseDate, this.rcInfo, this.ordersInBundle});
+  Bundle({this.id, this.bundleCode, this.ordersInBundle});
 
   factory Bundle.fromMap(Map<String, dynamic> data, String documentID) {
     if (data == null) {
@@ -12,8 +11,7 @@ class Bundle {
     }
     return Bundle(
       id: data['id'],
-      purchaseDate: data['purchaseDate'],
-      rcInfo: data['rcInfo'],
+      bundleCode: data['bundleCode'],
       ordersInBundle: data['ordersInBundle'],
     );
   }
@@ -21,8 +19,7 @@ class Bundle {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'purchaseDate': purchaseDate,
-      'rcInfo': rcInfo,
+      'bundleCode': bundleCode,
       'ordersInBundle': ordersInBundle,
     };
   }
