@@ -223,21 +223,25 @@ class _AccountPageState extends State<AccountPage> {
             return PlatformProgressIndicator();
           } else {
             session.userDetails = snapshot.data;
-            return FutureBuilder<List<Bundle>>(
-                future: database.bundlesSnapshot(database.userId),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState != ConnectionState.waiting &&
-                      snapshot.hasData) {
-                    final bundles = snapshot.data;
-                    bundles.removeWhere((element) => element.id == null);
-                    bundles.sort((a, b) => b.id.compareTo(a.id));
-                    _lastBundlePurchase = bundles[0].id;
-                    return _buildContents(context);
-                  } else {
-                    _loadOrdersLeft().then((value) => _ordersLeft = value);
-                    return Center(child: PlatformProgressIndicator());
-                  }
-            });
+            if (FlavourConfig.isManager()) {
+              return FutureBuilder<List<Bundle>>(
+                  future: database.bundlesSnapshot(database.userId),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState != ConnectionState.waiting &&
+                        snapshot.hasData) {
+                      final bundles = snapshot.data;
+                      bundles.removeWhere((element) => element.id == null);
+                      bundles.sort((a, b) => b.id.compareTo(a.id));
+                      _lastBundlePurchase = bundles[0].id;
+                      return _buildContents(context);
+                    } else {
+                      _loadOrdersLeft().then((value) => _ordersLeft = value);
+                      return Center(child: PlatformProgressIndicator());
+                    }
+                  });
+            } else {
+              return _buildContents(context);
+            }
           }
         }
       ),

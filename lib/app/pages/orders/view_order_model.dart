@@ -22,7 +22,12 @@ class ViewOrderModel with ChangeNotifier {
   Future<void> save() async {
     updateWith(isLoading: true, submitted: true);
     _submitOrder();
-    _sendMessage();
+    _sendMessage(
+        session.currentRestaurant.managerId,
+        ROLE_PATRON,
+        ROLE_STAFF,
+        'New order to ${session.currentRestaurant.name}'
+    );
   }
 
   Future<void> _submitOrder() async {
@@ -42,19 +47,19 @@ class ViewOrderModel with ChangeNotifier {
     }
   }
 
-  Future<void> _sendMessage() async {
+  Future<void> _sendMessage(String toUid, String fromRole, String toRole, String type) async {
     final double timestamp = dateFromCurrentDate() / 1.0;
     database.setMessageDetails(UserMessage(
       id: documentIdFromCurrentDate(),
       timestamp: timestamp,
       fromUid: database.userId,
-      toUid: session.currentRestaurant.managerId,
+      toUid: toUid,
       restaurantId: session.currentRestaurant.id,
-      fromRole: ROLE_PATRON,
-      toRole: ROLE_STAFF,
+      fromRole: fromRole,
+      toRole: toRole,
       fromName: session.userDetails.name,
       delivered: false,
-      type: 'New order to ${session.currentRestaurant.name}',
+      type: type,
       authFlag: false,
     ));
 
@@ -68,6 +73,24 @@ class ViewOrderModel with ChangeNotifier {
       print(e);
       rethrow;
     }
+    String message;
+    switch (newOrderStatus) {
+      case ORDER_ACCEPTED:
+        message = '${session.currentRestaurant.name} is processing your order!';
+        break;
+      case ORDER_DISPATCHED:
+        message = 'Your order is on it\'s way!';
+        break;
+      case ORDER_REJECTED:
+        message = 'We can\'t process your order, sorry.';
+        break;
+    }
+    _sendMessage(
+        order.userId,
+        ROLE_STAFF,
+        ROLE_PATRON,
+        message
+    );
   }
 
   void cancel() {

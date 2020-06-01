@@ -52,7 +52,7 @@ class _MessagesListenerState extends State<MessagesListener> {
       role = ROLE_STAFF;
       _stream = database.staffMessages(session.currentRestaurant.id, ROLE_STAFF);
     } else {
-      _stream = database.patronMessages(session.currentRestaurant.id, database.userId);
+      _stream = database.patronMessages(database.userId);
       role = ROLE_PATRON;
     }
     return StreamBuilder<List<UserMessage>>(
