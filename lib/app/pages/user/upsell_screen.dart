@@ -41,12 +41,17 @@ class _UpsellScreenState extends State<UpsellScreen> {
       ));
       packages.add(SizedBox(height: 16.0,));
     }
+    final excludeTrial = session.subscription.purchaserInfo.allPurchasedProductIdentifiers.contains('in_app_mp0');
     session.subscription.availableOfferings.forEach((pkg) {
-      packages.add(PurchaseButton(
-        package: pkg,
-        blockedOrders: blockedOrders,
-      ));
-      packages.add(SizedBox(height: 24.0,));
+      if (pkg.product.identifier == 'in_app_mp0' && excludeTrial) {
+        print('Excluding trial package');
+      } else {
+        packages.add(PurchaseButton(
+          package: pkg,
+          blockedOrders: blockedOrders,
+        ));
+        packages.add(SizedBox(height: 24.0,));
+      }
     });
     return packages;
   }

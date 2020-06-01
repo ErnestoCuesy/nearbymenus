@@ -32,18 +32,18 @@ class _OrderHistoryState extends State<OrderHistory> {
 
   Widget _buildContents(BuildContext context) {
     String lockedString = '';
-    stream = database.userOrders(
-      session.currentRestaurant.id,
-      database.userId,
-    );
-    if (role != ROLE_PATRON) {
+    if (FlavourConfig.isStaff()) {
       stream = database.restaurantOrders(
         session.currentRestaurant.id,
       );
-    }
-    if (widget.showBlocked) {
+    } else if (FlavourConfig.isManager()) {
       stream =  database.blockedOrders(database.userId);
       lockedString = 'locked';
+    } else {
+      stream = database.userOrders(
+        session.currentRestaurant.id,
+        database.userId,
+      );
     }
     return StreamBuilder<List<Order>>(
       stream: stream,
@@ -182,7 +182,7 @@ class _OrderHistoryState extends State<OrderHistory> {
       appBar: AppBar(
         title: Text(
           widget.showBlocked
-              ? '${session.currentRestaurant.name} Locked orders'
+              ? 'Locked orders'
               : '${session.currentRestaurant.name} Orders',
           style: TextStyle(color: Theme.of(context).appBarTheme.color),
         ),
