@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
+import 'package:nearbymenus/app/models/bundle.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/orders/order_history.dart';
@@ -144,19 +145,6 @@ class _AccountPageState extends State<AccountPage> {
     return ordersLeft;
   }
 
-  Future<String> _loadLastBundlePurchased() async {
-    String lastBundlePurchased = 'No bundles purchased yet';
-    await database.bundlesSnapshot(database.userId).then((bundles) {
-      if (bundles != null) {
-        bundles.removeWhere((element) => element.id == null);
-        bundles.sort((a, b) => b.id.compareTo(a.id));
-        lastBundlePurchased = bundles[0].id;
-      }
-    });
-    print('Last bundle purchased: $lastBundlePurchased');
-    return lastBundlePurchased;
-  }
-
   Widget _userDetailsSection(
       {String sectionTitle,
       String cardTitle,
@@ -211,8 +199,6 @@ class _AccountPageState extends State<AccountPage> {
     auth = Provider.of<AuthBase>(context);
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
-    _loadOrdersLeft().then((value) => _ordersLeft = value);
-    _loadLastBundlePurchased().then((value) => _lastBundlePurchase = value);
     var accountText = 'Your profile';
     return Scaffold(
       appBar: AppBar(
@@ -237,7 +223,21 @@ class _AccountPageState extends State<AccountPage> {
             return PlatformProgressIndicator();
           } else {
             session.userDetails = snapshot.data;
-            return _buildContents(context);
+            return FutureBuilder<List<Bundle>>(
+                future: database.bundlesSnapshot(database.userId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState != ConnectionState.waiting &&
+                      snapshot.hasData) {
+                    final bundles = snapshot.data;
+                    bundles.removeWhere((element) => element.id == null);
+                    bundles.sort((a, b) => b.id.compareTo(a.id));
+                    _lastBundlePurchase = bundles[0].id;
+                    return _buildContents(context);
+                  } else {
+                    _loadOrdersLeft().then((value) => _ordersLeft = value);
+                    return Center(child: PlatformProgressIndicator());
+                  }
+            });
           }
         }
       ),
