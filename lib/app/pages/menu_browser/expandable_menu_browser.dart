@@ -28,7 +28,9 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
       session.currentOrder.restaurantId == session.currentRestaurant.id &&
       session.currentOrder.status == ORDER_ON_HOLD;
 
-  int get _numberOfItems => session.currentOrder.orderItems.length;
+  int get _numberOfItems => orderOnHold
+      ? session.currentOrder.orderItems.length
+      : 0;
 
   Widget _buildContents(BuildContext context, Map<String, dynamic> menus,
       Map<String, dynamic> options, dynamic sortedKeys) {
@@ -46,9 +48,7 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
   }
 
   void _callBack() {
-    setState(() {
-
-    });
+    setState(() {});
   }
 
   void _shoppingCartAction(BuildContext context) async {
