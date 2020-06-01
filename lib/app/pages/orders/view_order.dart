@@ -207,7 +207,7 @@ class _ViewOrderState extends State<ViewOrder> {
                                 title: Row(
                                   children: [
                                     SizedBox(
-                                      width: 60.0,
+                                      width: 80.0,
                                       child: Text(orderItem['menuCode']),
                                     ),
                                     Text(

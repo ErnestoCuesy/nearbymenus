@@ -37,8 +37,14 @@ class _OrderHistoryState extends State<OrderHistory> {
         session.currentRestaurant.id,
       );
     } else if (FlavourConfig.isManager()) {
-      stream =  database.blockedOrders(database.userId);
-      lockedString = 'locked';
+      if (widget.showBlocked) {
+        stream = database.blockedOrders(database.userId);
+        lockedString = 'locked';
+      } else {
+        stream = database.restaurantOrders(
+          session.currentRestaurant.id,
+        );
+      }
     } else {
       stream = database.userOrders(
         session.currentRestaurant.id,

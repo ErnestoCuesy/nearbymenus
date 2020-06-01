@@ -26,8 +26,8 @@ class _AccountPageState extends State<AccountPage> {
   Database database;
   Restaurant restaurant = Restaurant(
       name: '', address1: '', acceptingStaffRequests: false);
-  int _ordersLeft;
-  String _lastBundlePurchase;
+  int _ordersLeft = 0;
+  String _lastBundlePurchase = '';
 
   Future<void> _signOut() async {
     try {
@@ -136,11 +136,16 @@ class _AccountPageState extends State<AccountPage> {
 
   Future<int> _loadOrdersLeft() async {
     int ordersLeft;
-    await database.ordersLeft(database.userId).then((value) {
-      if (value != null) {
-        ordersLeft = value;
-      }
-    });
+    try {
+      await database.ordersLeft(database.userId).then((value) {
+        if (value != null) {
+          ordersLeft = value;
+        }
+      });
+    } catch (e) {
+      print(e);
+      ordersLeft = 0;
+    }
     print('Orders left: $ordersLeft');
     return ordersLeft;
   }
@@ -224,18 +229,23 @@ class _AccountPageState extends State<AccountPage> {
           } else {
             session.userDetails = snapshot.data;
             if (FlavourConfig.isManager()) {
+              _lastBundlePurchase = '\nYou haven\'t bought any bundles';
               return FutureBuilder<List<Bundle>>(
                   future: database.bundlesSnapshot(database.userId),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState != ConnectionState.waiting &&
                         snapshot.hasData) {
-                      final bundles = snapshot.data;
-                      bundles.removeWhere((element) => element.id == null);
-                      bundles.sort((a, b) => b.id.compareTo(a.id));
-                      _lastBundlePurchase = bundles[0].id;
+                      if (snapshot.data.length > 0) {
+                        final bundles = snapshot.data;
+                        bundles.removeWhere((element) => element.id == null);
+                        bundles.sort((a, b) => b.id.compareTo(a.id));
+                        if (bundles.length > 0) {
+                          _lastBundlePurchase = '\n' + bundles[0].id;
+                        }
+                      }
                       return _buildContents(context);
                     } else {
-                      _loadOrdersLeft().then((value) => _ordersLeft = value);
+                      _loadOrdersLeft().then((value) => _ordersLeft = value ?? 0);
                       return Center(child: PlatformProgressIndicator());
                     }
                   });

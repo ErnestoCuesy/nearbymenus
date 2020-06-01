@@ -27,13 +27,11 @@ class _RestaurantQueryState extends State<RestaurantQuery> {
     return StreamBuilder<List<Restaurant>>(
       stream: bloc.stream,
       builder: (context, snapshot) {
-        bool stillLoading = true;
         var restaurantList = List<Restaurant>();
         if (snapshot.connectionState == ConnectionState.active) {
           if (snapshot.hasData && snapshot.data.length > 0) {
             restaurantList = snapshot.data;
           }
-          stillLoading = false;
         }
         return Scaffold(
           appBar: AppBar(
@@ -46,7 +44,6 @@ class _RestaurantQueryState extends State<RestaurantQuery> {
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           body: RestaurantList(
             nearbyRestaurantsList: restaurantList,
-            stillLoading: stillLoading,
           ),
         );
       },

@@ -69,7 +69,7 @@ class TabItemData {
     TabItem.restaurant:
     TabItemData(title: 'Restaurants', icon: Icons.home),
     TabItem.messages:
-    TabItemData(title: 'Messages', icon: Icons.message),
+    TabItemData(title: 'Staff Access', icon: Icons.group_add),
     TabItem.userAccount:
     TabItemData(title: 'Profile', icon: Icons.account_circle),
   };

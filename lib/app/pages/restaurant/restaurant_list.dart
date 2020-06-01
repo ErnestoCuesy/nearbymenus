@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
-import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/pages/messages/messages_listener.dart';
@@ -16,9 +15,8 @@ import 'package:provider/provider.dart';
 
 class RestaurantList extends StatefulWidget {
   final List<Restaurant> nearbyRestaurantsList;
-  final bool stillLoading;
 
-  const RestaurantList({Key key, this.nearbyRestaurantsList, this.stillLoading}) : super(key: key);
+  const RestaurantList({Key key, this.nearbyRestaurantsList}) : super(key: key);
   @override
   _RestaurantListState createState() => _RestaurantListState();
 }
@@ -88,42 +86,36 @@ class _RestaurantListState extends State<RestaurantList> {
                       if (role == ROLE_PATRON) {
                         _menuAndOrdersPage(context, index);
                       } else {
-                        //if (nearbyRestaurantsList[index].acceptingStaffRequests) {
-                          _staffAuthorizationPage(context, index);
-                        //}
+                        _staffAuthorizationPage(context, index);
                       }
                     },
                   ),
                 );
               });
     } else {
-      if (!widget.stillLoading) {
-        return Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text('No restaurants found near you', style: Theme
+      return Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text('No restaurants found near you', style: Theme
+                .of(context)
+                .accentTextTheme
+                .headline6,),
+            SizedBox(
+              height: 32.0,
+            ),
+            FormSubmitButton(
+              context: context,
+              text: 'OK',
+              color: Theme
                   .of(context)
-                  .accentTextTheme
-                  .headline6,),
-              SizedBox(
-                height: 32.0,
-              ),
-              FormSubmitButton(
-                context: context,
-                text: 'OK',
-                color: Theme
-                    .of(context)
-                    .primaryColor,
-                onPressed: () => _confirmContinue(context),
-              ),
-            ],
-          ),
-        );
-      } else {
-        return Center(child: PlatformProgressIndicator());
-      }
+                  .primaryColor,
+              onPressed: () => _confirmContinue(context),
+            ),
+          ],
+        ),
+      );
     }
   }
 }

@@ -69,8 +69,8 @@ class _MessagesPageState extends State<MessagesPage> {
       ),
       builder: (context, snapshot) {
         return ListItemsBuilder<UserMessage>(
-            title: 'Messages',
-            message: 'You don\'t have messages',
+            title: 'Staff Access',
+            message: 'You don\'t staff access requests',
             snapshot: snapshot,
             itemBuilder: (context, message) {
               return Dismissible(
@@ -183,7 +183,7 @@ class _MessagesPageState extends State<MessagesPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Messages',
+          'Staff Access',
           style: TextStyle(color: Theme.of(context).appBarTheme.color),
         ),
       ),
