@@ -33,7 +33,7 @@ class RestaurantListTile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Container(
-                  width: 300.00,
+                  width: MediaQuery.of(context).size.width - 150,
                   child: Text(
                     restaurant.name,
                     style: Theme.of(context).textTheme.headline5,
