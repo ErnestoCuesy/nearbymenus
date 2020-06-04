@@ -11,19 +11,6 @@ class RestaurantListTile extends StatelessWidget {
       : super(key: key);
 
   Widget _buildTitle(BuildContext context) {
-    if (!restaurantFound) {
-      return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              'Tap to search for restaurants',
-              style: Theme.of(context).textTheme.subtitle1,
-            ),
-            SizedBox(
-              height: 8.0,
-            ),
-          ]);
-    } else {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -113,10 +100,8 @@ class RestaurantListTile extends StatelessWidget {
               ),
             ],
           ),
-          _buildSubtitle(context),
         ],
       );
-    }
   }
 
   Widget _buildSubtitle(BuildContext context) {
@@ -202,17 +187,12 @@ class RestaurantListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (restaurant.id == '') {
       return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(
-              'No restaurant selected. Tap to search for nearby Restaurants',
-              style: Theme.of(context).textTheme.headline5,
-            ),
-          ]);
-    } else {
-      return _buildTitle(context);
-    }
+            _buildTitle(context),
+            _buildSubtitle(context),
+          ]
+      );
   }
 }
