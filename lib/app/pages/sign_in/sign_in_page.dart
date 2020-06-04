@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/utilities/logo_image_asset.dart';
 import 'package:provider/provider.dart';
 import 'email_sign_in_page.dart';
@@ -47,8 +48,12 @@ class SignInPage extends StatelessWidget {
           // EMAIL
           SignInButton(
             text: 'Sign in',
-            textColor: Theme.of(context).buttonTheme.colorScheme.onPrimary,
-            color: Theme.of(context).colorScheme.primary,
+            textColor: FlavourConfig.isManager()
+                ? Colors.white
+                : Theme.of(context).buttonTheme.colorScheme.onPrimary,
+            color: FlavourConfig.isManager()
+                ? Colors.black
+                : Theme.of(context).colorScheme.primary,
             onPressed: () => _signInWithEmail(context),
           ),
           SizedBox(height: 36.0),
