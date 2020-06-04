@@ -61,11 +61,11 @@ class _OrderHistoryState extends State<OrderHistory> {
             snapshot: snapshot,
             itemBuilder: (context, order) {
               return Card(
-                color: role != ROLE_PATRON && order.isBlocked ? Colors.redAccent : Theme.of(context).canvasColor,
+                color: _determineTileColor(order),
                 margin: EdgeInsets.all(12.0),
                 child: ListTile(
                   isThreeLine: true,
-                  leading: role != ROLE_PATRON && order.isBlocked ? Icon(Icons.lock) : Icon(Icons.receipt),
+                  leading: _determineIcon(order),
                   title: Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Column(
@@ -114,6 +114,52 @@ class _OrderHistoryState extends State<OrderHistory> {
             });
       },
     );
+  }
+
+  Color _determineTileColor(Order order) {
+    Color tileColor;
+    if (role != ROLE_PATRON && order.isBlocked) {
+      tileColor = Colors.brown;
+    } else {
+      switch (order.status) {
+        case ORDER_PLACED:
+          tileColor = Colors.deepOrangeAccent;
+          break;
+        case ORDER_ACCEPTED:
+          tileColor = Colors.greenAccent;
+          break;
+        case ORDER_DISPATCHED:
+          tileColor = Colors.white;
+          break;
+        case ORDER_REJECTED:
+          tileColor = Colors.white12;
+          break;
+      }
+    }
+    return tileColor;
+  }
+
+  Icon _determineIcon(Order order) {
+    Icon tileIcon;
+    if (role != ROLE_PATRON && order.isBlocked) {
+      tileIcon =  Icon(Icons.lock);
+    } else {
+      switch (order.status) {
+        case ORDER_PLACED:
+          tileIcon = Icon(Icons.assignment_late);
+          break;
+        case ORDER_REJECTED:
+          tileIcon = Icon(Icons.clear);
+          break;
+        case ORDER_DISPATCHED:
+          tileIcon = Icon(Icons.check);
+        break;
+        default:
+          tileIcon = Icon(Icons.receipt);
+          break;
+      }
+    }
+    return tileIcon;
   }
 
   void _viewOrder(BuildContext context, Order order) async {
