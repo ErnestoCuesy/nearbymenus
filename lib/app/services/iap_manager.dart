@@ -205,17 +205,13 @@ class IAPManager implements IAPManagerBase {
   }
 
   Future<void> init() async {
-    Purchases.setDebugLogsEnabled(true);
-    // TODO add user ID below
-    await Purchases.setup("AeegEYeSxBwqtfZXZtbeMWVTOnAhyxiA");
-    // await Purchases.setAllowSharingStoreAccount(true);
-    // Purchases.addAttributionData({}, PurchasesAttributionNetwork.facebook);
+    Purchases.setDebugLogsEnabled(false);
+    await Purchases.setup("AeegEYeSxBwqtfZXZtbeMWVTOnAhyxiA", appUserId: userID);
+    await Purchases.setAllowSharingStoreAccount(false);
     _purchaserInfo = await Purchases.getPurchaserInfo();
     _offerings = await Purchases.getOfferings();
     streamSubscription(pi: _purchaserInfo, of: _offerings);
     Purchases.addPurchaserInfoUpdateListener((pi) {
-      print('RevenueCat update 1: ${pi.activeSubscriptions}');
-      print('RevenueCat update 2: ${pi.latestExpirationDate}');
       streamSubscription(pi: pi, of: _offerings);
     });
   }
