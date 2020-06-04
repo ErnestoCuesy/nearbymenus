@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 
 class RestaurantListTile extends StatelessWidget {
@@ -26,17 +25,12 @@ class RestaurantListTile extends StatelessWidget {
                     style: Theme.of(context).textTheme.headline5,
                   ),
                 ),
-                if (FlavourConfig.isStaff())
                 Container(
                   width: 30.00,
                     child: Icon(
                       Icons.arrow_forward,
                     ),
                 ),
-                if (FlavourConfig.isPatron())
-                  Container(
-                    width: 30.00,
-                  )
               ],
             ),
           ),
