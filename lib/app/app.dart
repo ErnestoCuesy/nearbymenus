@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:nearbymenus/app/models/received_notification.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/landing/landing_page.dart';
+import 'package:nearbymenus/app/pages/landing/location_services_error.dart';
 import 'package:nearbymenus/app/pages/landing/splash_screen.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -17,8 +17,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:rxdart/subjects.dart';
-
-import 'common_widgets/platform_exception_alert_dialog.dart';
 
 class MyApp extends StatefulWidget {
   @override
@@ -31,6 +29,8 @@ class _MyAppState extends State<MyApp> {
   PermissionStatus _permissionStatus;
   final MethodChannel platform = MethodChannel('crossingthestreams.io/resourceResolver');
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  bool _locationServicesAreEnabled = false;
+  bool _locationPermissionGranted = false;
 
 // Streams are created so that app can respond to notification-related events since the plugin is initialised in the `main` function
   final BehaviorSubject<ReceivedNotification> didReceiveLocalNotificationSubject =
@@ -106,18 +106,19 @@ class _MyAppState extends State<MyApp> {
       setState(() {
         _permissionStatus = status;
         if (_permissionStatus == PermissionStatus.granted){
-          // print('Permission had already been granted... determining location...');
           _determineCurrentLocation();
         } else {
-          // print('Permission not granted yet... asking...');
           PermissionHandler().requestPermissions([PermissionGroup.location])
               .then((permission){
             if (permission[PermissionGroup.location] == PermissionStatus.granted){
-              // print('Permission granted... determining location...');
+              setState(() {
+                _locationPermissionGranted = true;
+              });
               _determineCurrentLocation();
             } else {
-              // print('Permission not granted by user... exiting...');
-              exit (0);
+              setState(() {
+                _locationPermissionGranted = false;
+              });
             }
           });
         }
@@ -125,38 +126,32 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  _determineCurrentLocation() {
+  _determineCurrentLocation() async {
     _geolocator = Geolocator();
-    _geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.best
-    ).timeout(
-        Duration(
-            seconds: 30
-        ),
-        onTimeout: () {
-          print('Geolocator timed out');
-          return;
-    }).then((position) async {
-      if (position != null) {
-        _currentLocation = position;
-        print(
-            'Current location: ${_currentLocation.latitude} : ${_currentLocation
-                .longitude}');
-        setState(() {
+    _locationServicesAreEnabled = await _geolocator.isLocationServiceEnabled();
+    if (_locationServicesAreEnabled) {
+      _geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.best
+      ).timeout(
+          Duration(
+              seconds: 30
+          ),
+          onTimeout: () {
+            print('Geolocator timed out');
+            return;
+          }).then((position) async {
+        if (position != null) {
           _currentLocation = position;
-        });
-      } else {
-        await PlatformExceptionAlertDialog(
-            title: 'Could not determine location',
-            exception: PlatformException(
-            code: 'NO_LOCATION_SERVICE',
-            message:  'Please make sure location services are enabled.',
-            details:  'Please make sure location services are enabled.',
-        ),
-        ).show(context);
-        exit(0);
-      }
-    });
+          print(
+              'Current location: ${_currentLocation
+                  .latitude} : ${_currentLocation
+                  .longitude}');
+          setState(() {
+            _currentLocation = position;
+          });
+        }
+      });
+    }
   }
 
   @override
@@ -194,7 +189,12 @@ class _MyAppState extends State<MyApp> {
           )
       );
     } else {
-      return SplashScreen();
+      if (!_locationServicesAreEnabled || !_locationPermissionGranted) {
+        return LocationServicesError(
+          message: 'Please check location services and location permissions',);
+      } else {
+        return SplashScreen();
+      }
     }
   }
 }
