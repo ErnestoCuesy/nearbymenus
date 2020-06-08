@@ -6,7 +6,7 @@ class UserDetails {
   String address2;
   String address3;
   String address4;
-  Map<String, dynamic> orderOnHold;
+  Map<dynamic, dynamic> orderOnHold;
 
   UserDetails({
     this.email = '',

@@ -9,16 +9,16 @@ import 'package:provider/provider.dart';
 class AddToOrder extends StatefulWidget {
   final AddToOrderModel model;
   final String menuCode;
-  final Map<String, dynamic> item;
-  final Map<String, dynamic> options;
+  final Map<dynamic, dynamic> item;
+  final Map<dynamic, dynamic> options;
 
   const AddToOrder({Key key, this.model, this.menuCode, this.item, this.options}) : super(key: key);
 
   static Widget create({
     BuildContext context,
     String menuCode,
-    Map<String, dynamic> item,
-    Map<String, dynamic> options,
+    Map<dynamic, dynamic> item,
+    Map<dynamic, dynamic> options,
   }) {
     final database = Provider.of<Database>(context);
     final session = Provider.of<Session>(context);
@@ -46,7 +46,7 @@ class AddToOrder extends StatefulWidget {
 }
 
 class _AddToOrderState extends State<AddToOrder> {
-  Map<String, dynamic> get item => widget.item;
+  Map<dynamic, dynamic> get item => widget.item;
   String get menuCode => widget.menuCode;
 
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
@@ -176,7 +176,7 @@ class _AddToOrderState extends State<AddToOrder> {
   List<Widget> _buildOptions() {
     List<Widget> optionList = List<Widget>();
     widget.item['options'].forEach((key) {
-      Map<String, dynamic> optionValue = widget.options[key];
+      Map<dynamic, dynamic> optionValue = widget.options[key];
       optionList.add(
         Text(
           '${optionValue['name']}',

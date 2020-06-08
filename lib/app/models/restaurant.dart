@@ -24,8 +24,8 @@ class Restaurant {
   final bool acceptCash;
   final bool acceptCard;
   final bool acceptOther;
-  final Map<String, dynamic> restaurantFlags;
-  final Map<String, dynamic> paymentFlags;
+  final Map<dynamic, dynamic> restaurantFlags;
+  final Map<dynamic, dynamic> paymentFlags;
   final Map<dynamic, dynamic> restaurantMenus;
   Map<dynamic, dynamic> restaurantOptions;
 
@@ -88,8 +88,8 @@ class Restaurant {
         acceptCash: value['paymentFlags']['Cash'],
         acceptCard: value['paymentFlags']['Card'],
         acceptOther: value['paymentFlags']['Other'],
-        restaurantFlags: value['restaurantFlags'],
-        paymentFlags: value['paymentFlags'],
+        restaurantFlags: value['restaurantFlags'] ?? {},
+        paymentFlags: value['paymentFlags'] ?? {},
         restaurantMenus: value['restaurantMenus'] ?? {},
         restaurantOptions: value['restaurantOptions'] ?? {},
     );

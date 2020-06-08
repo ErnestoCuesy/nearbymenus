@@ -13,7 +13,7 @@ import 'menu_item_details_model.dart';
 
 class MenuItemDetailsForm extends StatefulWidget {
   final MenuItemDetailsModel model;
-  final Map<String, dynamic> optionsMap;
+  final Map<dynamic, dynamic> optionsMap;
 
   const MenuItemDetailsForm({Key key, this.model, this.optionsMap}) : super(key: key);
 

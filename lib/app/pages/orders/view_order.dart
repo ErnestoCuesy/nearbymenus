@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/orders/view_order_model.dart';
@@ -210,8 +211,10 @@ class _ViewOrderState extends State<ViewOrder> {
                                       width: 80.0,
                                       child: Text(orderItem['menuCode']),
                                     ),
-                                    Text(
-                                      orderItem['name'],
+                                    Expanded(
+                                      child: Text(
+                                        orderItem['name'],
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -287,7 +290,7 @@ class _ViewOrderState extends State<ViewOrder> {
                   ),
                   // ORDER PROCESSING
                   if (model.order.status != ORDER_ON_HOLD &&
-                      session.userDetails.role != ROLE_PATRON)
+                      !FlavourConfig.isPatron())
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
@@ -394,7 +397,7 @@ class _ViewOrderState extends State<ViewOrder> {
 
   List<Widget> _buildPaymentMethods() {
     List<Widget> paymentOptionsList = List<Widget>();
-    Map<String, dynamic> restaurantPaymentOptions = session.currentRestaurant.paymentFlags;
+    Map<dynamic, dynamic> restaurantPaymentOptions = session.currentRestaurant.paymentFlags;
     restaurantPaymentOptions.forEach((key, value) {
       if (value) {
         paymentOptionsList.add(CheckboxListTile(

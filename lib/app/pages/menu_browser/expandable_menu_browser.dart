@@ -32,8 +32,8 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
       ? session.currentOrder.orderItems.length
       : 0;
 
-  Widget _buildContents(BuildContext context, Map<String, dynamic> menus,
-      Map<String, dynamic> options, dynamic sortedKeys) {
+  Widget _buildContents(BuildContext context, Map<dynamic, dynamic> menus,
+      Map<dynamic, dynamic> options, dynamic sortedKeys) {
     return ListView.builder(
       itemCount: sortedKeys.length,
       itemBuilder: (BuildContext context, int index) {
@@ -48,7 +48,9 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
   }
 
   void _callBack() {
-    setState(() {});
+    setState(() {
+      _checkExistingOrder();
+    });
   }
 
   void _shoppingCartAction(BuildContext context) async {
@@ -80,6 +82,10 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
         );
       } else {
         session.currentOrder = null;
+        if (session.userDetails.orderOnHold != null) {
+          session.userDetails.orderOnHold = null;
+          database.setUserDetails(session.userDetails);
+        }
         await PlatformExceptionAlertDialog(
           title: 'Empty Order',
           exception: PlatformException(
@@ -94,13 +100,7 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    session = Provider.of<Session>(context);
-    database = Provider.of<Database>(context);
-    Map<String, dynamic> menus;
-    Map<String, dynamic> options;
-    Map<String, dynamic> sortedMenus = Map<String, dynamic>();
+  void _checkExistingOrder() {
     final double timestamp = dateFromCurrentDate() / 1.0;
     var orderNumber = documentIdFromCurrentDate();
     if (session.currentOrder == null) {
@@ -115,10 +115,23 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
           name: session.userDetails.name,
           deliveryAddress: '${session.userDetails.address1} ${session.userDetails.address2} ${session.userDetails.address3} ${session.userDetails.address4}',
           paymentMethod: '',
-          orderItems: List<Map<String, dynamic>>(),
+          orderItems: List<Map<dynamic, dynamic>>(),
           notes: ''
       );
     }
+    if (session.userDetails.orderOnHold != null) {
+      session.currentOrder = Order.fromMap(session.userDetails.orderOnHold, null);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    session = Provider.of<Session>(context);
+    database = Provider.of<Database>(context);
+    Map<dynamic, dynamic> menus;
+    Map<dynamic, dynamic> options;
+    Map<String, dynamic> sortedMenus = Map<String, dynamic>();
+    _checkExistingOrder();
     restaurant = session.currentRestaurant;
     menus = restaurant.restaurantMenus;
     options = restaurant.restaurantOptions;

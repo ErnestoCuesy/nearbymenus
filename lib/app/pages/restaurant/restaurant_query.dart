@@ -46,7 +46,7 @@ class _RestaurantQueryState extends State<RestaurantQuery> {
         stream: bloc.stream,
         builder: (context, snapshot) {
           return ListItemsBuilder<Restaurant>(
-            title: 'No restaurants found near you',
+            title: 'No nearby restaurants found',
             message: 'You seem to be far away from them',
             snapshot: snapshot,
             itemBuilder: (context, restaurant) {

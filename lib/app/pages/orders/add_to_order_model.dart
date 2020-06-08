@@ -7,8 +7,8 @@ class AddToOrderModel with ChangeNotifier {
   final Database database;
   final Session session;
   String menuCode;
-  Map<String, dynamic> item;
-  Map<String, dynamic> options;
+  Map<dynamic, dynamic> item;
+  Map<dynamic, dynamic> options;
   bool isLoading;
   bool submitted;
   List<String> menuItemOptions = List<String>();
@@ -61,7 +61,7 @@ class AddToOrderModel with ChangeNotifier {
     }
     bool optionsAreValid = true;
     item['options'].forEach((key) {
-      Map<String, dynamic> optionValue = options[key];
+      Map<dynamic, dynamic> optionValue = options[key];
       final maxAllowed = optionValue['numberAllowed'];
       if (optionsSelectionCounters[optionValue['name']] == null ||
           optionsSelectionCounters[optionValue['name']] > maxAllowed ||

@@ -9,8 +9,8 @@ import 'package:provider/provider.dart';
 
 class ExpandableListView extends StatefulWidget {
   final Function callBack;
-  final Map<String, dynamic> menu;
-  final Map<String, dynamic> options;
+  final Map<dynamic, dynamic> menu;
+  final Map<dynamic, dynamic> options;
 
   const ExpandableListView({Key key, this.callBack, this.menu, this.options})
       : super(key: key);
@@ -22,14 +22,14 @@ class ExpandableListView extends StatefulWidget {
 class _ExpandableListViewState extends State<ExpandableListView> {
   Session session;
   Database database;
-  Map<String, dynamic> items;
+  Map<dynamic, dynamic> items;
   bool expandItemsFlag = false;
-  Map<String, dynamic> sortedMenuItems = Map<String, dynamic>();
+  Map<dynamic, dynamic> sortedMenuItems = Map<String, dynamic>();
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
 
-  Map<String, dynamic> get menu => widget.menu;
+  Map<dynamic, dynamic> get menu => widget.menu;
 
-  void _addMenuItemToOrder(BuildContext context, String menuCode, Map<String, dynamic> menuItem) async {
+  void _addMenuItemToOrder(BuildContext context, String menuCode, Map<dynamic, dynamic> menuItem) async {
     final result = await Navigator.of(context).push(
       MaterialPageRoute<String>(
         fullscreenDialog: false,

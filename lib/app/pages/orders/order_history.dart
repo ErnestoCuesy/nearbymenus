@@ -118,22 +118,26 @@ class _OrderHistoryState extends State<OrderHistory> {
 
   Color _determineTileColor(Order order) {
     Color tileColor;
-    if (role != ROLE_PATRON && order.isBlocked) {
-      tileColor = Colors.brown;
+    if (role == ROLE_PATRON) {
+      tileColor = Colors.white;
     } else {
-      switch (order.status) {
-        case ORDER_PLACED:
-          tileColor = Colors.deepOrangeAccent;
-          break;
-        case ORDER_ACCEPTED:
-          tileColor = Colors.greenAccent;
-          break;
-        case ORDER_DISPATCHED:
-          tileColor = Colors.white;
-          break;
-        case ORDER_REJECTED:
-          tileColor = Colors.white12;
-          break;
+      if (order.isBlocked) {
+        tileColor = Colors.brown;
+      } else {
+        switch (order.status) {
+          case ORDER_PLACED:
+            tileColor = Colors.deepOrangeAccent;
+            break;
+          case ORDER_ACCEPTED:
+            tileColor = Colors.greenAccent;
+            break;
+          case ORDER_DISPATCHED:
+            tileColor = Colors.white;
+            break;
+          case ORDER_REJECTED:
+            tileColor = Colors.white12;
+            break;
+        }
       }
     }
     return tileColor;

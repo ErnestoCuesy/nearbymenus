@@ -40,7 +40,7 @@ class ViewOrderModel with ChangeNotifier {
           order);
       session.currentOrder = null;
       session.userDetails.orderOnHold = null;
-      database.setUserDetails(session.userDetails);
+      _setUserDetails();
     } catch (e) {
       print(e);
       rethrow;
@@ -97,6 +97,10 @@ class ViewOrderModel with ChangeNotifier {
     order = null;
     session.userDetails.orderOnHold = null;
     session.currentOrder = null;
+    _setUserDetails();
+  }
+
+  void _setUserDetails() {
     database.setUserDetails(session.userDetails);
   }
 
@@ -104,6 +108,8 @@ class ViewOrderModel with ChangeNotifier {
 
   void deleteOrderItem(int index) {
       order.orderItems.removeAt(index);
+      session.userDetails.orderOnHold = order.toMap();
+      _setUserDetails();
       notifyListeners();
   }
   

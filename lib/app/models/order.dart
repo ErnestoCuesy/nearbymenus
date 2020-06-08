@@ -17,7 +17,7 @@ class Order {
   final String name;
   final String deliveryAddress;
   String paymentMethod;
-  final List<Map<String, dynamic>> orderItems;
+  List<Map<dynamic, dynamic>> orderItems;
   String notes;
   bool isBlocked;
 
@@ -38,15 +38,15 @@ class Order {
     this.isBlocked,
   });
 
-  factory Order.fromMap(Map<String, dynamic> data, String documentID) {
+  factory Order.fromMap(Map<dynamic, dynamic> data, String documentID) {
     if (data == null) {
       return null;
     }
-    List<Map<String, dynamic>> orderItems;
+    List<Map<dynamic, dynamic>> orderItems;
     if (data['orderItems'] != null) {
       orderItems = List.from(data['orderItems']);
     } else {
-      orderItems = List<Map<String, dynamic>>();
+      orderItems = List<Map<dynamic, dynamic>>();
     }
     return Order(
       id: data['id'],
@@ -69,7 +69,7 @@ class Order {
   double get orderTotal {
     double total = 0;
     orderItems.forEach((element) {
-      Map<String, dynamic> item = element;
+      Map<dynamic, dynamic> item = element;
       total += item['lineTotal'];
     });
     return total;

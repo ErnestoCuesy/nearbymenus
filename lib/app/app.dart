@@ -29,8 +29,8 @@ class _MyAppState extends State<MyApp> {
   PermissionStatus _permissionStatus;
   final MethodChannel platform = MethodChannel('crossingthestreams.io/resourceResolver');
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  bool _locationServicesAreEnabled = false;
-  bool _locationPermissionGranted = false;
+  bool _locationPermissionGranted = true;
+  bool _geolocatorTimedOut = false;
 
 // Streams are created so that app can respond to notification-related events since the plugin is initialised in the `main` function
   final BehaviorSubject<ReceivedNotification> didReceiveLocalNotificationSubject =
@@ -106,7 +106,7 @@ class _MyAppState extends State<MyApp> {
       setState(() {
         _permissionStatus = status;
         if (_permissionStatus == PermissionStatus.granted){
-          _determineCurrentLocation();
+          //_determineCurrentLocation();
         } else {
           PermissionHandler().requestPermissions([PermissionGroup.location])
               .then((permission){
@@ -114,7 +114,7 @@ class _MyAppState extends State<MyApp> {
               setState(() {
                 _locationPermissionGranted = true;
               });
-              _determineCurrentLocation();
+              //_determineCurrentLocation();
             } else {
               setState(() {
                 _locationPermissionGranted = false;
@@ -128,30 +128,36 @@ class _MyAppState extends State<MyApp> {
 
   _determineCurrentLocation() async {
     _geolocator = Geolocator();
-    _locationServicesAreEnabled = await _geolocator.isLocationServiceEnabled();
-    if (_locationServicesAreEnabled) {
-      _geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.best
-      ).timeout(
-          Duration(
-              seconds: 30
-          ),
-          onTimeout: () {
-            print('Geolocator timed out');
-            return;
-          }).then((position) async {
-        if (position != null) {
-          _currentLocation = position;
-          print(
-              'Current location: ${_currentLocation
-                  .latitude} : ${_currentLocation
-                  .longitude}');
+    _geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.best
+    ).timeout(
+        Duration(
+            seconds: 20
+        ),
+        onTimeout: () {
+          print('Geolocator timed out');
           setState(() {
-            _currentLocation = position;
+            _geolocatorTimedOut = true;
           });
-        }
-      });
-    }
+          return;
+        }).then((position) async {
+      if (position != null) {
+        _currentLocation = position;
+        print(
+            'Current location: ${_currentLocation
+                .latitude} : ${_currentLocation
+                .longitude}');
+        setState(() {
+          _currentLocation = position;
+        });
+      }
+    });
+  }
+
+  void _callBack() {
+    setState(() {
+      _geolocatorTimedOut = false;
+    });
   }
 
   @override
@@ -189,9 +195,11 @@ class _MyAppState extends State<MyApp> {
           )
       );
     } else {
-      if (!_locationServicesAreEnabled || !_locationPermissionGranted) {
+      _determineCurrentLocation();
+      if (!_locationPermissionGranted || _geolocatorTimedOut) {
         return LocationServicesError(
-          message: 'Please check location services and location permissions',);
+          callBack: () => _callBack(),
+          message: 'Please make sure location services are enabled and location permissions granted.',);
       } else {
         return SplashScreen();
       }

@@ -1,7 +1,7 @@
 class Authorizations {
   final String id;
-  final Map<String, dynamic> authorizedRoles;
-  final Map<String, dynamic> authorizedNames;
+  final Map<dynamic, dynamic> authorizedRoles;
+  final Map<dynamic, dynamic> authorizedNames;
 
   Authorizations({this.id, this.authorizedRoles, this.authorizedNames});
 

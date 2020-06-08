@@ -37,8 +37,8 @@ dependencies:
   responsive_framework: ^0.0.4
   rxdart: ^0.22.4
 
-dependency_overrides:
-  firebase_core: 0.4.4
+#dependency_overrides:
+#  firebase_core: 0.4.4
 
 dev_dependencies:
   flutter_test:

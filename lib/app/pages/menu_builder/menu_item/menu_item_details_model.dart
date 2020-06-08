@@ -23,7 +23,7 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
   bool isLoading;
   bool submitted;
 
-  Map<String, dynamic> restaurantObjectStagedOptions;
+  Map<dynamic, dynamic> restaurantObjectStagedOptions;
   Map<String, Option> stagedOptions = {};
 
   MenuItemDetailsModel(
