@@ -205,15 +205,19 @@ class IAPManager implements IAPManagerBase {
   }
 
   Future<void> init() async {
-    Purchases.setDebugLogsEnabled(false);
-    await Purchases.setup("AeegEYeSxBwqtfZXZtbeMWVTOnAhyxiA", appUserId: userID);
-    await Purchases.setAllowSharingStoreAccount(false);
-    _purchaserInfo = await Purchases.getPurchaserInfo();
-    _offerings = await Purchases.getOfferings();
-    streamSubscription(pi: _purchaserInfo, of: _offerings);
-    Purchases.addPurchaserInfoUpdateListener((pi) {
-      streamSubscription(pi: pi, of: _offerings);
-    });
+    try {
+      Purchases.setDebugLogsEnabled(false);
+      await Purchases.setup("AeegEYeSxBwqtfZXZtbeMWVTOnAhyxiA", appUserId: userID);
+      await Purchases.setAllowSharingStoreAccount(false);
+      _purchaserInfo = await Purchases.getPurchaserInfo();
+      _offerings = await Purchases.getOfferings();
+      streamSubscription(pi: _purchaserInfo, of: _offerings);
+      Purchases.addPurchaserInfoUpdateListener((pi) {
+            streamSubscription(pi: pi, of: _offerings);
+          });
+    } catch (e) {
+      print(e);
+    }
   }
 
   void streamSubscription({PurchaserInfo pi, Offerings of}) {
