@@ -100,7 +100,6 @@ class _AccountPageState extends State<AccountPage> {
           );
         })),
       ),
-      // TODO in progress bundle details for managers
       // SUBSCRIPTION
       if (FlavourConfig.isManager())
         _userDetailsSection(
@@ -204,7 +203,9 @@ class _AccountPageState extends State<AccountPage> {
     auth = Provider.of<AuthBase>(context);
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
-    _loadOrdersLeft().then((value) => _ordersLeft = value ?? 0);
+    if (FlavourConfig.isManager()) {
+      _loadOrdersLeft().then((value) => _ordersLeft = value ?? 0);
+    }
     var accountText = 'Your profile';
     return Scaffold(
       appBar: AppBar(

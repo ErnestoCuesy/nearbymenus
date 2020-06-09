@@ -54,49 +54,34 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
   }
 
   void _shoppingCartAction(BuildContext context) async {
-    if (session.userDetails.name == '' ||
-        session.userDetails.address1 == '' ||
-        session.userDetails.address2 == '') {
+    if (orderOnHold) {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          fullscreenDialog: false,
+          builder: (context) => ViewOrder.create(
+            context: context,
+            order: session.currentOrder,
+            scaffoldKey: _scaffoldKey,
+            callBack: _callBack,
+          ),
+        ),
+      );
+    } else {
+      session.currentOrder = null;
+      if (session.userDetails.orderOnHold != null) {
+        session.userDetails.orderOnHold = null;
+        database.setUserDetails(session.userDetails);
+      }
       await PlatformExceptionAlertDialog(
-        title: 'No delivery details',
+        title: 'Empty Order',
         exception: PlatformException(
-          code: 'NO_DELIVERY_DETAILS',
+          code: 'ORDER_IS_EMPTY',
           message:
-          'Please enter your delivery details in your profile page.',
+          'Please tap on the menu items you wish to order first.',
           details:
-          'Please enter your delivery details in your profile page.',
+          'Please tap on the menu items you wish to order first.',
         ),
       ).show(context);
-    } else {
-      if (orderOnHold) {
-        Navigator.of(context).push(
-          MaterialPageRoute<void>(
-            fullscreenDialog: false,
-            builder: (context) => ViewOrder.create(
-              context: context,
-              order: session.currentOrder,
-              scaffoldKey: _scaffoldKey,
-              callBack: _callBack,
-            ),
-          ),
-        );
-      } else {
-        session.currentOrder = null;
-        if (session.userDetails.orderOnHold != null) {
-          session.userDetails.orderOnHold = null;
-          database.setUserDetails(session.userDetails);
-        }
-        await PlatformExceptionAlertDialog(
-          title: 'Empty Order',
-          exception: PlatformException(
-            code: 'ORDER_IS_EMPTY',
-            message:
-            'Please tap on the menu items you wish to order first.',
-            details:
-            'Please tap on the menu items you wish to order first.',
-          ),
-        ).show(context);
-      }
     }
   }
 
@@ -119,7 +104,7 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
           notes: ''
       );
     }
-    if (session.userDetails.orderOnHold != null) {
+    if (session.userDetails.orderOnHold != null && session.userDetails.orderOnHold.length > 0) {
       session.currentOrder = Order.fromMap(session.userDetails.orderOnHold, null);
     }
   }
