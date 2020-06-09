@@ -204,6 +204,7 @@ class _AccountPageState extends State<AccountPage> {
     auth = Provider.of<AuthBase>(context);
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
+    _loadOrdersLeft().then((value) => _ordersLeft = value ?? 0);
     var accountText = 'Your profile';
     return Scaffold(
       appBar: AppBar(
@@ -245,7 +246,6 @@ class _AccountPageState extends State<AccountPage> {
                       }
                       return _buildContents(context);
                     } else {
-                      _loadOrdersLeft().then((value) => _ordersLeft = value ?? 0);
                       return Center(child: PlatformProgressIndicator());
                     }
                   });
