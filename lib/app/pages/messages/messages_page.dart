@@ -17,6 +17,7 @@ class MessagesPage extends StatefulWidget {
 }
 
 class _MessagesPageState extends State<MessagesPage> {
+  Session session;
   Database database;
   Authorizations authorizations =
       Authorizations(authorizedRoles: {}, authorizedNames: {});
@@ -173,12 +174,17 @@ class _MessagesPageState extends State<MessagesPage> {
       type: message.type,
       authFlag: message.authFlag,
       delivered: true,
+      attendedFlag: true
     );
     database.setMessageDetails(readMessage);
+    setState(() {
+      session.pendingStaffAuthorizations--;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
     return Scaffold(
       appBar: AppBar(

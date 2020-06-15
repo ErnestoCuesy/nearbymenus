@@ -95,6 +95,7 @@ class _StaffAuthorizationPageState extends State<StaffAuthorizationPage> {
         delivered: false,
         type: 'Access to ${session.currentRestaurant.name}',
         authFlag: false,
+        attendedFlag: false,
       ));
       //Navigator.of(context).pop();
       _scaffoldKey.currentState.showSnackBar(

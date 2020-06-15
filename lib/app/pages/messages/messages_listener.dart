@@ -35,6 +35,9 @@ class _MessagesListenerState extends State<MessagesListener> {
         'Notification from ${message.fromRole}: ${message.type}',
         platformChannelSpecifics,
         payload: 'item x');
+    setState(() {
+
+    });
   }
 
   @override
@@ -56,41 +59,45 @@ class _MessagesListenerState extends State<MessagesListener> {
       role = ROLE_PATRON;
     }
     return StreamBuilder<List<UserMessage>>(
-        stream: _stream,
-        //stream: database.userNotifications(database.userId),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Scaffold(
-              body: Center(
-                child: PlatformProgressIndicator(),
-              ),
-            );
-          }
-          if (snapshot.hasData) {
-            final notificationsList = snapshot.data;
-            notificationsList.forEach((message) {
-              print('Message for ${message.toRole}');
-              if (message.toRole == role &&
-                  !message.delivered) {
-                _notifyUser(message);
-                UserMessage readMessage = UserMessage(
-                  id: message.id,
-                  timestamp: message.timestamp,
-                  fromUid: message.fromUid,
-                  toUid: message.toUid,
-                  restaurantId: message.restaurantId,
-                  fromRole: message.fromRole,
-                  toRole: message.toRole,
-                  fromName: message.fromName,
-                  type: message.type,
-                  authFlag: message.authFlag,
-                  delivered: true,
-                );
-                database.setMessageDetails(readMessage);
-              }
-            });
-          }
-          return widget.page;
-        });
+      stream: _stream,
+      builder: (context, snapshot) {
+        session.pendingStaffAuthorizations = 0;
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            body: Center(
+              child: PlatformProgressIndicator(),
+            ),
+          );
+        }
+        if (snapshot.hasData) {
+          final notificationsList = snapshot.data;
+          notificationsList.forEach((message) {
+            print('Message for ${message.toRole}');
+            if (message.toRole == role &&
+                !message.delivered) {
+              _notifyUser(message);
+              UserMessage readMessage = UserMessage(
+                id: message.id,
+                timestamp: message.timestamp,
+                fromUid: message.fromUid,
+                toUid: message.toUid,
+                restaurantId: message.restaurantId,
+                fromRole: message.fromRole,
+                toRole: message.toRole,
+                fromName: message.fromName,
+                type: message.type,
+                authFlag: message.authFlag,
+                delivered: true,
+                attendedFlag: message.attendedFlag,
+              );
+              database.setMessageDetails(readMessage);
+            }
+            if (message.attendedFlag == false && message.toRole == ROLE_MANAGER) {
+              session.pendingStaffAuthorizations++;
+            }
+          });
+        }
+        return widget.page;
+      });
   }
 }

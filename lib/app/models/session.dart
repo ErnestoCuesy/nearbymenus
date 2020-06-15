@@ -15,6 +15,7 @@ class Session {
   UserDetails userDetails = UserDetails();
   Restaurant currentRestaurant;
   Subscription subscription = Subscription();
+  int pendingStaffAuthorizations;
   Order currentOrder;
 
   Session({this.position});

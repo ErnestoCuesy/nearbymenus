@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
+import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/home/tab_item.dart';
+import 'package:provider/provider.dart';
 
 class CupertinoHomeScaffold extends StatelessWidget {
   const CupertinoHomeScaffold({
@@ -21,23 +23,50 @@ class CupertinoHomeScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoTabScaffold(
-      tabBar: CupertinoTabBar(
-        backgroundColor: FlavourConfig.isManager()
-            ?  Theme.of(context).primaryColor
-            : Theme.of(context).backgroundColor,
-        activeColor: Theme.of(context).accentColor,
-        items: RoleEnumBase.itemsForRole(context, currentTab, roleTabItems),
-        onTap: (index) => onSelectTab(roleTabItems.roleEnumList[index]),
-      ),
-      resizeToAvoidBottomInset: false,
-      tabBuilder: (context, index) {
-        final item = roleTabItems.roleEnumList[index];
-        return CupertinoTabView(
-          builder: (context) => widgetBuilders[item](context),
-          navigatorKey: navigatorKeys[item],
-        );
-      },
+    final session = Provider.of<Session>(context);
+    return Stack(
+      children: <Widget>[
+          CupertinoTabScaffold(
+            tabBar: CupertinoTabBar(
+              backgroundColor: FlavourConfig.isManager()
+                  ?  Theme.of(context).primaryColor
+                  : Theme.of(context).backgroundColor,
+              activeColor: Theme.of(context).accentColor,
+              items: RoleEnumBase.itemsForRole(context, currentTab, roleTabItems),
+              onTap: (index) => onSelectTab(roleTabItems.roleEnumList[index]),
+            ),
+            resizeToAvoidBottomInset: false,
+            tabBuilder: (context, index) {
+              final item = roleTabItems.roleEnumList[index];
+              return CupertinoTabView(
+                builder: (context) => widgetBuilders[item](context),
+                navigatorKey: navigatorKeys[item],
+            );
+          },
+        ),
+        if (FlavourConfig.isManager() && session.pendingStaffAuthorizations > 0)
+          Positioned(
+            right: MediaQuery.of(context).size.width / 2 - 35,
+            bottom: 25,
+            child: Container(
+              height: 20.0,
+              width: 20.0,
+              alignment: Alignment.center,
+              margin: EdgeInsets.only(top: 35.0, right: 5.0),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12.0),
+                  color: Colors.red
+              ),
+              child: Text(
+                session.pendingStaffAuthorizations.toString(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12.0,
+                ),
+              ),
+            ),
+          ),
+      ]
     );
   }
 

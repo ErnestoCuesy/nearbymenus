@@ -61,6 +61,7 @@ class ViewOrderModel with ChangeNotifier {
       delivered: false,
       type: type,
       authFlag: false,
+      attendedFlag: false,
     ));
 
   }
