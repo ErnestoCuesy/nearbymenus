@@ -52,9 +52,11 @@ class UserCredentialsValidators {
 class UserDetailsValidators {
   final StringValidator userNameValidator = NonEmptyStringValidator();
   final StringValidator userAddressValidator = NonEmptyStringValidator();
+  final StringValidator userTelephoneValidator = NonEmptyStringValidator();
   final StringValidator userLocationValidator = NonEmptyStringValidator();
   final String invalidUsernameErrorText = 'Name can\'t be empty';
   final String invalidAddressErrorText = 'Can\'t be empty';
+  final String invalidTelephoneErrorText = 'Can\'t be empty';
   final String invalidLocationErrorText = 'Location can\'t be empty';
 }
 

@@ -74,7 +74,8 @@ class _AccountPageState extends State<AccountPage> {
             : '${session.userDetails.address1}\n'
             '${session.userDetails.address2}\n'
             '${session.userDetails.address3}\n'
-            '${session.userDetails.address4}',
+            '${session.userDetails.address4}\n'
+            '${session.userDetails.telephone}',
         onPressed: () => Navigator.of(context)
             .push(MaterialPageRoute(builder: (BuildContext context) {
           return Scaffold(

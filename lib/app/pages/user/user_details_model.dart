@@ -16,6 +16,7 @@ class UserDetailsModel with UserDetailsValidators, ChangeNotifier {
   String userAddress2;
   String userAddress3;
   String userAddress4;
+  String userTelephone;
   bool isLoading;
   bool submitted;
 
@@ -29,6 +30,7 @@ class UserDetailsModel with UserDetailsValidators, ChangeNotifier {
     this.userAddress2,
     this.userAddress3,
     this.userAddress4,
+    this.userTelephone,
     this.isLoading = false,
     this.submitted = false,
   });
@@ -43,6 +45,7 @@ class UserDetailsModel with UserDetailsValidators, ChangeNotifier {
       address2: userAddress2,
       address3: userAddress3,
       address4: userAddress4,
+      telephone: userTelephone,
     );
     try {
       await database.setUserDetails(userDetails);
@@ -59,8 +62,9 @@ class UserDetailsModel with UserDetailsValidators, ChangeNotifier {
   bool get canSave {
     bool canSubmitFlag = false;
     if (userNameValidator.isValid(userName) &&
-        (userAddressValidator.isValid(userAddress1)) &&
-        (userAddressValidator.isValid(userAddress2)) &&
+        userAddressValidator.isValid(userAddress1) &&
+        userAddressValidator.isValid(userAddress2) &&
+        userTelephoneValidator.isValid(userTelephone) &&
         !isLoading) {
       canSubmitFlag = true;
     }
@@ -82,6 +86,11 @@ class UserDetailsModel with UserDetailsValidators, ChangeNotifier {
     return showErrorText ? invalidAddressErrorText : null;
   }
 
+  String get userTelephoneErrorText {
+    bool showErrorText = !userTelephoneValidator.isValid(userTelephone);
+    return showErrorText ? invalidTelephoneErrorText : null;
+  }
+
   void updateUserName(String userName) => updateWith(userName: userName);
 
   void updateUserAddress1(String userAddress1) =>
@@ -96,6 +105,9 @@ class UserDetailsModel with UserDetailsValidators, ChangeNotifier {
   void updateUserAddress4(String userAddress4) =>
       updateWith(userAddress4: userAddress4);
 
+  void updateUserTelephone(String userTelephone) =>
+      updateWith(userTelephone: userTelephone);
+
   void updateWith({
     String userName,
     String userLocation,
@@ -103,6 +115,7 @@ class UserDetailsModel with UserDetailsValidators, ChangeNotifier {
     String userAddress2,
     String userAddress3,
     String userAddress4,
+    String userTelephone,
     bool isLoading,
     bool submitted,
   }) {
@@ -111,6 +124,7 @@ class UserDetailsModel with UserDetailsValidators, ChangeNotifier {
     this.userAddress2 = userAddress2 ?? this.userAddress2;
     this.userAddress3 = userAddress3 ?? this.userAddress3;
     this.userAddress4 = userAddress4 ?? this.userAddress4;
+    this.userTelephone = userTelephone ?? this.userTelephone;
     this.isLoading = isLoading ?? this.isLoading;
     this.submitted = this.submitted;
     notifyListeners();

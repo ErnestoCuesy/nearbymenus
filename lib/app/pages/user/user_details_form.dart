@@ -38,6 +38,7 @@ class UserDetailsForm extends StatefulWidget {
           userAddress2: userDetails.address2,
           userAddress3: userDetails.address3,
           userAddress4: userDetails.address4,
+          userTelephone: userDetails.telephone,
       ),
       child: Consumer<UserDetailsModel>(
         builder: (context, model, _) => UserDetailsForm(model: model,),
@@ -56,11 +57,13 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
   final TextEditingController _userAddress2Controller = TextEditingController();
   final TextEditingController _userAddress3Controller = TextEditingController();
   final TextEditingController _userAddress4Controller = TextEditingController();
+  final TextEditingController _userTelephoneController = TextEditingController();
   final FocusNode _userNameFocusNode = FocusNode();
   final FocusNode _userAddress1FocusNode = FocusNode();
   final FocusNode _userAddress2FocusNode = FocusNode();
   final FocusNode _userAddress3FocusNode = FocusNode();
   final FocusNode _userAddress4FocusNode = FocusNode();
+  final FocusNode _userTelephoneFocusNode = FocusNode();
   Session session;
 
   UserDetailsModel get model => widget.model;
@@ -72,11 +75,13 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
     _userAddress2Controller.dispose();
     _userAddress3Controller.dispose();
     _userAddress4Controller.dispose();
+    _userTelephoneController.dispose();
     _userNameFocusNode.dispose();
     _userAddress1FocusNode.dispose();
     _userAddress2FocusNode.dispose();
     _userAddress3FocusNode.dispose();
     _userAddress4FocusNode.dispose();
+    _userTelephoneFocusNode.dispose();
     super.dispose();
   }
 
@@ -88,6 +93,7 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
     _userAddress2Controller.text = model.userAddress2;
     _userAddress3Controller.text = model.userAddress3;
     _userAddress4Controller.text = model.userAddress4;
+    _userTelephoneController.text = model.userTelephone;
   }
 
   Future<void> _save() async {
@@ -133,8 +139,15 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
 
   void _userAddress4EditingComplete() {
     final newFocus = model.userAddressValidator.isValid(model.userAddress4)
-        ? _save()
+        ? _userTelephoneFocusNode
         : _userAddress4FocusNode;
+    FocusScope.of(context).requestFocus(newFocus);
+  }
+
+  void _userTelephoneEditingComplete() {
+    final newFocus = model.userTelephoneValidator.isValid(model.userTelephone)
+        ? _save()
+        : _userTelephoneFocusNode;
     FocusScope.of(context).requestFocus(newFocus);
   }
 
@@ -157,6 +170,10 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
         height: 8.0,
       ),
       _buildUserAddress4TextField(),
+      SizedBox(
+        height: 8.0,
+      ),
+      _buildUserTelephoneTextField(),
       SizedBox(
         height: 32.0,
       ),
@@ -277,9 +294,31 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
       enableSuggestions: false,
       enableInteractiveSelection: false,
       keyboardType: TextInputType.text,
-      textInputAction: TextInputAction.done,
+      textInputAction: TextInputAction.next,
       onChanged: model.updateUserAddress4,
       onEditingComplete: () => _userAddress4EditingComplete(),
+    );
+  }
+
+  TextField _buildUserTelephoneTextField() {
+    return TextField(
+      style: Theme.of(context).inputDecorationTheme.labelStyle,
+      controller: _userTelephoneController,
+      focusNode: _userTelephoneFocusNode,
+      cursorColor: Colors.black,
+      decoration: InputDecoration(
+        labelText: 'Telephone number',
+        hintText: 'Your contact number',
+        errorText: model.userTelephoneErrorText,
+        enabled: model.isLoading == false,
+      ),
+      autocorrect: false,
+      enableSuggestions: false,
+      enableInteractiveSelection: false,
+      keyboardType: TextInputType.number,
+      textInputAction: TextInputAction.done,
+      onChanged: model.updateUserTelephone,
+      onEditingComplete: () => _userTelephoneEditingComplete(),
     );
   }
 
