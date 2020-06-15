@@ -1,6 +1,9 @@
 import 'dart:core';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_container.dart';
 import 'package:nearbymenus/app/pages/orders/add_to_order.dart';
@@ -30,27 +33,41 @@ class _ExpandableListViewState extends State<ExpandableListView> {
   Map<dynamic, dynamic> get menu => widget.menu;
 
   void _addMenuItemToOrder(BuildContext context, String menuCode, Map<dynamic, dynamic> menuItem) async {
-    final result = await Navigator.of(context).push(
-      MaterialPageRoute<String>(
-        fullscreenDialog: false,
-        builder: (context) => AddToOrder.create(
-          context: context,
-          menuCode: menuCode,
-          item: menuItem,
-          options: widget.options,
+    if (session.currentRestaurant.isOpen || FlavourConfig.isManager()) {
+      final result = await Navigator.of(context).push(
+        MaterialPageRoute<String>(
+          fullscreenDialog: false,
+          builder: (context) =>
+              AddToOrder.create(
+                context: context,
+                menuCode: menuCode,
+                item: menuItem,
+                options: widget.options,
+              ),
         ),
-      ),
-    );
-    if (result == 'Yes') {
-      Scaffold.of(context)
-        ..removeCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text('Item added to the order.'),
-          ),
-        );
+      );
+      if (result == 'Yes') {
+        Scaffold.of(context)
+          ..removeCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text('Item added to the order.'),
+            ),
+          );
+      }
+      widget.callBack();
+    } else {
+      await PlatformExceptionAlertDialog(
+        title: 'Restaurant is closed',
+        exception: PlatformException(
+          code: 'RESTAURANT_IS_CLOSED',
+          message:
+          '${session.currentRestaurant.name} cannot take your order at this moment. Sorry.',
+          details:
+          'The restaurant cannot take your order at this moment. Sorry.',
+        ),
+      ).show(context);
     }
-    widget.callBack();
   }
 
   String _menuCode(String menuName) {

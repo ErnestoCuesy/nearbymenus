@@ -106,11 +106,8 @@ class RestaurantListTile extends StatelessWidget {
         localizations.formatTimeOfDay(restaurant.workingHoursFrom);
     final String hoursTo =
         localizations.formatTimeOfDay(restaurant.workingHoursTo);
-    final double hFrom = restaurant.workingHoursFrom.hour.toDouble() + restaurant.workingHoursFrom.minute.toDouble() / 60;
-    final double hTo = restaurant.workingHoursTo.hour.toDouble() + restaurant.workingHoursTo.minute.toDouble() / 60;
-    final double now = TimeOfDay.now().hour.toDouble() + TimeOfDay.now().minute.toDouble() / 60;
-    var status = restaurant.open ? 'Open' : 'Closed';
-    if (restaurant.open && now < hFrom || now > hTo) {
+    var status = 'Open';
+    if (!restaurant.isOpen) {
       status = 'Closed';
     }
     return Column(

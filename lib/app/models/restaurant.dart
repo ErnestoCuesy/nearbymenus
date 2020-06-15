@@ -125,4 +125,17 @@ class Restaurant {
   static Future<void> setRestaurant(Database database, Restaurant restaurant) async {
     await database.setRestaurant(restaurant);
   }
+
+  bool get isOpen {
+    final double hFrom = this.workingHoursFrom.hour.toDouble() + this.workingHoursFrom.minute.toDouble() / 60;
+    final double hTo = this.workingHoursTo.hour.toDouble() + this.workingHoursTo.minute.toDouble() / 60;
+    final double now = TimeOfDay.now().hour.toDouble() + TimeOfDay.now().minute.toDouble() / 60;
+    bool openFlag = true;
+    if (!this.open) {
+      openFlag = false;
+    } else if (now < hFrom || now > hTo){
+      openFlag = false;
+    }
+    return openFlag;
+  }
 }
