@@ -108,7 +108,36 @@ class _OrderHistoryState extends State<OrderHistory> {
                     f.format(order.orderTotal),
                     style: Theme.of(context).textTheme.headline6,
                   ),
-                  onTap: role != ROLE_PATRON && order.isBlocked ? null : () => _viewOrder(context, order),
+                  //onTap: role != ROLE_PATRON && order.isBlocked ? null : () => _viewOrder(context, order),
+                  onTap: () async {
+                    if (!order.isBlocked || FlavourConfig.isPatron()) {
+                      _viewOrder(context, order);
+                    } else {
+                      if (FlavourConfig.isManager()) {
+                        if (!widget.showBlocked) {
+                          await PlatformExceptionAlertDialog(
+                            title: 'Locked order',
+                            exception: PlatformException(
+                              code: 'LOCKED_ORDER',
+                              message: 'Please go to your profile page and buy a bundle to unlock your orders.',
+                              details: 'Please go to your profile page and buy a bundle to unlock your orders.',
+                            ),
+                          ).show(context);
+                        } else {
+                          _unlockOrders(context);
+                        }
+                      } else if (FlavourConfig.isStaff()) {
+                        await PlatformExceptionAlertDialog(
+                          title: 'Locked order',
+                          exception: PlatformException(
+                            code: 'LOCKED_ORDER',
+                            message:  'Order locked. Please notify your restaurant manager.',
+                            details:  'Order locked. Please notify your restaurant manager.',
+                          ),
+                        ).show(context);
+                      }
+                    }
+                  },
                 ),
               );
             });
