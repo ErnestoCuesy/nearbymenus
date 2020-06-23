@@ -160,7 +160,7 @@ class _OrderHistoryState extends State<OrderHistory> {
           case ORDER_ACCEPTED:
             tileColor = Colors.greenAccent;
             break;
-          case ORDER_DISPATCHED:
+          case ORDER_READY:
             tileColor = Colors.white;
             break;
           case ORDER_REJECTED:
@@ -184,7 +184,7 @@ class _OrderHistoryState extends State<OrderHistory> {
         case ORDER_REJECTED:
           tileIcon = Icon(Icons.clear);
           break;
-        case ORDER_DISPATCHED:
+        case ORDER_READY:
           tileIcon = Icon(Icons.check);
         break;
         default:

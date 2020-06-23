@@ -1,9 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
+
 const int ORDER_ON_HOLD = 0;
 const int ORDER_PLACED = 1;
 const int ORDER_ACCEPTED = 2;
-const int ORDER_DISPATCHED = 3;
+const int ORDER_READY = 3;
 const int ORDER_REJECTED = 4;
 const int ORDER_CANCELLED = 5;
+const int ORDER_DELIVERING = 6;
+const int ORDER_CLOSED = 7;
 
 class Order {
   String id;
@@ -16,6 +21,7 @@ class Order {
   int status;
   final String name;
   final String deliveryAddress;
+  Position deliveryPosition;
   String paymentMethod;
   List<Map<dynamic, dynamic>> orderItems;
   String notes;
@@ -32,6 +38,7 @@ class Order {
     this.status,
     this.name,
     this.deliveryAddress,
+    this.deliveryPosition,
     this.paymentMethod,
     this.orderItems,
     this.notes,
@@ -42,6 +49,7 @@ class Order {
     if (data == null) {
       return null;
     }
+    final geoPoint = data['deliveryPosition'] as GeoPoint;
     List<Map<dynamic, dynamic>> orderItems;
     if (data['orderItems'] != null) {
       orderItems = List.from(data['orderItems']);
@@ -59,6 +67,8 @@ class Order {
       status: data['status'],
       name: data['name'],
       deliveryAddress: data['deliveryAddress'],
+      deliveryPosition: Position(
+          latitude: geoPoint.latitude, longitude: geoPoint.longitude),
       paymentMethod: data['paymentMethod'],
       orderItems: orderItems,
       notes: data['notes'],
@@ -76,6 +86,8 @@ class Order {
   }
 
   Map<String, dynamic> toMap() {
+    final GeoPoint geoPoint =
+    GeoPoint(deliveryPosition.latitude, deliveryPosition.longitude);
     return {
       'id': id,
       'orderNumber': orderNumber,
@@ -87,6 +99,7 @@ class Order {
       'status': status,
       'name': name,
       'deliveryAddress': deliveryAddress,
+      'deliveryPosition': geoPoint,
       'paymentMethod': paymentMethod ?? '',
       'orderItems': orderItems ?? [],
       'notes': notes,
@@ -106,14 +119,20 @@ class Order {
       case ORDER_ACCEPTED:
         stString = 'Accepted, in progress';
         break;
-      case ORDER_DISPATCHED:
-        stString = 'Completed, dispatched';
+      case ORDER_READY:
+        stString = 'Ready';
         break;
       case ORDER_REJECTED:
         stString = 'Rejected by staff';
         break;
       case ORDER_CANCELLED:
         stString = 'Cancelled by patron';
+        break;
+      case ORDER_DELIVERING:
+        stString = 'Being delivered';
+        break;
+      case ORDER_CLOSED:
+        stString = 'Delivered, closed';
         break;
     }
     return stString;

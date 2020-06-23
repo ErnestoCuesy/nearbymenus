@@ -8,6 +8,7 @@ import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/session.dart';
+import 'package:nearbymenus/app/pages/map/map_route.dart';
 import 'package:nearbymenus/app/pages/orders/view_order_model.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/utilities/format.dart';
@@ -302,18 +303,12 @@ class _ViewOrderState extends State<ViewOrder> {
                             child: FormSubmitButton(
                               context: context,
                               text: 'ACCEPT',
-                              color: Theme.of(context).primaryColor,
-                              onPressed: () => _processOrder(ORDER_ACCEPTED),
-                            ),
-                          ),
-                          SizedBox(height: 16.0,),
-                          SizedBox(
-                            width: 200.0,
-                            child: FormSubmitButton(
-                              context: context,
-                              text: 'DISPATCH',
-                              color: Theme.of(context).primaryColor,
-                              onPressed: () => _processOrder(ORDER_DISPATCHED),
+                              color: model.canDoThis(ORDER_ACCEPTED)
+                                  ? Theme.of(context).primaryColor
+                                  : Theme.of(context).disabledColor,
+                              onPressed: model.canDoThis(ORDER_ACCEPTED)
+                                  ? () => _processOrder(ORDER_ACCEPTED)
+                                  : null,
                             ),
                           ),
                           SizedBox(height: 16.0,),
@@ -322,8 +317,26 @@ class _ViewOrderState extends State<ViewOrder> {
                             child: FormSubmitButton(
                               context: context,
                               text: 'REJECT',
-                              color: Theme.of(context).primaryColor,
-                              onPressed: () => _processOrder(ORDER_REJECTED),
+                              color: model.canDoThis(ORDER_REJECTED)
+                                  ? Theme.of(context).primaryColor
+                                  : Theme.of(context).disabledColor,
+                              onPressed: model.canDoThis(ORDER_REJECTED)
+                                  ? () => _processOrder(ORDER_REJECTED)
+                                  : null,
+                            ),
+                          ),
+                          SizedBox(height: 16.0,),
+                          SizedBox(
+                            width: 200.0,
+                            child: FormSubmitButton(
+                              context: context,
+                              text: 'READY',
+                              color: model.canDoThis(ORDER_READY)
+                                  ? Theme.of(context).primaryColor
+                                  : Theme.of(context).disabledColor,
+                              onPressed: model.canDoThis(ORDER_READY)
+                                  ? () => _processOrder(ORDER_READY)
+                                  : null,
                             ),
                           ),
                           SizedBox(height: 16.0,),
@@ -337,6 +350,33 @@ class _ViewOrderState extends State<ViewOrder> {
                               onPressed: () => _processOrder(ORDER_CANCELLED),
                             ),
                           ),
+                          SizedBox(
+                            width: 200.0,
+                            child: FormSubmitButton(
+                              context: context,
+                              text: 'DELIVER',
+                              color: model.canDoThis(ORDER_DELIVERING)
+                                  ? Theme.of(context).primaryColor
+                                  : Theme.of(context).disabledColor,
+                              onPressed: model.canDoThis(ORDER_DELIVERING)
+                                  ? () => _deliverOrder(context)
+                                  : null,
+                            ),
+                          ),
+                          SizedBox(height: 16.0,),
+                          SizedBox(
+                            width: 200.0,
+                            child: FormSubmitButton(
+                              context: context,
+                              text: 'CLOSE',
+                              color: model.canDoThis(ORDER_CLOSED)
+                                  ? Theme.of(context).primaryColor
+                                  : Theme.of(context).disabledColor,
+                              onPressed: model.canDoThis(ORDER_CLOSED)
+                                  ? () => _processOrder(ORDER_CLOSED)
+                                  : null,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -344,6 +384,19 @@ class _ViewOrderState extends State<ViewOrder> {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  void _deliverOrder(BuildContext context) {
+    _processOrder(ORDER_DELIVERING);
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        fullscreenDialog: false,
+        builder: (context) => MapRoute(
+          currentLocation: session.position,
+          destination: model.order.deliveryPosition,
         ),
       ),
     );

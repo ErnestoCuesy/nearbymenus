@@ -34,6 +34,7 @@ class ViewOrderModel with ChangeNotifier {
     try {
       order.id = documentIdFromCurrentDate();
       order.timestamp = dateFromCurrentDate() / 1.0;
+      order.deliveryPosition = session.position;
       order.status = ORDER_PLACED;
       database.setOrderTransaction(session.currentRestaurant.managerId,
           session.currentRestaurant.id,
@@ -79,7 +80,7 @@ class ViewOrderModel with ChangeNotifier {
       case ORDER_ACCEPTED:
         message = '${session.currentRestaurant.name} is processing your order!';
         break;
-      case ORDER_DISPATCHED:
+      case ORDER_READY:
         message = 'Your order is on it\'s way!';
         break;
       case ORDER_REJECTED:
@@ -134,6 +135,49 @@ class ViewOrderModel with ChangeNotifier {
   }
 
   bool optionCheck(String key) => order.paymentMethod == key;
+
+  bool canDoThis(int processStep) {
+    bool proceed;
+    switch (processStep) {
+      case ORDER_ACCEPTED:
+        if (order.status == ORDER_PLACED) {
+          proceed = true;
+        } else {
+          proceed = false;
+        }
+        break;
+      case ORDER_READY:
+        if (order.status == ORDER_ACCEPTED) {
+          proceed = true;
+        } else {
+          proceed = false;
+        }
+        break;
+      case ORDER_REJECTED:
+        if (order.status == ORDER_PLACED) {
+          proceed = true;
+        } else {
+          proceed = false;
+        }
+        break;
+      case ORDER_DELIVERING:
+        if (order.status == ORDER_READY) {
+          proceed = true;
+        } else {
+          proceed = false;
+        }
+        break;
+      case ORDER_CLOSED:
+        if (order.status == ORDER_READY ||
+            order.status == ORDER_DELIVERING) {
+          proceed = true;
+        } else {
+          proceed = false;
+        }
+        break;
+    }
+    return proceed;
+  }
 
   void updateWith({
     String notes,

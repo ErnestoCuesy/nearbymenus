@@ -99,6 +99,7 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
           status: ORDER_ON_HOLD,
           name: session.userDetails.name,
           deliveryAddress: '${session.userDetails.address1} ${session.userDetails.address2} ${session.userDetails.address3} ${session.userDetails.address4}',
+          deliveryPosition: session.position,
           paymentMethod: '',
           orderItems: List<Map<dynamic, dynamic>>(),
           notes: ''
