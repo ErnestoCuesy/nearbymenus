@@ -90,12 +90,14 @@ class ViewOrderModel with ChangeNotifier {
         message = 'We can\'t process your order at the moment, sorry.';
         break;
     }
-    _sendMessage(
-        order.userId,
-        ROLE_STAFF,
-        ROLE_PATRON,
-        message
-    );
+    if (newOrderStatus != ORDER_CLOSED) {
+      _sendMessage(
+          order.userId,
+          ROLE_STAFF,
+          ROLE_PATRON,
+          message
+      );
+    }
   }
 
   void cancel() {
