@@ -81,10 +81,13 @@ class ViewOrderModel with ChangeNotifier {
         message = '${session.currentRestaurant.name} is processing your order!';
         break;
       case ORDER_READY:
+        message = 'Your order is ready!';
+        break;
+      case ORDER_DELIVERING:
         message = 'Your order is on it\'s way!';
         break;
       case ORDER_REJECTED:
-        message = 'We can\'t process your order, sorry.';
+        message = 'We can\'t process your order at the moment, sorry.';
         break;
     }
     _sendMessage(
