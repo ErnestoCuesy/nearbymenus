@@ -157,10 +157,15 @@ class _AdministratorPageState extends State<AdministratorPage> {
             style: TextStyle(color: Theme.of(context).appBarTheme.color),
           ),
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: _buildContents(context),
+        body: SingleChildScrollView(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 32.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: _buildContents(context),
+              ),
+            ),
           ),
         ));
   }
