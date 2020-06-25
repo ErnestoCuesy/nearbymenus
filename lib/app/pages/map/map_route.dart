@@ -41,6 +41,7 @@ class _MapRouteState extends State<MapRoute> {
       ),
       body: GoogleMap(
         onMapCreated: mapUtils.onMapCreated,
+        mapToolbarEnabled: false,
         zoomControlsEnabled: false,
         myLocationButtonEnabled: false,
         cameraTargetBounds: CameraTargetBounds(mapUtils.createTargetBounds()),
