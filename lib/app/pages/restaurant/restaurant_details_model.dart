@@ -31,6 +31,9 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
   bool acceptCash;
   bool acceptCard;
   bool acceptOther;
+  bool foodDeliveries;
+  bool foodCollection;
+  bool allowCancellations;
   Map<dynamic, dynamic> restaurantMenus;
   Map<dynamic, dynamic> restaurantOptions;
   bool isLoading;
@@ -60,6 +63,9 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     this.acceptCash = false,
     this.acceptCard = false,
     this.acceptOther = false,
+    this.foodDeliveries = false,
+    this.foodCollection = false,
+    this.allowCancellations = false,
     this.restaurantMenus,
     this.restaurantOptions,
     this.isLoading = false,
@@ -94,6 +100,9 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
           acceptCash: acceptCash,
           acceptCard: acceptCard,
           acceptOther: acceptOther,
+          foodDeliveries: foodDeliveries,
+          foodCollection: foodCollection,
+          allowCancellations: allowCancellations,
           restaurantFlags: {
             'open': open,
             'active': active,
@@ -105,6 +114,10 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
             'Other': acceptOther,
           },
           restaurantMenus: restaurantMenus,
+          foodDeliveryFlags: {
+            'Deliver': foodDeliveries,
+            'Collect': foodCollection,
+          },
           restaurantOptions: restaurantOptions,
         ),
       );
@@ -203,8 +216,13 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
 
   void updateAcceptCard(bool acceptCard) => updateWith(acceptCard: acceptCard);
 
-  void updateAcceptOther(bool acceptOther) =>
-      updateWith(acceptOther: acceptOther);
+  void updateAcceptOther(bool acceptOther) => updateWith(acceptOther: acceptOther);
+
+  void updateFoodDeliveries(bool foodDeliveries) => updateWith(foodDeliveries: foodDeliveries);
+
+  void updateFoodCollection(bool foodCollection) => updateWith(foodCollection: foodCollection);
+
+  void updateAllowCancellations(bool allowCancellations) => updateWith(allowCancellations: allowCancellations);
 
   void updateWith({
     String name,
@@ -225,6 +243,9 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     bool acceptCash,
     bool acceptCard,
     bool acceptOther,
+    bool foodDeliveries,
+    bool foodCollection,
+    bool allowCancellations,
     bool isLoading,
     bool submitted,
   }) {
@@ -247,6 +268,9 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     this.acceptCash = acceptCash ?? this.acceptCash;
     this.acceptCard = acceptCard ?? this.acceptCard;
     this.acceptOther = acceptOther ?? this.acceptOther;
+    this.foodDeliveries = foodDeliveries ?? this.foodDeliveries;
+    this.foodCollection = foodCollection ?? this.foodCollection;
+    this.allowCancellations = allowCancellations ?? this.allowCancellations;
     this.isLoading = isLoading ?? this.isLoading;
     this.submitted = this.submitted;
     dataHasChanged = true;

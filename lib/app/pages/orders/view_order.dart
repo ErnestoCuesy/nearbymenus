@@ -105,7 +105,7 @@ class _ViewOrderState extends State<ViewOrder> {
   void _cancelOrder(BuildContext context) async {
     final bool cancelOrder = await _confirmCancelOrder(context);
     if (cancelOrder) {
-      model.cancel();
+      model.cancelOnHoldOrder();
       scaffoldKey.currentState
         ..removeCurrentSnackBar()
         ..showSnackBar(
@@ -254,6 +254,16 @@ class _ViewOrderState extends State<ViewOrder> {
                   Column(
                      children: _buildPaymentMethods(),
                   ),
+                  if (model.order.status == ORDER_ON_HOLD)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        'Select delivery option',
+                      ),
+                    ),
+                  Column(
+                    children: _buildFoodDeliveryOptions(),
+                  ),
                   Text(
                       Format.formatDateTime(model.order.timestamp.toInt()),
                   ),
@@ -290,6 +300,25 @@ class _ViewOrderState extends State<ViewOrder> {
                     ),
                   ),
                   // ORDER PROCESSING
+                  if (_canCancelOrder())
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          SizedBox(
+                            width: 200.0,
+                            child: FormSubmitButton(
+                              context: context,
+                              text: 'CANCEL',
+                              color: Theme.of(context).primaryColor,
+                              onPressed: () => _processOrder(context, ORDER_CANCELLED),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   if (model.order.status != ORDER_ON_HOLD &&
                       !FlavourConfig.isPatron())
                     Padding(
@@ -307,7 +336,7 @@ class _ViewOrderState extends State<ViewOrder> {
                                   ? Theme.of(context).primaryColor
                                   : Theme.of(context).disabledColor,
                               onPressed: model.canDoThis(ORDER_ACCEPTED)
-                                  ? () => _processOrder(ORDER_ACCEPTED)
+                                  ? () => _processOrder(context, ORDER_ACCEPTED)
                                   : null,
                             ),
                           ),
@@ -317,11 +346,11 @@ class _ViewOrderState extends State<ViewOrder> {
                             child: FormSubmitButton(
                               context: context,
                               text: 'REJECT',
-                              color: model.canDoThis(ORDER_REJECTED)
+                              color: model.canDoThis(ORDER_REJECTED_BUSY)
                                   ? Theme.of(context).primaryColor
                                   : Theme.of(context).disabledColor,
-                              onPressed: model.canDoThis(ORDER_REJECTED)
-                                  ? () => _processOrder(ORDER_REJECTED)
+                              onPressed: model.canDoThis(ORDER_REJECTED_BUSY)
+                                  ? () => _processOrder(context, ORDER_REJECTED_BUSY)
                                   : null,
                             ),
                           ),
@@ -335,21 +364,11 @@ class _ViewOrderState extends State<ViewOrder> {
                                   ? Theme.of(context).primaryColor
                                   : Theme.of(context).disabledColor,
                               onPressed: model.canDoThis(ORDER_READY)
-                                  ? () => _processOrder(ORDER_READY)
+                                  ? () => _processOrder(context, ORDER_READY)
                                   : null,
                             ),
                           ),
                           SizedBox(height: 16.0,),
-                          if (_canCancelOrder())
-                          SizedBox(
-                            width: 200.0,
-                            child: FormSubmitButton(
-                              context: context,
-                              text: 'CANCEL',
-                              color: Theme.of(context).primaryColor,
-                              onPressed: () => _processOrder(ORDER_CANCELLED),
-                            ),
-                          ),
                           SizedBox(
                             width: 200.0,
                             child: FormSubmitButton(
@@ -373,7 +392,7 @@ class _ViewOrderState extends State<ViewOrder> {
                                   ? Theme.of(context).primaryColor
                                   : Theme.of(context).disabledColor,
                               onPressed: model.canDoThis(ORDER_CLOSED)
-                                  ? () => _processOrder(ORDER_CLOSED)
+                                  ? () => _processOrder(context, ORDER_CLOSED)
                                   : null,
                             ),
                           ),
@@ -390,7 +409,7 @@ class _ViewOrderState extends State<ViewOrder> {
   }
 
   void _deliverOrder(BuildContext context) {
-    _processOrder(ORDER_DELIVERING);
+    _processOrder(context, ORDER_DELIVERING);
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         fullscreenDialog: false,
@@ -403,11 +422,27 @@ class _ViewOrderState extends State<ViewOrder> {
   }
 
   bool _canCancelOrder() {
-    return false;
+    return FlavourConfig.isPatron() &&
+            session.currentRestaurant.allowCancellations &&
+            model.order.status == ORDER_PLACED;
   }
 
-  void _processOrder(int newOrderStatus) {
-    model.processOrder(newOrderStatus);
+  void _processOrder(BuildContext context, int newOrderStatus) async {
+    int orderStatus = newOrderStatus;
+    if (newOrderStatus == ORDER_REJECTED_BUSY) {
+      bool rejectBusy = await PlatformAlertDialog(
+        title: 'Reject order',
+        content: 'Tap on the suitable reason of rejection.',
+        cancelActionText: 'We\'re out of stock',
+        defaultActionText: 'We can\'t attend your order',
+      ).show(context);
+      if (rejectBusy) {
+        orderStatus = ORDER_REJECTED_BUSY;
+      } else {
+        orderStatus = ORDER_REJECTED_STOCK;
+      }
+    }
+    model.processOrder(orderStatus);
     Navigator.of(context).pop();
   }
 
@@ -457,12 +492,29 @@ class _ViewOrderState extends State<ViewOrder> {
           title: Text(
             key,
           ),
-          value: model.optionCheck(key),
+          value: model.paymentOptionCheck(key),
           onChanged: (flag) => model.updatePaymentMethod(key, flag),
         ));
       }
     });
     return paymentOptionsList;
+  }
+
+  List<Widget> _buildFoodDeliveryOptions() {
+    List<Widget> foodDeliveryOptionsList = List<Widget>();
+    Map<dynamic, dynamic> foodDeliveryOptions = session.currentRestaurant.foodDeliveryFlags;
+    foodDeliveryOptions.forEach((key, value) {
+      if (value) {
+        foodDeliveryOptionsList.add(CheckboxListTile(
+          title: Text(
+            key,
+          ),
+          value: model.foodDeliveryOptionCheck(key),
+          onChanged: (flag) => model.updateFoodDeliveryOption(key, flag),
+        ));
+      }
+    });
+    return foodDeliveryOptionsList;
   }
 
   @override

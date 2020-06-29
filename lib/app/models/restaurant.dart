@@ -24,9 +24,13 @@ class Restaurant {
   final bool acceptCash;
   final bool acceptCard;
   final bool acceptOther;
+  final bool foodDeliveries;
+  final bool foodCollection;
+  final bool allowCancellations;
   final Map<dynamic, dynamic> restaurantFlags;
   final Map<dynamic, dynamic> paymentFlags;
   final Map<dynamic, dynamic> restaurantMenus;
+  final Map<dynamic, dynamic> foodDeliveryFlags;
   Map<dynamic, dynamic> restaurantOptions;
 
   Restaurant({
@@ -50,9 +54,13 @@ class Restaurant {
     this.acceptCash,
     this.acceptCard,
     this.acceptOther,
+    this.foodDeliveries,
+    this.foodCollection,
+    this.allowCancellations,
     this.restaurantFlags,
     this.paymentFlags,
     this.restaurantMenus,
+    this.foodDeliveryFlags,
     this.restaurantOptions,
   });
 
@@ -88,10 +96,14 @@ class Restaurant {
         acceptCash: value['paymentFlags']['Cash'],
         acceptCard: value['paymentFlags']['Card'],
         acceptOther: value['paymentFlags']['Other'],
+        foodDeliveries: value['foodDeliveryFlags']['Deliver'] ?? false,
+        foodCollection: value['foodDeliveryFlags']['Collect'] ?? false,
+        allowCancellations: value['allowCancellations'] ?? false,
         restaurantFlags: value['restaurantFlags'] ?? {},
         paymentFlags: value['paymentFlags'] ?? {},
         restaurantMenus: value['restaurantMenus'] ?? {},
         restaurantOptions: value['restaurantOptions'] ?? {},
+        foodDeliveryFlags: value['foodDeliveryFlags'] ?? {},
     );
   }
 
@@ -119,6 +131,8 @@ class Restaurant {
       'paymentFlags': paymentFlags,
       'restaurantMenus': restaurantMenus ?? {},
       'restaurantOptions': restaurantOptions ?? {},
+      'foodDeliveryFlags': foodDeliveryFlags ?? {},
+      'allowCancellations': allowCancellations,
     };
   }
 

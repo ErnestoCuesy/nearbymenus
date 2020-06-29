@@ -71,6 +71,9 @@ class ViewOrderModel with ChangeNotifier {
     try {
       order.status = newOrderStatus;
       database.setOrder(order);
+      if (newOrderStatus == ORDER_CANCELLED) {
+        database.setBundleCounterTransaction(session.currentRestaurant.managerId, 1);
+      }
     } catch (e) {
       print(e);
       rethrow;
@@ -86,11 +89,15 @@ class ViewOrderModel with ChangeNotifier {
       case ORDER_DELIVERING:
         message = 'Your order is on it\'s way!';
         break;
-      case ORDER_REJECTED:
+      case ORDER_REJECTED_BUSY:
         message = 'We can\'t process your order at the moment, sorry.';
         break;
+      case ORDER_REJECTED_STOCK:
+        message = 'We\'re out of stock on one or more items.';
+        break;
     }
-    if (newOrderStatus != ORDER_CLOSED) {
+    if (newOrderStatus != ORDER_CLOSED &&
+        newOrderStatus != ORDER_CANCELLED) {
       _sendMessage(
           order.userId,
           ROLE_STAFF,
@@ -100,7 +107,7 @@ class ViewOrderModel with ChangeNotifier {
     }
   }
 
-  void cancel() {
+  void cancelOnHoldOrder() {
     order = null;
     session.userDetails.orderOnHold = null;
     session.currentOrder = null;
@@ -125,7 +132,9 @@ class ViewOrderModel with ChangeNotifier {
   bool get canSave => _checkOrder();
 
   bool _checkOrder() {
-    return order.paymentMethod != '' && order.orderTotal > 0;
+    return order.paymentMethod != '' &&
+           order.deliveryOption != '' &&
+           order.orderTotal > 0;
   }
 
   void updatePaymentMethod(String key, bool flag) {
@@ -139,7 +148,20 @@ class ViewOrderModel with ChangeNotifier {
     }
   }
 
-  bool optionCheck(String key) => order.paymentMethod == key;
+  void updateFoodDeliveryOption(String key, bool flag) {
+    if (order.status != ORDER_ON_HOLD) {
+      return;
+    }
+    if (flag) {
+      updateWith(deliveryOption: key);
+    } else {
+      updateWith(deliveryOption: '');
+    }
+  }
+
+  bool paymentOptionCheck(String key) => order.paymentMethod == key;
+
+  bool foodDeliveryOptionCheck(String key) => order.deliveryOption == key;
 
   bool canDoThis(int processStep) {
     bool proceed;
@@ -158,7 +180,8 @@ class ViewOrderModel with ChangeNotifier {
           proceed = false;
         }
         break;
-      case ORDER_REJECTED:
+      case ORDER_REJECTED_BUSY:
+      case ORDER_REJECTED_STOCK:
         if (order.status == ORDER_PLACED) {
           proceed = true;
         } else {
@@ -187,11 +210,13 @@ class ViewOrderModel with ChangeNotifier {
   void updateWith({
     String notes,
     String paymentMethod,
+    String deliveryOption,
     bool isLoading,
     bool submitted,
   }) {
     this.order.notes = notes ?? this.order.notes;
     this.order.paymentMethod = paymentMethod ?? this.order.paymentMethod;
+    this.order.deliveryOption = deliveryOption ?? this.order.deliveryOption;
     this.isLoading = isLoading ?? this.isLoading;
     this.submitted = this.submitted;
     notifyListeners();

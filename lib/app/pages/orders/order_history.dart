@@ -163,8 +163,12 @@ class _OrderHistoryState extends State<OrderHistory> {
           case ORDER_READY:
             tileColor = Colors.white;
             break;
-          case ORDER_REJECTED:
+          case ORDER_REJECTED_BUSY:
+          case ORDER_REJECTED_STOCK:
             tileColor = Colors.white12;
+            break;
+          case ORDER_CANCELLED:
+            tileColor = Colors.black12;
             break;
         }
       }
@@ -181,12 +185,16 @@ class _OrderHistoryState extends State<OrderHistory> {
         case ORDER_PLACED:
           tileIcon = Icon(Icons.assignment_late);
           break;
-        case ORDER_REJECTED:
+        case ORDER_REJECTED_BUSY:
+        case ORDER_REJECTED_STOCK:
           tileIcon = Icon(Icons.clear);
           break;
         case ORDER_READY:
           tileIcon = Icon(Icons.check);
         break;
+        case ORDER_CANCELLED:
+          tileIcon = Icon(Icons.delete_forever);
+          break;
         default:
           tileIcon = Icon(Icons.receipt);
           break;

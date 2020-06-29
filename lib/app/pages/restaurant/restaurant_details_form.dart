@@ -44,6 +44,9 @@ class RestaurantDetailsForm extends StatefulWidget {
         acceptCash: restaurant.acceptCash ?? false,
         acceptCard: restaurant.acceptCard ?? false,
         acceptOther: restaurant.acceptOther ?? false,
+        foodDeliveries: restaurant.foodDeliveries ?? false,
+        foodCollection: restaurant.foodCollection ?? false,
+        allowCancellations: restaurant.allowCancellations ?? false,
         restaurantMenus: restaurant.restaurantMenus ?? {},
         restaurantOptions: restaurant.restaurantOptions ?? {},
       ),
@@ -264,7 +267,10 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
         children: <Widget>[
           _buildAcceptCashCheckBox(),
           _buildAcceptCardCheckBox(),
-          _buildAcceptOtherCheckBox()
+          _buildAcceptOtherCheckBox(),
+          _buildFoodDeliveriesCheckBox(),
+          _buildFoodCollectionCheckBox(),
+          _buildAllowCancellationsCheckBox(),
         ],
       ),
       SizedBox(
@@ -587,6 +593,33 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       value: model.acceptOther,
       onChanged: model.updateAcceptOther,
       secondary: const Icon(Icons.flash_on),
+    );
+  }
+
+  Widget _buildFoodDeliveriesCheckBox() {
+    return CheckboxListTile(
+      title: const Text('Food deliveries'),
+      value: model.foodDeliveries,
+      onChanged: model.updateFoodDeliveries,
+      secondary: const Icon(Icons.motorcycle),
+    );
+  }
+
+  Widget _buildFoodCollectionCheckBox() {
+    return CheckboxListTile(
+      title: const Text('Food collection'),
+      value: model.foodCollection,
+      onChanged: model.updateFoodCollection,
+      secondary: const Icon(Icons.home),
+    );
+  }
+
+  Widget _buildAllowCancellationsCheckBox() {
+    return CheckboxListTile(
+      title: const Text('Allow order cancellation'),
+      value: model.allowCancellations,
+      onChanged: model.updateAllowCancellations,
+      secondary: const Icon(Icons.delete_forever),
     );
   }
 

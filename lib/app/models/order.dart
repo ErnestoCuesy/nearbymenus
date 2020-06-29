@@ -5,10 +5,11 @@ const int ORDER_ON_HOLD = 0;
 const int ORDER_PLACED = 1;
 const int ORDER_ACCEPTED = 2;
 const int ORDER_READY = 3;
-const int ORDER_REJECTED = 4;
-const int ORDER_CANCELLED = 5;
-const int ORDER_DELIVERING = 6;
-const int ORDER_CLOSED = 7;
+const int ORDER_DELIVERING = 4;
+const int ORDER_REJECTED_BUSY = 5;
+const int ORDER_REJECTED_STOCK = 6;
+const int ORDER_CANCELLED = 7;
+const int ORDER_CLOSED = 8;
 
 class Order {
   String id;
@@ -23,6 +24,7 @@ class Order {
   final String deliveryAddress;
   Position deliveryPosition;
   String paymentMethod;
+  String deliveryOption;
   List<Map<dynamic, dynamic>> orderItems;
   String notes;
   bool isBlocked;
@@ -40,6 +42,7 @@ class Order {
     this.deliveryAddress,
     this.deliveryPosition,
     this.paymentMethod,
+    this.deliveryOption,
     this.orderItems,
     this.notes,
     this.isBlocked,
@@ -70,6 +73,7 @@ class Order {
       deliveryPosition: Position(
           latitude: geoPoint.latitude, longitude: geoPoint.longitude),
       paymentMethod: data['paymentMethod'],
+      deliveryOption: data['deliveryOption'],
       orderItems: orderItems,
       notes: data['notes'],
       isBlocked: data['isBlocked'],
@@ -101,6 +105,7 @@ class Order {
       'deliveryAddress': deliveryAddress,
       'deliveryPosition': geoPoint,
       'paymentMethod': paymentMethod ?? '',
+      'deliveryOption': deliveryOption ?? '',
       'orderItems': orderItems ?? [],
       'notes': notes,
       'isBlocked': isBlocked ?? false,
@@ -122,8 +127,11 @@ class Order {
       case ORDER_READY:
         stString = 'Ready';
         break;
-      case ORDER_REJECTED:
-        stString = 'Rejected by staff';
+      case ORDER_REJECTED_BUSY:
+        stString = 'Rejected by staff: too busy or closed';
+        break;
+      case ORDER_REJECTED_STOCK:
+        stString = 'Rejected by staff: out of stock';
         break;
       case ORDER_CANCELLED:
         stString = 'Cancelled by patron';
@@ -140,7 +148,7 @@ class Order {
 
   @override
   String toString() {
-    return 'id: $id, orderNumber: $orderNumber, restaurantId: $restaurantId, restaurantName: $restaurantName, managerId: $managerId, userId: $userId, timestamp: $timestamp, status: $status, name: $name, deliveryAddress: $deliveryAddress, paymentMethod: $paymentMethod, orderItems: $orderItems, notes: $notes, isBlocked: $isBlocked';
+    return 'id: $id, orderNumber: $orderNumber, restaurantId: $restaurantId, restaurantName: $restaurantName, managerId: $managerId, userId: $userId, timestamp: $timestamp, status: $status, name: $name, deliveryAddress: $deliveryAddress, paymentMethod: $paymentMethod, deliveryOption: $deliveryOption, orderItems: $orderItems, notes: $notes, isBlocked: $isBlocked';
   }
 
 }
