@@ -3,7 +3,7 @@ import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart'
 import 'package:nearbymenus/app/models/authorizations.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/messages/messages_listener.dart';
-import 'package:nearbymenus/app/pages/orders/order_history.dart';
+import 'package:nearbymenus/app/pages/restaurant/administrator_page.dart';
 import 'package:nearbymenus/app/pages/restaurant/staff_authorization_page.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
@@ -35,7 +35,7 @@ class _CheckStaffAuthorizationState extends State<CheckStaffAuthorization> {
         if (snapshot.hasData) {
           final Authorizations authorizations = snapshot.data;
           if (authorizations.authorizedRoles[database.userId] == 'Staff') {
-            return MessagesListener(page: OrderHistory(showBlocked: false),);
+            return MessagesListener(page: AdministratorPage(),);
           }
         }
         return StaffAuthorizationPage();

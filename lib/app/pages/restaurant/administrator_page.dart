@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/custom_raised_button.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_menu_browser.dart';
@@ -29,6 +30,7 @@ class _AdministratorPageState extends State<AdministratorPage> {
       SizedBox(
         height: 32.0,
       ),
+      if (FlavourConfig.isManager())
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -85,9 +87,11 @@ class _AdministratorPageState extends State<AdministratorPage> {
           ),
         ],
       ),
+      if (FlavourConfig.isManager())
       SizedBox(
         height: 16.0,
       ),
+      if (FlavourConfig.isManager())
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -115,6 +119,41 @@ class _AdministratorPageState extends State<AdministratorPage> {
               ],
             ),
           ),
+        ],
+      ),
+      SizedBox(
+        height: 16.0,
+      ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CustomRaisedButton(
+            height: buttonSize,
+            width: buttonSize,
+            color: Theme.of(context).buttonTheme.colorScheme.surface,
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (BuildContext context) => OrderHistory(
+                  showBlocked: false,
+                  showActive: true,
+                ),
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Active Orders',
+                  style: Theme.of(context).accentTextTheme.headline6,
+                ),
+                SizedBox(height: 8.0,),
+                Icon(
+                  Icons.assignment,
+                  size: 36.0,
+                ),
+              ],
+            ),
+          ),
           SizedBox(
             width: 16.0,
           ),
@@ -124,14 +163,17 @@ class _AdministratorPageState extends State<AdministratorPage> {
             color: Theme.of(context).buttonTheme.colorScheme.surface,
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (BuildContext context) => OrderHistory(showBlocked: false,),
+                builder: (BuildContext context) => OrderHistory(
+                  showBlocked: false,
+                  showActive: false,
+                ),
               ),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Orders',
+                  'Inactive Orders',
                   style: Theme.of(context).accentTextTheme.headline6,
                 ),
                 SizedBox(height: 8.0,),
@@ -160,7 +202,7 @@ class _AdministratorPageState extends State<AdministratorPage> {
         body: SingleChildScrollView(
           child: Center(
             child: Padding(
-              padding: const EdgeInsets.only(top: 32.0),
+              padding: const EdgeInsets.all(32.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: _buildContents(context),

@@ -6,10 +6,10 @@ const int ORDER_PLACED = 1;
 const int ORDER_ACCEPTED = 2;
 const int ORDER_READY = 3;
 const int ORDER_DELIVERING = 4;
-const int ORDER_REJECTED_BUSY = 5;
-const int ORDER_REJECTED_STOCK = 6;
-const int ORDER_CANCELLED = 7;
-const int ORDER_CLOSED = 8;
+const int ORDER_REJECTED_BUSY = 10;
+const int ORDER_REJECTED_STOCK = 11;
+const int ORDER_CANCELLED = 12;
+const int ORDER_CLOSED = 13;
 
 class Order {
   String id;

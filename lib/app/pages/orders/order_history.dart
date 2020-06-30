@@ -14,8 +14,9 @@ import 'package:provider/provider.dart';
 
 class OrderHistory extends StatefulWidget {
   final bool showBlocked;
+  final bool showActive;
 
-  const OrderHistory({Key key, this.showBlocked}) : super(key: key);
+  const OrderHistory({Key key, this.showBlocked, this.showActive}) : super(key: key);
 
   @override
   _OrderHistoryState createState() => _OrderHistoryState();
@@ -33,7 +34,7 @@ class _OrderHistoryState extends State<OrderHistory> {
   Widget _buildContents(BuildContext context) {
     String lockedString = '';
     if (FlavourConfig.isStaff()) {
-      stream = database.restaurantOrders(
+      stream = database.activeRestaurantOrders(
         session.currentRestaurant.id,
       );
     } else if (FlavourConfig.isManager()) {
@@ -41,9 +42,15 @@ class _OrderHistoryState extends State<OrderHistory> {
         stream = database.blockedOrders(database.userId);
         lockedString = 'locked';
       } else {
-        stream = database.restaurantOrders(
-          session.currentRestaurant.id,
-        );
+        if (widget.showActive) {
+          stream = database.activeRestaurantOrders(
+            session.currentRestaurant.id,
+          );
+        } else {
+          stream = database.inactiveRestaurantOrders(
+            session.currentRestaurant.id,
+          );
+        }
       }
     } else {
       stream = database.userOrders(

@@ -48,7 +48,8 @@ abstract class Database {
   Stream<List<MenuItem>> menuItems(String menuItemId);
   Stream<List<Option>> restaurantOptions(String restaurantId);
   Stream<List<OptionItem>> optionItems(String optionId);
-  Stream<List<Order>> restaurantOrders(String restaurantId);
+  Stream<List<Order>> activeRestaurantOrders(String restaurantId);
+  Stream<List<Order>> inactiveRestaurantOrders(String restaurantId);
   Stream<List<Order>> userOrders(String restaurantId, String uid);
   Stream<List<Order>> blockedOrders(String managerId);
 
@@ -267,10 +268,21 @@ class FirestoreDatabase implements Database {
   );
 
   @override
-  Stream<List<Order>> restaurantOrders(String restaurantId) => _service.collectionStream(
+  Stream<List<Order>> activeRestaurantOrders(String restaurantId) => _service.collectionStream(
     path: APIPath.orders(),
     queryBuilder: restaurantId != null
         ? (query) => query.where('restaurantId', isEqualTo: restaurantId)
+                          .where('status', isLessThan: 10)
+        : null,
+    builder: (data, documentId) => Order.fromMap(data, documentId),
+  );
+
+  @override
+  Stream<List<Order>> inactiveRestaurantOrders(String restaurantId) => _service.collectionStream(
+    path: APIPath.orders(),
+    queryBuilder: restaurantId != null
+        ? (query) => query.where('restaurantId', isEqualTo: restaurantId)
+        .where('status', isGreaterThan: 9)
         : null,
     builder: (data, documentId) => Order.fromMap(data, documentId),
   );
