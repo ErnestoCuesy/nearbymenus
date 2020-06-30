@@ -132,8 +132,20 @@ class ViewOrderModel with ChangeNotifier {
   bool get canSave => _checkOrder();
 
   bool _checkOrder() {
+    int deliveryOptionsAvailable = 0;
+    session.currentRestaurant.foodDeliveryFlags.forEach((key, value) {
+      if (value) deliveryOptionsAvailable++;
+    });
+    bool deliveryOptionsOk = false;
+    if (deliveryOptionsAvailable > 0) {
+      if (order.deliveryOption != '') {
+        deliveryOptionsOk = true;
+      }
+    } else {
+      deliveryOptionsOk = true;
+    }
     return order.paymentMethod != '' &&
-           order.deliveryOption != '' &&
+           deliveryOptionsOk &&
            order.orderTotal > 0;
   }
 
@@ -189,7 +201,7 @@ class ViewOrderModel with ChangeNotifier {
         }
         break;
       case ORDER_DELIVERING:
-        if (order.status == ORDER_READY) {
+        if (order.status == ORDER_READY && order.deliveryOption == 'Deliver') {
           proceed = true;
         } else {
           proceed = false;

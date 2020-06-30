@@ -56,6 +56,7 @@ class _ViewOrderState extends State<ViewOrder> {
   ScrollController itemsScrollController = ScrollController();
   final TextEditingController _notesController = TextEditingController();
   final FocusNode _notesFocusNode = FocusNode();
+  int deliveryOptionsAvailable = 0;
 
   ViewOrderModel get model => widget.model;
   GlobalKey<ScaffoldState> get scaffoldKey => widget.scaffoldKey;
@@ -138,6 +139,9 @@ class _ViewOrderState extends State<ViewOrder> {
     if (model.order == null) {
       return null;
     }
+    session.currentRestaurant.foodDeliveryFlags.forEach((key, value) {
+      if (value) deliveryOptionsAvailable++;
+    });
     return SingleChildScrollView(
       controller: orderScrollController,
       child: Padding(
@@ -254,7 +258,7 @@ class _ViewOrderState extends State<ViewOrder> {
                   Column(
                      children: _buildPaymentMethods(),
                   ),
-                  if (model.order.status == ORDER_ON_HOLD)
+                  if (model.order.status == ORDER_ON_HOLD && deliveryOptionsAvailable > 0)
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Text(
