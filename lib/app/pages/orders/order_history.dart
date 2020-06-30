@@ -32,24 +32,22 @@ class _OrderHistoryState extends State<OrderHistory> {
   String role = ROLE_PATRON;
 
   Widget _buildContents(BuildContext context) {
-    String lockedString = '';
-    if (FlavourConfig.isStaff()) {
-      stream = database.activeRestaurantOrders(
-        session.currentRestaurant.id,
-      );
-    } else if (FlavourConfig.isManager()) {
+    String messageString = '';
+    if (!FlavourConfig.isPatron()) {
       if (widget.showBlocked) {
         stream = database.blockedOrders(database.userId);
-        lockedString = 'locked';
+        messageString = 'locked';
       } else {
         if (widget.showActive) {
           stream = database.activeRestaurantOrders(
             session.currentRestaurant.id,
           );
+          messageString = 'active';
         } else {
           stream = database.inactiveRestaurantOrders(
             session.currentRestaurant.id,
           );
+          messageString = 'inactive';
         }
       }
     } else {
@@ -64,7 +62,7 @@ class _OrderHistoryState extends State<OrderHistory> {
         blockedOrders = snapshot.data;
         return ListItemsBuilder<Order>(
             title: 'Orders',
-            message: 'There are no $lockedString orders',
+            message: 'There are no $messageString orders',
             snapshot: snapshot,
             itemBuilder: (context, order) {
               return Card(
