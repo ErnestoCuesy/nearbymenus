@@ -71,7 +71,7 @@ class _MessagesPageState extends State<MessagesPage> {
       builder: (context, snapshot) {
         return ListItemsBuilder<UserMessage>(
             title: 'Staff Access',
-            message: 'You don\'t staff access requests',
+            message: 'You don\'t have staff access requests',
             snapshot: snapshot,
             itemBuilder: (context, message) {
               return Dismissible(
