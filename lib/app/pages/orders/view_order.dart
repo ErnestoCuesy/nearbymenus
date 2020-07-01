@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
+import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/session.dart';
@@ -57,6 +58,7 @@ class _ViewOrderState extends State<ViewOrder> {
   final TextEditingController _notesController = TextEditingController();
   final FocusNode _notesFocusNode = FocusNode();
   int deliveryOptionsAvailable = 0;
+  int orderDistance = 0;
 
   ViewOrderModel get model => widget.model;
   GlobalKey<ScaffoldState> get scaffoldKey => widget.scaffoldKey;
@@ -179,6 +181,10 @@ class _ViewOrderState extends State<ViewOrder> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: Text(model.order.deliveryAddress),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text('Order placed $orderDistance metres from you'),
                   ),
                   SizedBox(
                     child: Container(
@@ -531,7 +537,18 @@ class _ViewOrderState extends State<ViewOrder> {
           style: TextStyle(color: Theme.of(context).appBarTheme.color),
         ),
       ),
-      body: _buildContents(context),
+      body: FutureBuilder<int>(
+          future: model.orderDistance,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.waiting &&
+                snapshot.hasData) {
+                orderDistance = snapshot.data;
+                return _buildContents(context);
+            } else {
+              return Center(child: PlatformProgressIndicator());
+            }
+          },
+      )
     );
   }
 }

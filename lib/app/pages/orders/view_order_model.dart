@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
@@ -18,6 +19,16 @@ class ViewOrderModel with ChangeNotifier {
         this.isLoading = false,
         this.submitted = false,
       });
+
+  Future<int> get orderDistance async {
+    double distance = await Geolocator().distanceBetween(
+      session.position.latitude,
+      session.position.longitude,
+      order.deliveryPosition.latitude,
+      order.deliveryPosition.longitude,
+    );
+    return distance.round();
+  }
 
   Future<void> save() async {
     updateWith(isLoading: true, submitted: true);
