@@ -73,7 +73,7 @@ class SubscriptionCheck extends StatelessWidget {
                     snapshot.hasData) {
                   _setBundleAndUnlock(database, snapshot.data,
                       session.subscription.purchaserInfo.allPurchaseDates);
-                  return MessagesListener(page: HomePageManager());
+                  return MessagesListener(child: HomePageManager());
                 } else {
                   return Scaffold(
                     body: Center(

@@ -27,7 +27,7 @@ class _RestaurantQueryState extends State<RestaurantQuery> {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         fullscreenDialog: false,
-        builder: (context) => MessagesListener(page: MenuAndOrdersPage(),),
+        builder: (context) => MessagesListener(child: MenuAndOrdersPage(),),
       ),
     );
   }
@@ -83,6 +83,8 @@ class _RestaurantQueryState extends State<RestaurantQuery> {
       role = ROLE_MANAGER;
     } else if (FlavourConfig.isStaff()) {
       role = ROLE_STAFF;
+    } else if (FlavourConfig.isVenue()) {
+      role = ROLE_VENUE;
     }
     bloc = NearRestaurantBloc(
         source: database.patronRestaurants(),

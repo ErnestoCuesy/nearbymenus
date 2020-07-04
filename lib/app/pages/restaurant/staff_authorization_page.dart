@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nearbymenus/app/common_widgets/custom_raised_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -89,7 +90,7 @@ class _StaffAuthorizationPageState extends State<StaffAuthorizationPage> {
         fromUid: database.userId,
         toUid: session.currentRestaurant.managerId,
         restaurantId: session.currentRestaurant.id,
-        fromRole: ROLE_STAFF,
+        fromRole: FlavourConfig.isStaff() ? ROLE_STAFF : ROLE_VENUE,
         toRole: ROLE_MANAGER,
         fromName: session.userDetails.name,
         delivered: false,

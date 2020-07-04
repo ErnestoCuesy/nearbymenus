@@ -34,8 +34,9 @@ class _CheckStaffAuthorizationState extends State<CheckStaffAuthorization> {
         }
         if (snapshot.hasData) {
           final Authorizations authorizations = snapshot.data;
-          if (authorizations.authorizedRoles[database.userId] == 'Staff') {
-            return MessagesListener(page: AdministratorPage(),);
+          if (authorizations.authorizedRoles[database.userId] == ROLE_STAFF ||
+              authorizations.authorizedRoles[database.userId] == ROLE_VENUE) {
+            return MessagesListener(child: AdministratorPage(),);
           }
         }
         return StaffAuthorizationPage();

@@ -7,6 +7,7 @@ import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/authorizations.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
+import 'package:nearbymenus/app/pages/messages/authorized_dates.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/utilities/format.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +21,7 @@ class _MessagesPageState extends State<MessagesPage> {
   Session session;
   Database database;
   Authorizations authorizations =
-      Authorizations(authorizedRoles: {}, authorizedNames: {});
+      Authorizations(authorizedRoles: {}, authorizedNames: {}, authorizedDates: {});
   String role = ROLE_PATRON;
 
   void _getAuthorizations(UserMessage message) async {
@@ -62,6 +63,8 @@ class _MessagesPageState extends State<MessagesPage> {
       role = ROLE_MANAGER;
     } else if (FlavourConfig.isStaff()) {
       role = ROLE_STAFF;
+    } else if (FlavourConfig.isVenue()) {
+      role = ROLE_VENUE;
     }
     return StreamBuilder<List<UserMessage>>(
       stream: database.managerMessages(
@@ -70,8 +73,8 @@ class _MessagesPageState extends State<MessagesPage> {
       ),
       builder: (context, snapshot) {
         return ListItemsBuilder<UserMessage>(
-            title: 'Staff Access',
-            message: 'You don\'t have staff access requests',
+            title: 'Restaurant Access',
+            message: 'You don\'t have restaurant access requests',
             snapshot: snapshot,
             itemBuilder: (context, message) {
               return Dismissible(
@@ -148,18 +151,35 @@ class _MessagesPageState extends State<MessagesPage> {
     );
   }
 
-  void _changeAuthorization(UserMessage message, bool flag) {
+  void _changeAuthorization(UserMessage message, bool flag) async {
     setState(() {
       message.authFlag = flag;
     });
+    List<int> authorizedIntDates = List<int>();
+    if (flag && message.fromRole == ROLE_VENUE) {
+      final authorizedDates = await Navigator.of(context).push(
+        MaterialPageRoute<List<DateTime>>(
+          fullscreenDialog: false,
+          builder: (context) =>
+              AuthorizedDates(),
+        ),
+      );
+      print('$authorizedDates');
+      authorizedDates.forEach((element) {
+        authorizedIntDates.add(element.millisecondsSinceEpoch);
+      });
+    }
     if (flag) {
       authorizations.authorizedRoles
-          .putIfAbsent(message.fromUid, () => ROLE_STAFF);
+          .putIfAbsent(message.fromUid, () => message.fromRole);
       authorizations.authorizedNames
           .putIfAbsent(message.fromUid, () => message.fromName);
+      authorizations.authorizedDates
+          .putIfAbsent(message.fromUid, () => authorizedIntDates);
     } else {
       authorizations.authorizedRoles.remove(message.fromUid);
       authorizations.authorizedNames.remove(message.fromUid);
+      authorizations.authorizedDates.remove(message.fromUid);
     }
     database.setAuthorization(message.restaurantId, authorizations);
     UserMessage readMessage = UserMessage(
@@ -189,7 +209,7 @@ class _MessagesPageState extends State<MessagesPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Staff Access',
+          'Restaurant Access',
           style: TextStyle(color: Theme.of(context).appBarTheme.color),
         ),
       ),

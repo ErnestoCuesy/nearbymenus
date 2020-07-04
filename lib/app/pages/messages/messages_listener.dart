@@ -8,9 +8,9 @@ import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
 class MessagesListener extends StatefulWidget {
-  final Widget page;
+  final Widget child;
 
-  const MessagesListener({Key key, this.page}) : super(key: key);
+  const MessagesListener({Key key, this.child}) : super(key: key);
 
   @override
   _MessagesListenerState createState() => _MessagesListenerState();
@@ -50,13 +50,16 @@ class _MessagesListenerState extends State<MessagesListener> {
     Stream<List<UserMessage>> _stream;
     if (FlavourConfig.isManager()) {
       role = ROLE_MANAGER;
-      _stream = database.managerMessages(database.userId, ROLE_MANAGER);
+      _stream = database.managerMessages(database.userId, role);
     } else if (FlavourConfig.isStaff()) {
       role = ROLE_STAFF;
-      _stream = database.staffMessages(session.currentRestaurant.id, ROLE_STAFF);
+      _stream = database.staffMessages(session.currentRestaurant.id, role);
+    } else if (FlavourConfig.isVenue()) {
+      role = ROLE_VENUE;
+      _stream = database.staffMessages(session.currentRestaurant.id, role);
     } else {
-      _stream = database.patronMessages(database.userId);
       role = ROLE_PATRON;
+      _stream = database.patronMessages(database.userId);
     }
     return StreamBuilder<List<UserMessage>>(
       stream: _stream,
@@ -97,7 +100,7 @@ class _MessagesListenerState extends State<MessagesListener> {
             }
           });
         }
-        return widget.page;
+        return widget.child;
       });
   }
 }

@@ -186,6 +186,38 @@ class _AdministratorPageState extends State<AdministratorPage> {
           ),
         ],
       ),
+    SizedBox(
+    height: 16.0,
+    ),
+    Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        CustomRaisedButton(
+          height: buttonSize,
+          width: buttonSize,
+          color: Theme.of(context).buttonTheme.colorScheme.surface,
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (BuildContext context) => Placeholder(),
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Sales',
+                style: Theme.of(context).accentTextTheme.headline6,
+              ),
+              SizedBox(height: 8.0,),
+              Icon(
+                Icons.attach_money,
+                size: 36.0,
+              ),
+            ],
+          ),
+        ),
+      ]
+    )
     ];
   }
 
