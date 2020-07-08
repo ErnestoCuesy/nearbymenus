@@ -7,6 +7,7 @@ import 'package:nearbymenus/app/pages/menu_browser/expandable_menu_browser.dart'
 import 'package:nearbymenus/app/pages/menu_builder/menu/menu_page.dart';
 import 'package:nearbymenus/app/pages/option_builder/option/option_page.dart';
 import 'package:nearbymenus/app/pages/orders/order_history.dart';
+import 'package:nearbymenus/app/pages/orders/order_totals.dart';
 import 'package:provider/provider.dart';
 
 class AdministratorPage extends StatefulWidget {
@@ -198,7 +199,7 @@ class _AdministratorPageState extends State<AdministratorPage> {
           color: Theme.of(context).buttonTheme.colorScheme.surface,
           onPressed: () => Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (BuildContext context) => Placeholder(),
+              builder: (BuildContext context) => OrderTotals(),
             ),
           ),
           child: Column(
