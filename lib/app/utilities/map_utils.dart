@@ -75,7 +75,12 @@ class MapUtils {
     // Determine correct level of zoom
     double zoom =
         _getBoundsZoomLevel(bounds.northeast, bounds.southwest, width, height);
-    controller.moveCamera(CameraUpdate.zoomTo(zoom));
+
+    // Move camera and display finish marker info window (only 1 marker at a time is possible)
+    controller.moveCamera(CameraUpdate.zoomTo(zoom)).then((_) async {
+      await Future.delayed(Duration(seconds: 1));
+      controller.showMarkerInfoWindow(finishMarkerId);
+    });
 
     callBack();
   }
