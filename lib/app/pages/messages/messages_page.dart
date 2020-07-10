@@ -4,10 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:nearbymenus/app/common_widgets/list_items_builder.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
-import 'package:nearbymenus/app/models/authorizations.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
-import 'package:nearbymenus/app/pages/messages/authorized_dates.dart';
+import 'package:nearbymenus/app/pages/messages/access_options.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/utilities/format.dart';
 import 'package:provider/provider.dart';
@@ -20,21 +19,7 @@ class MessagesPage extends StatefulWidget {
 class _MessagesPageState extends State<MessagesPage> {
   Session session;
   Database database;
-  Authorizations authorizations =
-      Authorizations(authorizedRoles: {}, authorizedNames: {}, authorizedDates: {});
   String role = ROLE_PATRON;
-
-  Future<void> _getAuthorizations(UserMessage message) async {
-    await database.authorizationsSnapshot().then((authorizationsList) {
-      if (authorizationsList.length > 0) {
-        authorizationsList.forEach((authorization) {
-          if (authorization.id == message.restaurantId) {
-            authorizations = authorization;
-          }
-        });
-      }
-    });
-  }
 
   Future<void> _deleteMessage(BuildContext context, UserMessage message) async {
     try {
@@ -63,8 +48,6 @@ class _MessagesPageState extends State<MessagesPage> {
       role = ROLE_MANAGER;
     } else if (FlavourConfig.isStaff()) {
       role = ROLE_STAFF;
-    } else if (FlavourConfig.isVenue()) {
-      role = ROLE_VENUE;
     }
     return StreamBuilder<List<UserMessage>>(
       stream: database.managerMessages(
@@ -112,7 +95,7 @@ class _MessagesPageState extends State<MessagesPage> {
                             padding:
                                 const EdgeInsets.only(top: 4.0, bottom: 4.0),
                             child: Text(
-                              'Slide the switch to grant or deny',
+                              'Tap for options',
                             ),
                           ),
                           Text(
@@ -132,25 +115,12 @@ class _MessagesPageState extends State<MessagesPage> {
                         ),
                       ],
                     ),
-                    trailing: Column(
-                      children: [
-                        if (message.fromRole == ROLE_STAFF)
-                        CupertinoSwitch(
-                          value: message.authFlag,
-                          onChanged: (flag) async {
-                            await _getAuthorizations(message);
-                            _changeAuthorization(message, flag);
-                          }
-                        ),
-                        if (message.fromRole == ROLE_VENUE)
-                        IconButton(
-                          icon: Icon(Icons.calendar_today),
-                          onPressed: () async {
-                            await _getAuthorizations(message);
-                            _changeAuthorization(message, true);
-                          },
-                        ),
-                      ],
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        fullscreenDialog: false,
+                        builder: (context) =>
+                            AccessOptions(message: message,),
+                      ),
                     ),
                   ),
                 ),
@@ -158,68 +128,6 @@ class _MessagesPageState extends State<MessagesPage> {
             });
       },
     );
-  }
-
-  void _changeAuthorization(UserMessage message, bool flag) async {
-    setState(() {
-      message.authFlag = flag;
-    });
-    List<dynamic> authorizedIntDates = authorizations.authorizedDates[message.fromUid] ?? [];
-    if (flag && message.fromRole == ROLE_VENUE) {
-      final authorizedDates = await Navigator.of(context).push(
-        MaterialPageRoute<List<DateTime>>(
-          fullscreenDialog: false,
-          builder: (context) =>
-              AuthorizedDates(
-                authorizedIntDates: authorizedIntDates,
-              ),
-        ),
-      );
-      print('$authorizedDates');
-      if (authorizedDates != null) {
-        authorizedIntDates.clear();
-        authorizedDates.forEach((date) {
-          authorizedIntDates.add(date.millisecondsSinceEpoch);
-        });
-      }
-    }
-    if (flag) {
-      authorizations.authorizedRoles
-          .putIfAbsent(message.fromUid, () => message.fromRole);
-      authorizations.authorizedNames
-          .putIfAbsent(message.fromUid, () => message.fromName);
-      if (authorizations.authorizedDates.containsKey(message.fromUid)) {
-        authorizations.authorizedDates.update(message.fromUid, (value) => authorizedIntDates);
-      } else {
-        authorizations.authorizedDates
-            .putIfAbsent(message.fromUid, () => authorizedIntDates);
-      }
-    } else {
-      if (message.fromRole == ROLE_STAFF) {
-        authorizations.authorizedRoles.remove(message.fromUid);
-        authorizations.authorizedNames.remove(message.fromUid);
-        authorizations.authorizedDates.remove(message.fromUid);
-      }
-    }
-    database.setAuthorization(message.restaurantId, authorizations);
-    UserMessage readMessage = UserMessage(
-        id: message.id,
-        timestamp: message.timestamp,
-        fromUid: message.fromUid,
-        toUid: message.toUid,
-        restaurantId: message.restaurantId,
-        fromRole: message.fromRole,
-        toRole: message.toRole,
-        fromName: message.fromName,
-        type: message.type,
-        authFlag: message.authFlag,
-        delivered: true,
-        attendedFlag: true
-    );
-    database.setMessageDetails(readMessage);
-    setState(() {
-      session.pendingStaffAuthorizations--;
-    });
   }
 
   @override

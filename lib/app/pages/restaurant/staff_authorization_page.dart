@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nearbymenus/app/common_widgets/custom_raised_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
-import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -90,9 +89,9 @@ class _StaffAuthorizationPageState extends State<StaffAuthorizationPage> {
         fromUid: database.userId,
         toUid: session.currentRestaurant.managerId,
         restaurantId: session.currentRestaurant.id,
-        fromRole: FlavourConfig.isStaff() ? ROLE_STAFF : ROLE_VENUE,
+        fromRole: ROLE_STAFF,
         toRole: ROLE_MANAGER,
-        fromName: session.userDetails.name,
+        fromName: '${session.userDetails.name} (${session.userDetails.email})',
         delivered: false,
         type: 'Access to ${session.currentRestaurant.name}',
         authFlag: false,

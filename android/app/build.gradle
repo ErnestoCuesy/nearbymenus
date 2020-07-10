@@ -85,12 +85,6 @@ android {
             applicationIdSuffix ".staff"
             versionNameSuffix "-staff"
         }
-        venue {
-            dimension "app"
-            resValue "string", "app_name", "NM Venue"
-            applicationIdSuffix ".venue"
-            versionNameSuffix "-venue"
-        }
         patron {
             dimension "app"
             resValue "string", "app_name", "Nearby Menus"

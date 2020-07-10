@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
-enum Flavour { PATRON, MANAGER, STAFF, VENUE }
+enum Flavour { PATRON, MANAGER, STAFF }
 enum ColorTheme { BLACK, ORANGE, GREEN }
 
 class StringUtils {
@@ -41,5 +41,4 @@ class FlavourConfig {
   static bool isPatron() => _instance.flavour == Flavour.PATRON;
   static bool isManager() => _instance.flavour == Flavour.MANAGER;
   static bool isStaff() => _instance.flavour == Flavour.STAFF;
-  static bool isVenue() => _instance.flavour == Flavour.VENUE;
 }

@@ -9,6 +9,7 @@ import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/authorizations.dart';
 import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/session.dart';
+import 'package:nearbymenus/app/pages/orders/order_totals_page.dart';
 import 'package:nearbymenus/app/pages/restaurant/venue_authorization_page.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
@@ -21,10 +22,7 @@ class OrderTotals extends StatefulWidget {
 class _OrderTotalsState extends State<OrderTotals> {
   Session session;
   Database database;
-  final f = NumberFormat.simpleCurrency(locale: "en_ZA");
   Stream<List<Order>> _stream;
-  List<Order> _orderList = List<Order>();
-  Map<String, double> _orderTotals = {};
   Authorizations _authorizations =
   Authorizations(authorizedRoles: {}, authorizedNames: {}, authorizedDates: {});
   List<dynamic> _intDates = List<dynamic>();
@@ -34,25 +32,10 @@ class _OrderTotalsState extends State<OrderTotals> {
   dynamic _searchDate;
   static const String NOT_AUTH = '9999/12/31';
 
-  void _calculateTotals() {
-    _orderTotals.clear();
-    _orderTotals.putIfAbsent('active', () => 0.00);
-    _orderTotals.putIfAbsent('closed', () => 0.00);
-    _orderList.forEach((order) {
-      if (order.status > ORDER_PLACED && order.status < 10) {
-        _orderTotals.update('active', (value) => value + order.orderTotal);
-      } else {
-        if (order.status == ORDER_CLOSED) {
-          _orderTotals.update('closed', (value) => value + order.orderTotal);
-        }
-      }
-    });
-    print('Orders totals: $_orderTotals');
-  }
-
   void _determineSearchDate() {
-    if (FlavourConfig.isVenue()) {
-      _intDates = _authorizations.authorizedDates[database.userId];
+    if (!FlavourConfig.isManager()) {
+      _intDates = _authorizations.authorizedDates[database.userId]
+                  ?? [DateTime.now().millisecondsSinceEpoch];
       _intDates.sort((a, b) => b.compareTo(a));
       _stringDates.clear();
       _intDates.forEach((intDate) {
@@ -81,171 +64,6 @@ class _OrderTotalsState extends State<OrderTotals> {
       _selectedStringDate = '${startDate.year}' + '/' + '${startDate.month}' + '/' +
           '${startDate.day}';
     }
-  }
-
-  Widget _buildContents(BuildContext context) {
-    return FutureBuilder<List<Authorizations>>(
-      future: database.authorizationsSnapshot(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.waiting &&
-            snapshot.hasData) {
-          _authorizations = snapshot.data.firstWhere((authorization) => authorization.id == session.currentRestaurant.id);
-          _determineSearchDate();
-          if (_selectedStringDate == NOT_AUTH) {
-            return VenueAuthorizationPage();
-          } else {
-            _stream = database.dayRestaurantOrders(
-                session.currentRestaurant.id,
-                DateTime.fromMillisecondsSinceEpoch(_searchDate)
-            );
-            return StreamBuilder<List<Order>>(
-              stream: _stream,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState != ConnectionState.waiting &&
-                    snapshot.hasData) {
-                  _orderList = snapshot.data;
-                  _calculateTotals();
-                  return SingleChildScrollView(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Text(
-                              'Sales for the day',
-                              style: Theme
-                                  .of(context)
-                                  .textTheme
-                                  .headline4,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Text(
-                              _selectedStringDate,
-                              style: Theme
-                                  .of(context)
-                                  .textTheme
-                                  .headline5,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              height: 150,
-                              width: 300,
-                              child: Card(
-                                child: Column(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(24.0),
-                                      child: Text(
-                                        'Orders in progress',
-                                        style: Theme
-                                            .of(context)
-                                            .textTheme
-                                            .headline5,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        '${f.format(_orderTotals['active'])}',
-                                        style: Theme
-                                            .of(context)
-                                            .textTheme
-                                            .headline5,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              height: 150,
-                              width: 300,
-                              child: Card(
-                                child: Column(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(24.0),
-                                      child: Text(
-                                        'Orders closed',
-                                        style: Theme
-                                            .of(context)
-                                            .textTheme
-                                            .headline5,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        '${f.format(_orderTotals['closed'])}',
-                                        style: Theme
-                                            .of(context)
-                                            .textTheme
-                                            .headline5,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              height: 150,
-                              width: 300,
-                              child: Card(
-                                child: Column(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(16.0),
-                                      child: Text(
-                                        'Total',
-                                        style: Theme
-                                            .of(context)
-                                            .textTheme
-                                            .headline4,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        '${f.format(_orderTotals['active'] +
-                                            _orderTotals['closed'])}',
-                                        style: Theme
-                                            .of(context)
-                                            .textTheme
-                                            .headline4,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                } else {
-                  return Center(child: PlatformProgressIndicator());
-                }
-              },
-            );
-          }
-        } else {
-          return Center(child: PlatformProgressIndicator());
-        }
-      },
-    );
   }
 
   Widget _datesMenuButton() {
@@ -306,6 +124,44 @@ class _OrderTotalsState extends State<OrderTotals> {
     });
   }
 
+  Widget _buildContents(BuildContext context) {
+    if (!FlavourConfig.isManager()) {
+      return FutureBuilder<List<Authorizations>>(
+        future: database.authorizationsSnapshot(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.waiting &&
+              snapshot.hasData) {
+            _authorizations = snapshot.data.firstWhere((authorization) => authorization.id == session.currentRestaurant.id);
+            _determineSearchDate();
+            if (_selectedStringDate == NOT_AUTH) {
+              return VenueAuthorizationPage();
+            } else {
+              _stream = database.dayRestaurantOrders(
+                  session.currentRestaurant.id,
+                  DateTime.fromMillisecondsSinceEpoch(_searchDate)
+              );
+              return OrderTotalsPage(
+                stream: _stream, selectedStringDate: _selectedStringDate,);
+            }
+          } else {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return VenueAuthorizationPage();
+            } else {
+              return Center(child: PlatformProgressIndicator());
+            }
+          }
+        },
+      );
+    } else {
+      _determineSearchDate();
+      _stream = database.dayRestaurantOrders(
+        session.currentRestaurant.id,
+        DateTime.fromMillisecondsSinceEpoch(_searchDate));
+      return OrderTotalsPage(
+        stream: _stream, selectedStringDate: _selectedStringDate,);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
@@ -325,7 +181,7 @@ class _OrderTotalsState extends State<OrderTotals> {
                 onPressed: () => _calendarButton(context),
               ),
             ),
-          if (FlavourConfig.isVenue())
+          if (!FlavourConfig.isManager())
             _datesMenuButton()
         ],
       ),

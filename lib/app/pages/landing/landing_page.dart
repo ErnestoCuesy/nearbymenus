@@ -20,8 +20,6 @@ class LandingPage extends StatelessWidget {
       role = ROLE_MANAGER;
     } else if (FlavourConfig.isStaff()) {
       role = ROLE_STAFF;
-    } else if (FlavourConfig.isVenue()) {
-      role = ROLE_VENUE;
     }
     session.userDetails.role = role;
   }

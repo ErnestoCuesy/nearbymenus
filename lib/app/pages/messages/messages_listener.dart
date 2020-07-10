@@ -52,10 +52,7 @@ class _MessagesListenerState extends State<MessagesListener> {
       role = ROLE_MANAGER;
       _stream = database.managerMessages(database.userId, role);
     } else if (FlavourConfig.isStaff()) {
-      role = ROLE_STAFF;
-      _stream = database.staffMessages(session.currentRestaurant.id, role);
-    } else if (FlavourConfig.isVenue()) {
-      role = ROLE_VENUE;
+      role = session.userDetails.role ?? ROLE_STAFF;
       _stream = database.staffMessages(session.currentRestaurant.id, role);
     } else {
       role = ROLE_PATRON;

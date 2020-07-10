@@ -122,9 +122,11 @@ class _AdministratorPageState extends State<AdministratorPage> {
           ),
         ],
       ),
+      if (FlavourConfig.isManager())
       SizedBox(
         height: 16.0,
       ),
+      if (FlavourConfig.isManager() || session.userDetails.role == ROLE_STAFF)
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
