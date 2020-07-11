@@ -182,9 +182,24 @@ class _ViewOrderState extends State<ViewOrder> {
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: Text(model.order.deliveryAddress),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Text('Order placed $orderDistance metres from you'),
+//                  Padding(
+//                    padding: const EdgeInsets.only(bottom: 8.0),
+//                    child: Text('Order placed $orderDistance metres from you'),
+//                  ),
+                  FutureBuilder<int>(
+                    future: model.orderDistance,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState != ConnectionState.waiting &&
+                          snapshot.hasData) {
+                        orderDistance = snapshot.data;
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: Text('Order placed $orderDistance metres from you'),
+                        );
+                      } else {
+                        return Center(child: PlatformProgressIndicator());
+                      }
+                    },
                   ),
                   SizedBox(
                     child: Container(
@@ -467,7 +482,7 @@ class _ViewOrderState extends State<ViewOrder> {
         cursorColor: Colors.black,
         decoration: InputDecoration(
           labelText: 'Notes',
-          enabled: true,
+          enabled: model.isLoading == false,
         ),
         autocorrect: false,
         enableSuggestions: false,
@@ -475,6 +490,7 @@ class _ViewOrderState extends State<ViewOrder> {
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.done,
         onChanged: model.updateNotes,
+        onEditingComplete: _notesEditingComplete,
       );
     } else {
       notesField = Text(notes);
@@ -491,6 +507,10 @@ class _ViewOrderState extends State<ViewOrder> {
         )
       ],
     );
+  }
+
+  void _notesEditingComplete() {
+    FocusScope.of(context).requestFocus(_notesFocusNode);
   }
 
   List<Widget> _buildPaymentMethods() {
@@ -537,18 +557,7 @@ class _ViewOrderState extends State<ViewOrder> {
           style: TextStyle(color: Theme.of(context).appBarTheme.color),
         ),
       ),
-      body: FutureBuilder<int>(
-          future: model.orderDistance,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState != ConnectionState.waiting &&
-                snapshot.hasData) {
-                orderDistance = snapshot.data;
-                return _buildContents(context);
-            } else {
-              return Center(child: PlatformProgressIndicator());
-            }
-          },
-      )
+      body: _buildContents(context),
     );
   }
 }
