@@ -6,7 +6,8 @@ import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_menu_browser.dart';
 import 'package:nearbymenus/app/pages/menu_builder/menu/menu_page.dart';
 import 'package:nearbymenus/app/pages/option_builder/option/option_page.dart';
-import 'package:nearbymenus/app/pages/orders/order_history.dart';
+import 'package:nearbymenus/app/pages/orders/active_orders.dart';
+import 'package:nearbymenus/app/pages/orders/inactive_orders.dart';
 import 'package:nearbymenus/app/pages/orders/order_totals.dart';
 import 'package:provider/provider.dart';
 
@@ -136,10 +137,7 @@ class _AdministratorPageState extends State<AdministratorPage> {
             color: Theme.of(context).buttonTheme.colorScheme.surface,
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (BuildContext context) => OrderHistory(
-                  showBlocked: false,
-                  showActive: true,
-                ),
+                builder: (BuildContext context) => ActiveOrders(),
               ),
             ),
             child: Column(
@@ -166,10 +164,7 @@ class _AdministratorPageState extends State<AdministratorPage> {
             color: Theme.of(context).buttonTheme.colorScheme.surface,
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (BuildContext context) => OrderHistory(
-                  showBlocked: false,
-                  showActive: false,
-                ),
+                builder: (BuildContext context) => InactiveOrders(),
               ),
             ),
             child: Column(

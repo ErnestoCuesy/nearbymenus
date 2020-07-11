@@ -160,7 +160,7 @@ class _ExpandableListViewState extends State<ExpandableListView> {
           ),
           ExpandableContainer(
             expanded: expandItemsFlag,
-            expandedHeight: 100.0 * itemCount,
+            expandedHeight: 90.0 * itemCount,
             child: ListView.builder(
               itemCount: itemCount,
               itemBuilder: (BuildContext context, int index) {

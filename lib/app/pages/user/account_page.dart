@@ -5,7 +5,7 @@ import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/bundle.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
-import 'package:nearbymenus/app/pages/orders/order_history.dart';
+import 'package:nearbymenus/app/pages/orders/locked_orders.dart';
 import 'package:nearbymenus/app/pages/user/upsell_screen.dart';
 import 'package:nearbymenus/app/pages/user/user_details_form.dart';
 import 'package:nearbymenus/app/services/auth.dart';
@@ -127,7 +127,7 @@ class _AccountPageState extends State<AccountPage> {
           cardSubtitle: '',
           onPressed: () => Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (BuildContext context) => OrderHistory(showBlocked: true,),
+              builder: (BuildContext context) => LockedOrders(),
             ),
           ),
         ),

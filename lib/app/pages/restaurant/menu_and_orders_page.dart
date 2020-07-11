@@ -4,7 +4,7 @@ import 'package:nearbymenus/app/common_widgets/custom_raised_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_menu_browser.dart';
-import 'package:nearbymenus/app/pages/orders/order_history.dart';
+import 'package:nearbymenus/app/pages/orders/active_orders.dart';
 import 'package:provider/provider.dart';
 
 class MenuAndOrdersPage extends StatefulWidget {
@@ -30,7 +30,7 @@ class _MenuAndOrdersPageState extends State<MenuAndOrdersPage> {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         fullscreenDialog: false,
-        builder: (context) => OrderHistory(showBlocked: false,),
+        builder: (context) => ActiveOrders(),
       ),
     );
   }

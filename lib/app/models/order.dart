@@ -27,6 +27,7 @@ class Order {
   String deliveryOption;
   List<Map<dynamic, dynamic>> orderItems;
   String notes;
+  bool isActive;
   bool isBlocked;
 
   Order({
@@ -45,6 +46,7 @@ class Order {
     this.deliveryOption,
     this.orderItems,
     this.notes,
+    this.isActive,
     this.isBlocked,
   });
 
@@ -76,6 +78,7 @@ class Order {
       deliveryOption: data['deliveryOption'],
       orderItems: orderItems,
       notes: data['notes'],
+      isActive: data['isActive'],
       isBlocked: data['isBlocked'],
     );
   }
@@ -92,6 +95,7 @@ class Order {
   Map<String, dynamic> toMap() {
     final GeoPoint geoPoint =
     GeoPoint(deliveryPosition.latitude, deliveryPosition.longitude);
+    bool activeFlag = status < 10 ? true : false;
     return {
       'id': id,
       'orderNumber': orderNumber,
@@ -108,6 +112,7 @@ class Order {
       'deliveryOption': deliveryOption ?? '',
       'orderItems': orderItems ?? [],
       'notes': notes,
+      'isActive': activeFlag,
       'isBlocked': isBlocked ?? false,
     };
   }

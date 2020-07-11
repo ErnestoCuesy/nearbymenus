@@ -273,7 +273,7 @@ class FirestoreDatabase implements Database {
     path: APIPath.orders(),
     queryBuilder: restaurantId != null
         ? (query) => query.where('restaurantId', isEqualTo: restaurantId)
-                          .where('status', isLessThan: 10)
+                          .where('isActive', isEqualTo: true)
         : null,
     builder: (data, documentId) => Order.fromMap(data, documentId),
   );
@@ -283,7 +283,7 @@ class FirestoreDatabase implements Database {
     path: APIPath.orders(),
     queryBuilder: restaurantId != null
         ? (query) => query.where('restaurantId', isEqualTo: restaurantId)
-        .where('status', isGreaterThan: 9)
+                          .where('isActive', isEqualTo: false)
         : null,
     builder: (data, documentId) => Order.fromMap(data, documentId),
   );
@@ -293,8 +293,8 @@ class FirestoreDatabase implements Database {
     path: APIPath.orders(),
     queryBuilder: restaurantId != null
         ? (query) => query.where('restaurantId', isEqualTo: restaurantId)
-        .where('timestamp', isGreaterThanOrEqualTo: dateTime.millisecondsSinceEpoch)
-        .where('timestamp', isLessThanOrEqualTo: dateTime.add(Duration(hours: 24)).millisecondsSinceEpoch)
+                          .where('timestamp', isGreaterThanOrEqualTo: dateTime.millisecondsSinceEpoch)
+                          .where('timestamp', isLessThanOrEqualTo: dateTime.add(Duration(hours: 24)).millisecondsSinceEpoch)
         : null,
     builder: (data, documentId) => Order.fromMap(data, documentId),
   );
