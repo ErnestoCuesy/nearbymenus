@@ -274,6 +274,7 @@ class FirestoreDatabase implements Database {
     queryBuilder: restaurantId != null
         ? (query) => query.where('restaurantId', isEqualTo: restaurantId)
                           .where('isActive', isEqualTo: true)
+                          .orderBy('timestamp', descending: true)
         : null,
     builder: (data, documentId) => Order.fromMap(data, documentId),
   );
@@ -284,6 +285,7 @@ class FirestoreDatabase implements Database {
     queryBuilder: restaurantId != null
         ? (query) => query.where('restaurantId', isEqualTo: restaurantId)
                           .where('isActive', isEqualTo: false)
+                          .orderBy('timestamp', descending: true)
         : null,
     builder: (data, documentId) => Order.fromMap(data, documentId),
   );
@@ -305,6 +307,7 @@ class FirestoreDatabase implements Database {
     queryBuilder: restaurantId != null
         ? (query) => query.where('restaurantId', isEqualTo: restaurantId)
                           .where('userId', isEqualTo: uid)
+                          .orderBy('timestamp', descending: true)
         : null,
     builder: (data, documentId) => Order.fromMap(data, documentId),
   );
