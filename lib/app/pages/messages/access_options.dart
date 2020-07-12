@@ -41,7 +41,6 @@ class _AccessOptionsState extends State<AccessOptions> {
             ),
       ),
     );
-    print('$authorizedDates');
     if (authorizedDates != null && authorizedDates.length > 0) {
       authorizedIntDates.clear();
       authorizedDates.forEach((date) {
@@ -66,6 +65,7 @@ class _AccessOptionsState extends State<AccessOptions> {
       authorizations.authorizedRoles.remove(message.fromUid);
       authorizations.authorizedNames.remove(message.fromUid);
       authorizations.authorizedDates.remove(message.fromUid);
+      message.authFlag = false;
     }
     _setDatabaseAuthorization();
   }
