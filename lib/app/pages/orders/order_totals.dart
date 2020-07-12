@@ -33,7 +33,7 @@ class _OrderTotalsState extends State<OrderTotals> {
   static const String NOT_AUTH = '9999/12/31';
 
   void _determineSearchDate() {
-    if (!FlavourConfig.isManager()) {
+    if (session.userDetails.role == ROLE_VENUE) {
       _intDates = _authorizations.authorizedDates[database.userId]
                   ?? [DateTime.now().millisecondsSinceEpoch];
       _intDates.sort((a, b) => b.compareTo(a));
@@ -173,7 +173,7 @@ class _OrderTotalsState extends State<OrderTotals> {
           style: TextStyle(color: Theme.of(context).appBarTheme.color),
         ),
         actions: [
-          if (FlavourConfig.isManager())
+          if (FlavourConfig.isManager() || session.userDetails.role == ROLE_STAFF)
             Padding(
               padding: const EdgeInsets.only(right: 16.0),
               child: IconButton(
@@ -181,7 +181,7 @@ class _OrderTotalsState extends State<OrderTotals> {
                 onPressed: () => _calendarButton(context),
               ),
             ),
-          if (!FlavourConfig.isManager())
+          if (session.userDetails.role == ROLE_VENUE)
             _datesMenuButton()
         ],
       ),
