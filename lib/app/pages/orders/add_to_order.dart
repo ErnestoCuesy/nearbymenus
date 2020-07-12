@@ -103,10 +103,9 @@ class _AddToOrderState extends State<AddToOrder> {
                   Column(
                     children: _buildOptions(),
                   ),
-                  if (item['options'].isEmpty)
-                    Column(
-                      children: _buildQuantityField(),
-                    ),
+                  Column(
+                    children: _buildQuantityField(),
+                  ),
                   SizedBox(
                     height: 16.0,
                   ),
