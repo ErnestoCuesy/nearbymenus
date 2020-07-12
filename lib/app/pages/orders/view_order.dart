@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
-import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/session.dart';
@@ -66,9 +65,13 @@ class _ViewOrderState extends State<ViewOrder> {
   @override
   void initState() {
     super.initState();
+    _getOrderDistance();
     _notesController.text = model.order.notes;
   }
 
+  void _getOrderDistance() async {
+    orderDistance = await model.orderDistance;
+  }
 
   @override
   void dispose() {
@@ -182,24 +185,10 @@ class _ViewOrderState extends State<ViewOrder> {
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: Text(model.order.deliveryAddress),
                   ),
-//                  Padding(
-//                    padding: const EdgeInsets.only(bottom: 8.0),
-//                    child: Text('Order placed $orderDistance metres from you'),
-//                  ),
-                  FutureBuilder<int>(
-                    future: model.orderDistance,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState != ConnectionState.waiting &&
-                          snapshot.hasData) {
-                        orderDistance = snapshot.data;
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: Text('Order placed $orderDistance metres from you'),
-                        );
-                      } else {
-                        return Center(child: PlatformProgressIndicator());
-                      }
-                    },
+                  if (!FlavourConfig.isPatron())
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text('Order placed $orderDistance metres from you'),
                   ),
                   SizedBox(
                     child: Container(
