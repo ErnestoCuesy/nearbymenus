@@ -102,3 +102,8 @@ class RestaurantOptionValidators {
   final NumberValidator numberAllowedValidator = NumericFieldValidator();
   final String invalidNumberAllowedText = 'Must be greater than zero and less or equal to number of options.';
 }
+
+class ItemImageValidators {
+  final StringValidator itemImageDescriptionValidator = NonEmptyStringValidator();
+  final String invalidItemImageDescriptionText = 'Description can\'t be empty';
+}

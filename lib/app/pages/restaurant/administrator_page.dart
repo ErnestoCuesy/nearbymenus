@@ -3,6 +3,7 @@ import 'package:nearbymenus/app/common_widgets/custom_raised_button.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
+import 'package:nearbymenus/app/pages/images/item_image_page.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_menu_browser.dart';
 import 'package:nearbymenus/app/pages/menu_builder/menu/menu_page.dart';
 import 'package:nearbymenus/app/pages/option_builder/option/option_page.dart';
@@ -116,6 +117,33 @@ class _AdministratorPageState extends State<AdministratorPage> {
                 SizedBox(height: 8.0,),
                 Icon(
                   Icons.import_contacts,
+                  size: 36.0,
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            width: 16.0,
+          ),
+          CustomRaisedButton(
+            height: buttonSize,
+            width: buttonSize,
+            color: Theme.of(context).buttonTheme.colorScheme.surface,
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (BuildContext context) => ItemImagePage(),
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Images',
+                  style: Theme.of(context).accentTextTheme.headline6,
+                ),
+                SizedBox(height: 8.0,),
+                Icon(
+                  Icons.image,
                   size: 36.0,
                 ),
               ],

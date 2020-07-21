@@ -1,0 +1,38 @@
+import 'package:flutter/material.dart';
+import 'package:nearbymenus/app/models/item_image.dart';
+import 'package:nearbymenus/app/models/session.dart';
+import 'package:nearbymenus/app/pages/images/item_image_details_form.dart';
+import 'package:provider/provider.dart';
+
+class ItemImageDetailsPage extends StatelessWidget {
+  final ItemImage itemImage;
+
+  const ItemImageDetailsPage({
+    Key key,
+    this.itemImage,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    Session session = Provider.of<Session>(context);
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Enter image description'),
+        elevation: 2.0,
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Card(
+            child: ItemImageDetailsForm.create(
+              context: context,
+              restaurant: session.currentRestaurant,
+              itemImage: itemImage
+            ),
+          ),
+        ),
+      ),
+      backgroundColor: Colors.grey[200],
+    );
+  }
+}
