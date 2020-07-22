@@ -11,7 +11,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Nearby Menus</string>
+	<string>NM Manager</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -36,6 +36,8 @@
 	<string>Your current location will be used to find restaurants advertising on Nearby Menus.</string>
 	<key>NSMotionUsageDescription</key>
 	<string>Your phone's motion may be accessed while you use this app.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Your phone's photo library may be accessed to pick restaurant images.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Your phone's speech recognition may be accessed while you use this app.</string>
 	<key>UILaunchStoryboardName</key>

@@ -15,6 +15,9 @@ class ItemImageDetailsModel with ItemImageValidators, ChangeNotifier {
   String id;
   String description;
   String url;
+  Widget image;
+  File imageFile;
+  bool imageChanged = false;
   bool isLoading;
   bool submitted;
 
@@ -22,8 +25,6 @@ class ItemImageDetailsModel with ItemImageValidators, ChangeNotifier {
 
   Map<dynamic, dynamic> itemImages;
   ImagePicker _imagePicker = ImagePicker();
-  File _image;
-  bool _imageChanged = false;
 
   ItemImageDetailsModel(
       {@required this.database,
@@ -31,15 +32,16 @@ class ItemImageDetailsModel with ItemImageValidators, ChangeNotifier {
         this.id,
         this.description,
         this.url,
+        this.image,
         this.isLoading = false,
         this.submitted = false,
       });
 
   Future<void> save() async {
-    if (_imageChanged) {
+    updateWith(isLoading: true, submitted: true);
+    if (imageChanged) {
       await uploadPic();
     }
-    updateWith(isLoading: true, submitted: true);
     final itemImage = ItemImage(
       id: id,
       description: description,
@@ -61,18 +63,18 @@ class ItemImageDetailsModel with ItemImageValidators, ChangeNotifier {
   }
 
   Future getImage() async {
-    PickedFile image = await _imagePicker.getImage(source: ImageSource.gallery);
-    if (image != null) {
-      _image = File(image.path);
-      _imageChanged = true;
-      print('Image path: ${_image.path}');
+    PickedFile pickedImage = await _imagePicker.getImage(source: ImageSource.gallery);
+    if (pickedImage != null) {
+      imageFile = File(pickedImage.path);
+      image = Image.file(imageFile);
+      updateWith(image: image, imageChanged: true);
     }
   }
 
   Future uploadPic() async {
-    String fileName = 'images/${restaurant.id}/${DateTime.now()}';
+    String fileName = 'images/${restaurant.id}/Image_$id';
     StorageReference storageReference = _storage.ref().child(fileName);
-    StorageUploadTask uploadTask = storageReference.putFile(_image);
+    StorageUploadTask uploadTask = storageReference.putFile(imageFile);
     try {
       final StorageTaskSnapshot downloadUrl = await uploadTask.onComplete;
       url = await downloadUrl.ref.getDownloadURL();
@@ -95,10 +97,14 @@ class ItemImageDetailsModel with ItemImageValidators, ChangeNotifier {
 
   void updateWith({
     String description,
+    Widget image,
+    bool imageChanged,
     bool isLoading,
     bool submitted,
   }) {
     this.description = description ?? this.description;
+    this.image = image ?? this.image;
+    this.imageChanged = imageChanged ?? this.imageChanged;
     this.isLoading = isLoading ?? this.isLoading;
     this.submitted = this.submitted;
     notifyListeners();

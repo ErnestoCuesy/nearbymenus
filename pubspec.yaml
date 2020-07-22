@@ -12,9 +12,9 @@ description: Nearby Menus mobile app for Flutter.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # Last iOS version
-# version: 1.0.3
+version: 1.0.3
 # Last Android version
-version: 1.0.0+11
+# version: 1.0.0+11
 
 environment:
   sdk: ">=2.5.0 <3.0.0"

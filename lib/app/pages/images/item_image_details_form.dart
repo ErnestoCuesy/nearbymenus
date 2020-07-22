@@ -6,7 +6,6 @@ import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.d
 import 'package:nearbymenus/app/models/item_image.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/pages/images/item_image_details_model.dart';
-import 'package:nearbymenus/app/pages/images/item_image_image.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
@@ -22,6 +21,7 @@ class ItemImageDetailsForm extends StatefulWidget {
     ItemImage itemImage,
   }) {
     final database = Provider.of<Database>(context);
+    final image = itemImage.url != '' ? Image.network(itemImage.url) : null;
     return ChangeNotifierProvider<ItemImageDetailsModel>(
       create: (context) => ItemImageDetailsModel(
         database: database,
@@ -29,6 +29,7 @@ class ItemImageDetailsForm extends StatefulWidget {
         id: itemImage.id ?? '',
         description: itemImage.description ?? '',
         url: itemImage.url ?? '',
+        image: image,
       ),
       child: Consumer<ItemImageDetailsModel>(
         builder: (context, model, _) => ItemImageDetailsForm(
@@ -109,7 +110,12 @@ class _ItemImageDetailsFormState extends State<ItemImageDetailsForm> {
                   style: Theme.of(context).accentTextTheme.headline6,
                 ),
                 SizedBox(height: 8.0,),
-                ItemImageImage(url: model.url,)
+                if (model.imageChanged && model.imageFile != null)
+                Expanded(child: Image.file(model.imageFile)),
+                if (!model.imageChanged && model.image != null)
+                Expanded(child: model.image),
+                if (model.image == null && model.imageFile == null)
+                Icon(Icons.image,size: 36.0,),
               ],
             ),
           ),
@@ -149,7 +155,7 @@ class _ItemImageDetailsFormState extends State<ItemImageDetailsForm> {
       enableSuggestions: false,
       enableInteractiveSelection: false,
       keyboardType: TextInputType.text,
-      textInputAction: TextInputAction.next,
+      textInputAction: TextInputAction.done,
       onChanged: model.updateItemImageDescription,
       onEditingComplete: () => _itemImageDescriptionEditingComplete(),
     );
