@@ -27,7 +27,7 @@ class _ExpandableListViewState extends State<ExpandableListView> {
   Database database;
   Map<dynamic, dynamic> items;
   bool expandItemsFlag = false;
-  Map<dynamic, dynamic> sortedMenuItems = Map<String, dynamic>();
+  Map<dynamic, dynamic> sortedMenuItems = Map<dynamic, dynamic>();
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
 
   Map<dynamic, dynamic> get menu => widget.menu;
@@ -93,7 +93,7 @@ class _ExpandableListViewState extends State<ExpandableListView> {
               (element.value['hidden'] == null ||
                   element.value['hidden'] == false)) {
             sortedMenuItems.putIfAbsent(
-                menu[element.key]['sequence'].toString(), () => element.value);
+                menu[element.key]['sequence'], () => element.value);
             return true;
           } else {
             return false;

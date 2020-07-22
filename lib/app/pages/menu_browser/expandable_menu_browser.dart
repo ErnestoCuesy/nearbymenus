@@ -116,7 +116,7 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
     database = Provider.of<Database>(context);
     Map<dynamic, dynamic> menus;
     Map<dynamic, dynamic> options;
-    Map<String, dynamic> sortedMenus = Map<String, dynamic>();
+    Map<dynamic, dynamic> sortedMenus = Map<dynamic, dynamic>();
     _checkExistingOrder();
     restaurant = session.currentRestaurant;
     menus = restaurant.restaurantMenus;
@@ -124,7 +124,7 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
     sortedMenus.clear();
     menus.forEach((key, value) {
       if (value['hidden'] == false) {
-        sortedMenus.putIfAbsent(value['sequence'].toString(), () => value);
+        sortedMenus.putIfAbsent(value['sequence'], () => value);
       }
     });
     var sortedKeys = sortedMenus.keys.toList()..sort();
