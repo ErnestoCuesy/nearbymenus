@@ -6,10 +6,12 @@ import 'package:provider/provider.dart';
 
 class ItemImageDetailsPage extends StatelessWidget {
   final ItemImage itemImage;
+  final Widget image;
 
   const ItemImageDetailsPage({
     Key key,
     this.itemImage,
+    this.image,
   }) : super(key: key);
 
   @override
@@ -27,7 +29,8 @@ class ItemImageDetailsPage extends StatelessWidget {
             child: ItemImageDetailsForm.create(
               context: context,
               restaurant: session.currentRestaurant,
-              itemImage: itemImage
+              itemImage: itemImage,
+              image: image,
             ),
           ),
         ),

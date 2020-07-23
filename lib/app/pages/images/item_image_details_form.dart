@@ -19,9 +19,10 @@ class ItemImageDetailsForm extends StatefulWidget {
     BuildContext context,
     Restaurant restaurant,
     ItemImage itemImage,
+    Widget image,
+    Function callBack,
   }) {
     final database = Provider.of<Database>(context);
-    final image = itemImage.url != '' ? Image.network(itemImage.url) : null;
     return ChangeNotifierProvider<ItemImageDetailsModel>(
       create: (context) => ItemImageDetailsModel(
         database: database,
@@ -67,7 +68,7 @@ class _ItemImageDetailsFormState extends State<ItemImageDetailsForm> {
     super.dispose();
   }
 
-  Future<void> _save() async {
+  Future<void> _save(BuildContext context) async {
     try {
       await model.save();
       Navigator.of(context).pop();
@@ -130,7 +131,7 @@ class _ItemImageDetailsFormState extends State<ItemImageDetailsForm> {
         color: model.canSave
             ? Theme.of(context).primaryColor
             : Theme.of(context).disabledColor,
-        onPressed: model.canSave ? _save : null,
+        onPressed: model.canSave ? () => _save(context) : null,
       ),
       SizedBox(
         height: 8.0,

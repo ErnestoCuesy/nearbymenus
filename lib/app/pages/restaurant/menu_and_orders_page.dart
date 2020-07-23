@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:nearbymenus/app/common_widgets/custom_raised_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/models/session.dart';
+import 'package:nearbymenus/app/pages/images/item_image_page.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_menu_browser.dart';
 import 'package:nearbymenus/app/pages/orders/active_orders.dart';
 import 'package:provider/provider.dart';
@@ -68,6 +69,33 @@ class _MenuAndOrdersPageState extends State<MenuAndOrdersPage> {
         height: 150.0,
         width: 250.0,
         color: Theme.of(context).buttonTheme.colorScheme.surface,
+        onPressed: () => Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (BuildContext context) => ItemImagePage(viewOnly: true,),
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Image Gallery',
+              style: Theme.of(context).accentTextTheme.headline6,
+            ),
+            SizedBox(height: 8.0,),
+            Icon(
+              Icons.image,
+              size: 36.0,
+            ),
+          ],
+        ),
+      ),
+      SizedBox(
+        height: 32.0,
+      ),
+      CustomRaisedButton(
+        height: 150.0,
+        width: 250.0,
+        color: Theme.of(context).buttonTheme.colorScheme.surface,
         onPressed: () => _checkUserDetails(context),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -96,7 +124,7 @@ class _MenuAndOrdersPageState extends State<MenuAndOrdersPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Orders',
+              'Order History',
               style: Theme.of(context).accentTextTheme.headline6,
             ),
             SizedBox(height: 16.0,),

@@ -131,7 +131,7 @@ class _AdministratorPageState extends State<AdministratorPage> {
             color: Theme.of(context).buttonTheme.colorScheme.surface,
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (BuildContext context) => ItemImagePage(),
+                builder: (BuildContext context) => ItemImagePage(viewOnly: false,),
               ),
             ),
             child: Column(
