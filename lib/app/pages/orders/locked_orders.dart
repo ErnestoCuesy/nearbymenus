@@ -19,7 +19,7 @@ class _LockedOrdersState extends State<LockedOrders> {
     database = Provider.of<Database>(context);
     return OrderHistory(
       stream: database.blockedOrders(database.userId),
-      restaurantName: session.currentRestaurant.name,
+      restaurantName: '',
       showLocked: true,
       showActive: true,
     );
