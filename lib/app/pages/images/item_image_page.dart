@@ -25,7 +25,7 @@ class _ItemImagePageState extends State<ItemImagePage> {
     if (!session.currentRestaurant.itemImagesInitialized) {
       for (int i = 0; i < 5; i++) {
         database.setItemImage(ItemImage(
-            id: documentIdFromCurrentDate(),
+            id: DateTime.now().millisecondsSinceEpoch,
             restaurantId: session.currentRestaurant.id,
             description: 'Tap image to change',
             url: ''

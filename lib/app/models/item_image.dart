@@ -1,5 +1,5 @@
 class ItemImage {
-  final String id;
+  final int id;
   final String restaurantId;
   String description;
   String url;

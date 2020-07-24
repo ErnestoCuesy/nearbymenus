@@ -13,7 +13,7 @@ import 'package:nearbymenus/app/services/database.dart';
 class ItemImageDetailsModel with ItemImageValidators, ChangeNotifier {
   final Database database;
   final Restaurant restaurant;
-  String id;
+  int id;
   String description;
   String url;
   Widget image;
