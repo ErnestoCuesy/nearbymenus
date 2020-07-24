@@ -32,7 +32,7 @@ class Restaurant {
   final Map<dynamic, dynamic> restaurantMenus;
   final Map<dynamic, dynamic> foodDeliveryFlags;
   Map<dynamic, dynamic> restaurantOptions;
-  Map<dynamic, dynamic> itemImages;
+  bool itemImagesInitialized;
 
   Restaurant({
     this.id,
@@ -63,7 +63,7 @@ class Restaurant {
     this.restaurantMenus,
     this.foodDeliveryFlags,
     this.restaurantOptions,
-    this.itemImages,
+    this.itemImagesInitialized,
   });
 
   factory Restaurant.fromMap(Map<dynamic, dynamic> value, String documentId) {
@@ -106,7 +106,7 @@ class Restaurant {
         restaurantMenus: value['restaurantMenus'] ?? {},
         restaurantOptions: value['restaurantOptions'] ?? {},
         foodDeliveryFlags: value['foodDeliveryFlags'] ?? {},
-        itemImages: value['itemImages'] ?? {},
+        itemImagesInitialized: value['itemImagesInitialized'] ?? false,
     );
   }
 
@@ -135,7 +135,7 @@ class Restaurant {
       'restaurantMenus': restaurantMenus ?? {},
       'restaurantOptions': restaurantOptions ?? {},
       'foodDeliveryFlags': foodDeliveryFlags ?? {},
-      'itemImages': itemImages ?? {},
+      'itemImagesInitialized': itemImagesInitialized ?? false,
       'allowCancellations': allowCancellations,
     };
   }

@@ -78,7 +78,7 @@ class _MenuAndOrdersPageState extends State<MenuAndOrdersPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Image Gallery',
+              'Food Gallery',
               style: Theme.of(context).accentTextTheme.headline6,
             ),
             SizedBox(height: 8.0,),

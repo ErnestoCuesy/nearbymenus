@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nearbymenus/app/models/item_image.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
@@ -44,17 +45,12 @@ class ItemImageDetailsModel with ItemImageValidators, ChangeNotifier {
     }
     final itemImage = ItemImage(
       id: id,
+      restaurantId: restaurant.id,
       description: description,
       url: url,
     );
     try {
-      final Map<dynamic, dynamic> itemImages = restaurant.itemImages;
-      if (itemImages.containsKey(id)) {
-        restaurant.itemImages.update(id, (_) => itemImage.toMap());
-      } else {
-        restaurant.itemImages.putIfAbsent(id, () => itemImage.toMap());
-      }
-      await Restaurant.setRestaurant(database, restaurant);
+      database.setItemImage(itemImage);
     } catch (e) {
       print(e);
       updateWith(isLoading: false);
@@ -65,8 +61,13 @@ class ItemImageDetailsModel with ItemImageValidators, ChangeNotifier {
   Future getImage() async {
     PickedFile pickedImage = await _imagePicker.getImage(source: ImageSource.gallery);
     if (pickedImage != null) {
-      imageFile = File(pickedImage.path);
-      image = Image.file(imageFile);
+      var tempPath = pickedImage.path.split('image_picker');
+      var dirPath = tempPath[0];
+      var tempName = tempPath[1].split('.');
+      var newPath = dirPath + tempName[0] + 'comp.' + tempName[1];
+      var result = await FlutterImageCompress.compressAndGetFile(pickedImage.path, newPath, quality: 50);
+      imageFile = File(result.path);
+      image = Image.file(result);
       updateWith(image: image, imageChanged: true);
     }
   }

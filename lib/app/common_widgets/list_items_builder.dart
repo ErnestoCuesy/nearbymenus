@@ -5,12 +5,13 @@ import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart'
 typedef ItemWidgetBuilder<T> = Widget Function(BuildContext context, T item);
 
 class ListItemsBuilder<T> extends StatelessWidget {
-  const ListItemsBuilder({Key key, @required this.snapshot, @required this.itemBuilder, this.title, this.message}) : super(key: key);
+  const ListItemsBuilder({Key key, @required this.snapshot, @required this.itemBuilder, this.title, this.message, this.axis}) : super(key: key);
 
   final AsyncSnapshot<List<T>> snapshot;
   final ItemWidgetBuilder<T> itemBuilder;
   final String title;
   final String message;
+  final Axis axis;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +38,7 @@ class ListItemsBuilder<T> extends StatelessWidget {
 
   Widget _buildList(List<T> items) {
     return ListView.builder(
+      scrollDirection: axis ?? Axis.vertical,
       itemCount: items.length,
       itemBuilder: (context, index) {
         return itemBuilder(context, items[index]);

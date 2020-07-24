@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:nearbymenus/app/common_widgets/list_items_builder.dart';
 import 'package:nearbymenus/app/models/item_image.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/images/item_image_details_page.dart';
+import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
 class ItemImagePage extends StatefulWidget {
@@ -15,28 +19,21 @@ class ItemImagePage extends StatefulWidget {
 
 class _ItemImagePageState extends State<ItemImagePage> {
   Session session;
-  Map<dynamic, dynamic> _itemImageList;
-  List<Widget> _itemImages = List<Widget>.generate(5, (index) => null);
+  Database database;
 
   void _loadItemImages() {
-    if (session.currentRestaurant.itemImages == null ||
-        session.currentRestaurant.itemImages.isEmpty) {
-      final initItems = List<ItemImage>.generate(5, (index) =>
-          ItemImage(
-              id: index.toString(),
-              description: 'Tap to change',
-              url: '')
-      );
-      initItems.forEach((item) {
-        session.currentRestaurant.itemImages.putIfAbsent(item.id, () => item.toMap());
-      });
-    }
-    _itemImageList = session.currentRestaurant.itemImages;
-    _itemImageList.forEach((key, value) {
-      if (value['url'] != '') {
-        _itemImages[int.parse(key)] = Image.network(value['url']);
+    if (!session.currentRestaurant.itemImagesInitialized) {
+      for (int i = 0; i < 5; i++) {
+        database.setItemImage(ItemImage(
+            id: documentIdFromCurrentDate(),
+            restaurantId: session.currentRestaurant.id,
+            description: 'Tap image to change',
+            url: ''
+        ));
       }
-    });
+      session.currentRestaurant.itemImagesInitialized = true;
+      database.setRestaurant(session.currentRestaurant);
+    }
   }
 
   void _createItemImageDetailsPage(BuildContext context, ItemImage itemImage, Widget image) {
@@ -51,66 +48,108 @@ class _ItemImagePageState extends State<ItemImagePage> {
     );
   }
 
-  Widget _buildContentsForEdit() {
-    return ListView.builder(
-      itemCount: _itemImageList.length,
-      itemBuilder: (context, index) {
-        final ItemImage itemImage = ItemImage.fromMap(_itemImageList[index.toString()], null) ;
-        final image = _itemImages[index] ?? Icon(Icons.image);
-        return Card(
-          child: ListTile(
-            leading: Container(
-              width: 50.0,
-              child: image,
-            ),
-            title: Text(
-                itemImage.description
-            ),
-            onTap: () => _createItemImageDetailsPage(context, itemImage, image),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildContentsForView() {
+  Widget _buildContents(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-    return ListView.builder(
-      scrollDirection: Axis.horizontal,
-      itemCount: _itemImageList.length,
-      itemBuilder: (context, index) {
-        final ItemImage itemImage = ItemImage.fromMap(_itemImageList[index.toString()], null) ;
-        final image = _itemImages[index] ?? Icon(Icons.image);
-        return Container(
-          width: width,
-          height: height,
-          child: Column(
-            children: [
-              Expanded(child: image),
-              Text(
-                  _itemImages[index] != null ? itemImage.description : '',
-                style: Theme.of(context).textTheme.headline4,
-              ),
-            ],
-          ),
+    return StreamBuilder<List<ItemImage>>(
+      stream: database.itemImages(session.currentRestaurant.id),
+      builder: (context, snapshot) {
+        return ListItemsBuilder<ItemImage>(
+          axis: widget.viewOnly ? Axis.horizontal : Axis.vertical,
+          title: 'No images found',
+          message: '',
+          snapshot: snapshot,
+          itemBuilder: (context, itemImage) {
+            final image = itemImage.url != ''
+                ? Image.network(itemImage.url)
+                : Icon(Icons.image, size: 36.0,);
+            if (widget.viewOnly) {
+              return Container(
+                width: width,
+                height: height,
+                child: Column(
+                  children: [
+                    Text(''),
+                    Expanded(child: image),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        itemImage.url != '' ? itemImage.description : '',
+                        textAlign: TextAlign.center,
+                        style: Theme
+                            .of(context)
+                            .textTheme
+                            .headline5,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Card(
+                  child: Row(
+                    //mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SizedBox(
+                          width: 110,
+                          height: 110,
+                          child: IconButton(
+                            icon: image,
+                            onPressed: () =>
+                                _createItemImageDetailsPage(
+                                    context, itemImage, image),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          itemImage.description,
+                          overflow: TextOverflow.fade,
+                          style: Theme
+                              .of(context)
+                              .textTheme
+                              .headline5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+          },
         );
-      },
+      }
     );
   }
 
   @override
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
+    database = Provider.of<Database>(context);
     _loadItemImages();
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-            widget.viewOnly ? 'Our specialities' : 'Upload images'
+    if (Platform.isAndroid) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(
+              widget.viewOnly ? 'Our specialities' : 'Upload images'
+          ),
         ),
-      ),
-      body: widget.viewOnly ? _buildContentsForView() : _buildContentsForEdit(),
-    );
+        body: _buildContents(context),
+      );
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(
+              widget.viewOnly ? 'Our specialities' : 'Upload images'
+          ),
+        ),
+        body: _buildContents(context),
+      );
+    }
   }
 
 }

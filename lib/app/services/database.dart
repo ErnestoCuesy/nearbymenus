@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:nearbymenus/app/models/authorizations.dart';
+import 'package:nearbymenus/app/models/item_image.dart';
 import 'package:nearbymenus/app/models/menu_item.dart';
 import 'package:nearbymenus/app/models/menu.dart';
 import 'package:nearbymenus/app/models/option.dart';
@@ -28,6 +29,7 @@ abstract class Database {
   Future<void> setBundle(String uid, Bundle orderBundle);
   Future<int>  setBundleCounterTransaction(String managerId, int quantity);
   Future<void> setOrderTransaction(String managerId, String restaurantId, Order order);
+  Future<void> setItemImage(ItemImage itemImage);
 
   Future<void> deleteMessage(String id);
   Future<void> deleteRestaurant(Restaurant restaurant);
@@ -53,6 +55,7 @@ abstract class Database {
   Stream<List<Order>> dayRestaurantOrders(String restaurantId, DateTime dateTime);
   Stream<List<Order>> userOrders(String restaurantId, String uid);
   Stream<List<Order>> blockedOrders(String managerId);
+  Stream<List<ItemImage>> itemImages(String itemImageId);
 
   Future<UserDetails> userDetailsSnapshot(String uid);
   Future<List<Authorizations>> authorizationsSnapshot();
@@ -140,6 +143,10 @@ class FirestoreDatabase implements Database {
       orderData: order.toMap(),
     );
   }
+
+  @override
+  Future<void> setItemImage(ItemImage itemImage) async => await _service
+      .setData(path: APIPath.itemImage(itemImage.restaurantId, itemImage.id), data: itemImage.toMap());
 
   @override
   Future<void> deleteMessage(String id) async =>
@@ -320,6 +327,15 @@ class FirestoreDatabase implements Database {
                           .where('isBlocked', isEqualTo: true)
         : null,
     builder: (data, documentId) => Order.fromMap(data, documentId),
+  );
+
+  @override
+  Stream<List<ItemImage>> itemImages(String restaurantId) => _service.collectionStream(
+    path: APIPath.itemImages(restaurantId),
+//    queryBuilder: restaurantId != null
+//        ? (query) => query.where('restaurantId', isEqualTo: restaurantId)
+//        : null,
+    builder: (data, documentId) => ItemImage.fromMap(data, documentId),
   );
 
   @override

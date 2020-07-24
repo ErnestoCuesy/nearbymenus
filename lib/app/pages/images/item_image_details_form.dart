@@ -57,7 +57,11 @@ class _ItemImageDetailsFormState extends State<ItemImageDetailsForm> {
   void initState() {
     super.initState();
     if (model != null) {
-      _itemImageDescriptionController.text = model.description ?? null;
+      if (model.url != '') {
+        _itemImageDescriptionController.text = model.description ?? null;
+      } else {
+        _itemImageDescriptionController.text = '';
+      }
     }
   }
 
