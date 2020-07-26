@@ -55,6 +55,7 @@ class _StaffAuthorizationPageState extends State<StaffAuthorizationPage> {
           children: [
             Text(
               'Request Access',
+              textAlign: TextAlign.center,
               style: Theme.of(context).accentTextTheme.headline6,
             ),
             SizedBox(height: 16.0,),
