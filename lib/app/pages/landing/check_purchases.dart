@@ -8,7 +8,7 @@ import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/services/iap_manager.dart';
 import 'package:provider/provider.dart';
 
-class SubscriptionCheck extends StatelessWidget {
+class CheckPurchases extends StatelessWidget {
 
   Future<void> _setBundleAndUnlock(Database database, List<Bundle> bundleSnapshot, Map<String, dynamic> allPurchasesDates) async {
     bundleSnapshot.forEach((bundle) {

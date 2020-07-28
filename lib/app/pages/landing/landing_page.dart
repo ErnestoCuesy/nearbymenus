@@ -3,7 +3,7 @@ import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart'
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/home/home_page_staff_and_patron.dart';
-import 'package:nearbymenus/app/pages/landing/subscription_check.dart';
+import 'package:nearbymenus/app/pages/landing/check_purchases.dart';
 import 'package:nearbymenus/app/pages/sign_in/sign_in_page.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -36,6 +36,9 @@ class LandingPage extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.active) {
           UserAuth user = snapshot.data;
           if (user == null) {
+            if (FlavourConfig.isPatron()) {
+              auth.signInAnonymously();
+            }
             return SignInPage();
           }
           _setUser(database, session, user);
@@ -54,7 +57,7 @@ class LandingPage extends StatelessWidget {
                   return Provider<IAPManagerBase>(
                     create: (context) =>
                         IAPManager(userID: session.userDetails.email),
-                    child: SubscriptionCheck(),
+                    child: CheckPurchases(),
                   );
                 } else {
                   return HomePageStaffAndPatron();

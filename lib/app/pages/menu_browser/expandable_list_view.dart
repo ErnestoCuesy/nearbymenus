@@ -2,11 +2,13 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_container.dart';
 import 'package:nearbymenus/app/pages/orders/add_to_order.dart';
+import 'package:nearbymenus/app/pages/user/user_details_form.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
@@ -32,41 +34,83 @@ class _ExpandableListViewState extends State<ExpandableListView> {
 
   Map<dynamic, dynamic> get menu => widget.menu;
 
-  void _addMenuItemToOrder(BuildContext context, String menuCode, Map<dynamic, dynamic> menuItem) async {
-    if (session.currentRestaurant.isOpen || FlavourConfig.isManager()) {
-      final result = await Navigator.of(context).push(
-        MaterialPageRoute<String>(
-          fullscreenDialog: false,
-          builder: (context) =>
-              AddToOrder.create(
-                context: context,
-                menuCode: menuCode,
-                item: menuItem,
-                options: widget.options,
-              ),
-        ),
-      );
-      if (result == 'Yes') {
-        Scaffold.of(context)
-          ..removeCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              content: Text('Item added to the order.'),
-            ),
-          );
+  Future<bool> _confirmDetailsCapture(BuildContext context) async {
+    return await PlatformAlertDialog(
+      title: 'Delivery details missing',
+      content: 'We\'re missing your delivery details. Your details will not be shared with anyone else.',
+      cancelActionText: 'Keep browsing',
+      defaultActionText: 'Capture my details',
+    ).show(context);
+  }
+
+  Future<void> _exceptionDialog(BuildContext context, String title, String code, String message) async {
+    await PlatformExceptionAlertDialog(
+      title: title,
+      exception: PlatformException(
+        code: code,
+        message: message,
+        details: message,
+      ),
+    ).show(context);
+  }
+
+  Future<void> _addMenuItemToOrder(BuildContext context, String menuCode, Map<dynamic, dynamic> menuItem) async {
+    if (session.userDetails.name == null ||
+        session.userDetails.name == '' ||
+        session.userDetails.address1 == '' ||
+        session.userDetails.address2 == '' ||
+        session.userDetails.telephone == '') {
+      if (await _confirmDetailsCapture(context)) {
+        await Navigator.of(context).push(
+          MaterialPageRoute<bool>(
+            fullscreenDialog: false,
+            builder: (context) =>
+                Scaffold(
+                  appBar: AppBar(
+                    title: Text('Please enter your delivery details'),
+                  ),
+                  body: SingleChildScrollView(
+                    child: UserDetailsForm.create(
+                        context: context,
+                        userDetails: session.userDetails
+                    ),
+                  ),
+                ),
+          ),
+        );
       }
-      widget.callBack();
     } else {
-      await PlatformExceptionAlertDialog(
-        title: 'Restaurant is closed',
-        exception: PlatformException(
-          code: 'RESTAURANT_IS_CLOSED',
-          message:
-          '${session.currentRestaurant.name} cannot take your order at this moment. Sorry.',
-          details:
-          'The restaurant cannot take your order at this moment. Sorry.',
-        ),
-      ).show(context);
+      if (session.currentRestaurant.isOpen || FlavourConfig.isManager()) {
+        final result = await Navigator.of(context).push(
+          MaterialPageRoute<String>(
+            fullscreenDialog: false,
+            builder: (context) =>
+                AddToOrder.create(
+                  context: context,
+                  menuCode: menuCode,
+                  item: menuItem,
+                  options: widget.options,
+                ),
+          ),
+        );
+        if (result == 'Yes') {
+          Scaffold.of(context)
+            ..removeCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Text('Item added to the order.'),
+              ),
+            );
+        }
+        widget.callBack();
+      } else {
+        _exceptionDialog(
+            context,
+            'Restaurant is closed',
+            'RESTAURANT_IS_CLOSED',
+            '${session.currentRestaurant.name} cannot take your order at this moment. Sorry.',
+        );
+      }
     }
   }
 

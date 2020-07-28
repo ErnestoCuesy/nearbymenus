@@ -33,7 +33,7 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
       : 0;
 
   Widget _buildContents(BuildContext context, Map<dynamic, dynamic> menus,
-      Map<dynamic, dynamic> options, dynamic sortedKeys) {
+    Map<dynamic, dynamic> options, dynamic sortedKeys) {
     return ListView.builder(
       itemCount: sortedKeys.length,
       itemBuilder: (BuildContext context, int index) {
@@ -99,6 +99,7 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
           status: ORDER_ON_HOLD,
           name: session.userDetails.name,
           deliveryAddress: '${session.userDetails.address1} ${session.userDetails.address2} ${session.userDetails.address3} ${session.userDetails.address4}',
+          telephone: session.userDetails.telephone,
           deliveryPosition: session.position,
           paymentMethod: '',
           orderItems: List<Map<dynamic, dynamic>>(),

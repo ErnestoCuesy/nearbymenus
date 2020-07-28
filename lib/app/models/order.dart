@@ -20,8 +20,9 @@ class Order {
   final String userId;
   double timestamp;
   int status;
-  final String name;
-  final String deliveryAddress;
+  String name;
+  String deliveryAddress;
+  String telephone;
   Position deliveryPosition;
   String paymentMethod;
   String deliveryOption;
@@ -41,6 +42,7 @@ class Order {
     this.status,
     this.name,
     this.deliveryAddress,
+    this.telephone,
     this.deliveryPosition,
     this.paymentMethod,
     this.deliveryOption,
@@ -72,6 +74,7 @@ class Order {
       status: data['status'],
       name: data['name'],
       deliveryAddress: data['deliveryAddress'],
+      telephone: data['telephone'],
       deliveryPosition: Position(
           latitude: geoPoint.latitude, longitude: geoPoint.longitude),
       paymentMethod: data['paymentMethod'],
@@ -107,6 +110,7 @@ class Order {
       'status': status,
       'name': name,
       'deliveryAddress': deliveryAddress,
+      'telephone': telephone,
       'deliveryPosition': geoPoint,
       'paymentMethod': paymentMethod ?? '',
       'deliveryOption': deliveryOption ?? '',
@@ -153,7 +157,7 @@ class Order {
 
   @override
   String toString() {
-    return 'id: $id, orderNumber: $orderNumber, restaurantId: $restaurantId, restaurantName: $restaurantName, managerId: $managerId, userId: $userId, timestamp: $timestamp, status: $status, name: $name, deliveryAddress: $deliveryAddress, paymentMethod: $paymentMethod, deliveryOption: $deliveryOption, orderItems: $orderItems, notes: $notes, isBlocked: $isBlocked';
+    return 'id: $id, orderNumber: $orderNumber, restaurantId: $restaurantId, restaurantName: $restaurantName, managerId: $managerId, userId: $userId, timestamp: $timestamp, status: $status, name: $name, deliveryAddress: $deliveryAddress, telephone: $telephone, paymentMethod: $paymentMethod, deliveryOption: $deliveryOption, orderItems: $orderItems, notes: $notes, isBlocked: $isBlocked';
   }
 
 }

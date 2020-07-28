@@ -73,26 +73,31 @@ class _MessagesListenerState extends State<MessagesListener> {
           final notificationsList = snapshot.data;
           notificationsList.forEach((message) {
             print('Message for ${message.toRole}');
-            if (message.toRole == role &&
-                !message.delivered) {
+            if (message.toRole == role && !message.delivered) {
               _notifyUser(message);
-              UserMessage readMessage = UserMessage(
-                id: message.id,
-                timestamp: message.timestamp,
-                fromUid: message.fromUid,
-                toUid: message.toUid,
-                restaurantId: message.restaurantId,
-                fromRole: message.fromRole,
-                toRole: message.toRole,
-                fromName: message.fromName,
-                type: message.type,
-                authFlag: message.authFlag,
-                delivered: true,
-                attendedFlag: message.attendedFlag,
-              );
-              database.setMessageDetails(readMessage);
+              if (message.toRole == ROLE_PATRON ||
+                  message.toRole == ROLE_STAFF) {
+                database.deleteMessage(message.id);
+              } else {
+                UserMessage readMessage = UserMessage(
+                  id: message.id,
+                  timestamp: message.timestamp,
+                  fromUid: message.fromUid,
+                  toUid: message.toUid,
+                  restaurantId: message.restaurantId,
+                  fromRole: message.fromRole,
+                  toRole: message.toRole,
+                  fromName: message.fromName,
+                  type: message.type,
+                  authFlag: message.authFlag,
+                  delivered: true,
+                  attendedFlag: message.attendedFlag,
+                );
+                database.setMessageDetails(readMessage);
+              }
             }
-            if (message.attendedFlag == false && message.toRole == ROLE_MANAGER) {
+            if (message.attendedFlag == false &&
+                message.toRole == ROLE_MANAGER) {
               session.pendingStaffAuthorizations++;
             }
           });

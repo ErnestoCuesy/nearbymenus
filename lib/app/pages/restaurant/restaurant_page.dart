@@ -8,7 +8,7 @@ import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
-import 'package:nearbymenus/app/pages/restaurant/administrator_page.dart';
+import 'package:nearbymenus/app/pages/restaurant/restaurant_administrator_page.dart';
 import 'package:nearbymenus/app/pages/restaurant/restaurant_details_page.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
@@ -129,7 +129,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
                         session.currentRestaurant = restaurant;
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (BuildContext context) => AdministratorPage(),
+                            builder: (BuildContext context) => RestaurantAdministratorPage(),
                           ),
                         );
                       },

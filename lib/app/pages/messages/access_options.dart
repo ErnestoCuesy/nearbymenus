@@ -125,6 +125,7 @@ class _AccessOptionsState extends State<AccessOptions> {
       ),
       Text(
           'Requested by ${message.fromName}',
+          textAlign: TextAlign.center,
           style: Theme.of(context).accentTextTheme.headline6
       ),
       SizedBox(

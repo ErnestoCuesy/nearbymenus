@@ -12,14 +12,14 @@ import 'package:nearbymenus/app/pages/orders/inactive_orders.dart';
 import 'package:nearbymenus/app/pages/orders/order_totals.dart';
 import 'package:provider/provider.dart';
 
-class AdministratorPage extends StatefulWidget {
+class RestaurantAdministratorPage extends StatefulWidget {
 
   @override
-  _AdministratorPageState createState() =>
-      _AdministratorPageState();
+  _RestaurantAdministratorPageState createState() =>
+      _RestaurantAdministratorPageState();
 }
 
-class _AdministratorPageState extends State<AdministratorPage> {
+class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPage> {
   Session session;
   Restaurant get restaurant => session.currentRestaurant;
   double buttonSize = 180.0;

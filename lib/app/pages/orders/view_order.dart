@@ -185,6 +185,10 @@ class _ViewOrderState extends State<ViewOrder> {
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: Text(model.order.deliveryAddress),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text('Tel: ${model.order.telephone}'),
+                  ),
                   if (!FlavourConfig.isPatron())
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),

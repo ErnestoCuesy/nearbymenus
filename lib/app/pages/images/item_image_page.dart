@@ -30,6 +30,7 @@ class _ItemImagePageState extends State<ItemImagePage> {
             description: 'Tap image to change',
             url: ''
         ));
+        Future.delayed(Duration(milliseconds: 100));
       }
       session.currentRestaurant.itemImagesInitialized = true;
       database.setRestaurant(session.currentRestaurant);

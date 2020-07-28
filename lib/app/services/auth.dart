@@ -16,6 +16,7 @@ class UserAuth {
 abstract class AuthBase {
   Stream<UserAuth> get onAuthStateChanged;
   Future<UserAuth> currentUser();
+  Future<UserAuth> signInAnonymously();
   Future<UserAuth> signInWithEmailAndPassword(String email, String password);
   Future<void> createUserWithEmailAndPassword(String email, String password);
   Future<void> resetPassword(String email);
@@ -48,6 +49,12 @@ class Auth implements AuthBase {
   }
 
   @override
+  Future<UserAuth> signInAnonymously() async {
+    final authResult = await _fireBaseAuth.signInAnonymously();
+    return _userFromFirebase(authResult.user);
+  }
+
+  @override
   Future<UserAuth> signInWithEmailAndPassword(
       String email, String password) async {
     final authResult = await _fireBaseAuth.signInWithEmailAndPassword(
@@ -64,10 +71,10 @@ class Auth implements AuthBase {
 
   @override
   Future<void> createUserWithEmailAndPassword(
-      String email, String password) async {
+    String email, String password) async {
     final authResult = await _fireBaseAuth.createUserWithEmailAndPassword(
         email: email, password: password);
-    // TODO Hotmail filters verification email sent by Firebase
+    // Hotmail filters verification email sent by Firebase - avoid Hotmail
     authResult.user.sendEmailVerification();
     throw PlatformException(
         code: 'EMAIL_NOT_VERIFIED',

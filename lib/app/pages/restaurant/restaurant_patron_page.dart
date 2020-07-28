@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:nearbymenus/app/common_widgets/custom_raised_button.dart';
-import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/images/item_image_page.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_menu_browser.dart';
 import 'package:nearbymenus/app/pages/orders/active_orders.dart';
 import 'package:provider/provider.dart';
 
-class MenuAndOrdersPage extends StatefulWidget {
+class RestaurantPatronPage extends StatefulWidget {
 
   @override
-  _MenuAndOrdersPageState createState() =>
-      _MenuAndOrdersPageState();
+  _RestaurantPatronPageState createState() =>
+      _RestaurantPatronPageState();
 }
 
-class _MenuAndOrdersPageState extends State<MenuAndOrdersPage> {
+class _RestaurantPatronPageState extends State<RestaurantPatronPage> {
   Session session;
 
   void _expandableMenuBrowserPage(BuildContext context) {
@@ -34,26 +32,6 @@ class _MenuAndOrdersPageState extends State<MenuAndOrdersPage> {
         builder: (context) => ActiveOrders(),
       ),
     );
-  }
-
-  Future<void> _checkUserDetails(BuildContext context) async {
-    if (session.userDetails.name == null ||
-        session.userDetails.name == '' ||
-        session.userDetails.address1 == '' ||
-        session.userDetails.address2 == '') {
-      await PlatformExceptionAlertDialog(
-        title: 'No delivery details',
-        exception: PlatformException(
-          code: 'USERNAME_IS_EMPTY',
-          message:
-          'Please enter your name and address in the profile page before proceeding.',
-          details:
-          'Please enter your name and address in the profile page before proceeding',
-        ),
-      ).show(context);
-    } else {
-      _expandableMenuBrowserPage(context);
-    }
   }
 
   List<Widget> _buildContents(BuildContext context) {
@@ -96,7 +74,7 @@ class _MenuAndOrdersPageState extends State<MenuAndOrdersPage> {
         height: 150.0,
         width: 250.0,
         color: Theme.of(context).buttonTheme.colorScheme.surface,
-        onPressed: () => _checkUserDetails(context),
+        onPressed: () => _expandableMenuBrowserPage(context),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

@@ -3,7 +3,7 @@ import 'package:nearbymenus/app/common_widgets/list_items_builder.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/pages/messages/messages_listener.dart';
 import 'package:nearbymenus/app/pages/restaurant/check_staff_authorization.dart';
-import 'package:nearbymenus/app/pages/restaurant/menu_and_orders_page.dart';
+import 'package:nearbymenus/app/pages/restaurant/restaurant_patron_page.dart';
 import 'package:nearbymenus/app/pages/restaurant/restaurant_list_tile.dart';
 import 'package:nearbymenus/app/services/near_restaurant_bloc.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
@@ -27,7 +27,7 @@ class _RestaurantQueryState extends State<RestaurantQuery> {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         fullscreenDialog: false,
-        builder: (context) => MessagesListener(child: MenuAndOrdersPage(),),
+        builder: (context) => MessagesListener(child: RestaurantPatronPage(),),
       ),
     );
   }

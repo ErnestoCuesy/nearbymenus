@@ -39,7 +39,7 @@ class _AccountPageState extends State<AccountPage> {
     }
   }
 
-  Future<void> _confirmSignOut() async {
+  Future<void> _confirmSignOut(BuildContext context) async {
     final didRequestSignOut = await PlatformAlertDialog(
       title: 'Logout',
       content: 'Are you sure you want to logout?',
@@ -55,6 +55,10 @@ class _AccountPageState extends State<AccountPage> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final imageAsset = Provider.of<LogoImageAsset>(context);
+    String nameEmail = session.userDetails.name;
+    if (!FlavourConfig.isPatron()) {
+      nameEmail = nameEmail + ' (${session.userDetails.email})';
+    }
     return [
       Container(
         width: screenWidth / 4,
@@ -68,7 +72,7 @@ class _AccountPageState extends State<AccountPage> {
       _userDetailsSection(
         sectionTitle: 'Your details',
         cardTitle:
-            session.userDetails.name + ' (${session.userDetails.email})' ?? '',
+            nameEmail,
         cardSubtitle: session.userDetails.address1 == null
             ? 'Address unknown'
             : '${session.userDetails.address1}\n'
@@ -215,12 +219,13 @@ class _AccountPageState extends State<AccountPage> {
           style: Theme.of(context).primaryTextTheme.headline6,
         ),
         actions: <Widget>[
+          if (!FlavourConfig.isPatron())
           FlatButton(
             child: Text(
               'Logout',
               style: Theme.of(context).primaryTextTheme.button,
             ),
-            onPressed: () => _confirmSignOut(),
+            onPressed: () => _confirmSignOut(context),
           ),
         ],
       ),
