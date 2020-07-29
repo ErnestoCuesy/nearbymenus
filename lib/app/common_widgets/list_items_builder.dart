@@ -31,9 +31,19 @@ class ListItemsBuilder<T> extends StatelessWidget {
         message: 'Can\'t load items right now',
       );
     }
-    return Center(
-      child: PlatformProgressIndicator(),
-    );
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      Future.delayed(Duration(seconds: 5));
+      return Center(
+        child: EmptyContent(
+          title: title,
+          message: message,
+        ),
+      );
+    } else {
+      return Center(
+        child: PlatformProgressIndicator(),
+      );
+    }
   }
 
   Widget _buildList(List<T> items) {

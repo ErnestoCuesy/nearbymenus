@@ -131,7 +131,7 @@ class _ItemImagePageState extends State<ItemImagePage> {
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
-    _loadItemImages();
+    if (!widget.viewOnly) _loadItemImages();
     if (Platform.isAndroid) {
       return Scaffold(
         appBar: AppBar(

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'email_sign_in_form.dart';
 
 class EmailSignInPage extends StatelessWidget {
+  final bool convertAnonymous;
+
+  const EmailSignInPage({Key key, this.convertAnonymous}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,7 +16,7 @@ class EmailSignInPage extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Card(
-            child: EmailSignInForm.create(context),
+            child: EmailSignInForm.create(context, convertAnonymous),
           ),
         ),
       ),

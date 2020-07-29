@@ -100,7 +100,7 @@ class _UserDetailsFormState extends State<UserDetailsForm> {
     try {
       // await Future.delayed(Duration(seconds: 3)); // Simulate slow network
       await model.save();
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(true);
     } on PlatformException catch (e) {
       PlatformExceptionAlertDialog(
         title: 'Save User Details',

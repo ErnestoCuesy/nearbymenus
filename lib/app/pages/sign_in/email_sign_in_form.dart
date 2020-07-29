@@ -9,17 +9,21 @@ import 'package:flutter/services.dart';
 
 class EmailSignInForm extends StatefulWidget {
 
-  EmailSignInForm({@required this.model});
+  EmailSignInForm({@required this.model, @required this.convertAnonymous});
 
   final EmailSignInModel model;
+  final bool convertAnonymous;
 
-  static Widget create(BuildContext context) {
+  static Widget create(BuildContext context, bool convertAnonymous) {
     final auth = Provider.of<AuthBase>(context);
     final session = Provider.of<Session>(context);
     return ChangeNotifierProvider<EmailSignInModel>(
-      create: (context) => EmailSignInModel(auth: auth, session: session),
+      create: (context) => EmailSignInModel(
+          auth: auth,
+          session: session,
+          formType: convertAnonymous ? EmailSignInFormType.convert : EmailSignInFormType.signIn),
       child: Consumer<EmailSignInModel>(
-        builder: (context, model, _) => EmailSignInForm(model: model),
+        builder: (context, model, _) => EmailSignInForm(model: model, convertAnonymous: convertAnonymous,),
       ),
     );
   }
@@ -57,7 +61,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
     try {
       // await Future.delayed(Duration(seconds: 3)); // Simulate slow network
       await model.submit();
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(true);
     } on PlatformException catch (e) {
       PlatformExceptionAlertDialog(
         title: 'Sign In',
@@ -92,6 +96,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
         height: 8.0,
       ),
       if (model.formType == EmailSignInFormType.register ||
+          model.formType == EmailSignInFormType.convert ||
           model.formType == EmailSignInFormType.signIn)
       _buildEmailPasswordField(),
       SizedBox(

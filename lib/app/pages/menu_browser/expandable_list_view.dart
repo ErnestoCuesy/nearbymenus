@@ -8,7 +8,9 @@ import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_container.dart';
 import 'package:nearbymenus/app/pages/orders/add_to_order.dart';
+import 'package:nearbymenus/app/pages/sign_in/email_sign_in_page.dart';
 import 'package:nearbymenus/app/pages/user/user_details_form.dart';
+import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
@@ -25,6 +27,7 @@ class ExpandableListView extends StatefulWidget {
 }
 
 class _ExpandableListViewState extends State<ExpandableListView> {
+  Auth auth;
   Session session;
   Database database;
   Map<dynamic, dynamic> items;
@@ -33,6 +36,15 @@ class _ExpandableListViewState extends State<ExpandableListView> {
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
 
   Map<dynamic, dynamic> get menu => widget.menu;
+
+  Future<bool> _askForSignIn(BuildContext context) async {
+    return await PlatformAlertDialog(
+      title: 'Sign In required',
+      content: 'You need to sign-in to continue.',
+      cancelActionText: 'Keep browsing',
+      defaultActionText: 'Sign In',
+    ).show(context);
+  }
 
   Future<bool> _confirmDetailsCapture(BuildContext context) async {
     return await PlatformAlertDialog(
@@ -54,63 +66,91 @@ class _ExpandableListViewState extends State<ExpandableListView> {
     ).show(context);
   }
 
-  Future<void> _addMenuItemToOrder(BuildContext context, String menuCode, Map<dynamic, dynamic> menuItem) async {
-    if (session.userDetails.name == null ||
-        session.userDetails.name == '' ||
-        session.userDetails.address1 == '' ||
-        session.userDetails.address2 == '' ||
-        session.userDetails.telephone == '') {
-      if (await _confirmDetailsCapture(context)) {
+  Future<bool> _userCanProceed(BuildContext context) async {
+    bool emailVerified = false;
+    bool detailsCaptured = false;
+    if (await auth.userIsAnonymous()) {
+      if (await _askForSignIn(context)) {
         await Navigator.of(context).push(
           MaterialPageRoute<bool>(
             fullscreenDialog: false,
-            builder: (context) =>
-                Scaffold(
-                  appBar: AppBar(
-                    title: Text('Please enter your delivery details'),
-                  ),
-                  body: SingleChildScrollView(
-                    child: UserDetailsForm.create(
-                        context: context,
-                        userDetails: session.userDetails
-                    ),
-                  ),
-                ),
+            builder: (context) => EmailSignInPage(convertAnonymous: true,),
           ),
         );
       }
     } else {
-      if (session.currentRestaurant.isOpen || FlavourConfig.isManager()) {
-        final result = await Navigator.of(context).push(
-          MaterialPageRoute<String>(
-            fullscreenDialog: false,
-            builder: (context) =>
-                AddToOrder.create(
-                  context: context,
-                  menuCode: menuCode,
-                  item: menuItem,
-                  options: widget.options,
-                ),
-          ),
-        );
-        if (result == 'Yes') {
-          Scaffold.of(context)
-            ..removeCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text('Item added to the order.'),
+      await auth.reloadUser();
+      emailVerified = await auth.userEmailVerified();
+      if (emailVerified) {
+        if (!session.userDetailsCaptured()) {
+          if (await _confirmDetailsCapture(context)) {
+            detailsCaptured = await Navigator.of(context).push(
+              MaterialPageRoute<bool>(
+                fullscreenDialog: false,
+                builder: (context) =>
+                    Scaffold(
+                      appBar: AppBar(
+                        title: Text('Please enter your delivery details'),
+                      ),
+                      body: SingleChildScrollView(
+                        child: UserDetailsForm.create(
+                            context: context,
+                            userDetails: session.userDetails
+                        ),
+                      ),
+                    ),
               ),
             );
+          }
+        } else {
+          detailsCaptured = true;
         }
-        widget.callBack();
       } else {
         _exceptionDialog(
-            context,
-            'Restaurant is closed',
-            'RESTAURANT_IS_CLOSED',
-            '${session.currentRestaurant.name} cannot take your order at this moment. Sorry.',
+          context,
+          'Email address not verified yet',
+          'EMAIL_NOT_VERIFIED',
+          'Please check your inbox and follow the link sent to verify your email address.',
         );
       }
+    }
+    return detailsCaptured ?? false;
+  }
+
+  Future<void> _addMenuItemToOrder(BuildContext context, String menuCode, Map<dynamic, dynamic> menuItem) async {
+    if (!await _userCanProceed(context)) {
+      return;
+    }
+    if (session.currentRestaurant.isOpen || FlavourConfig.isManager()) {
+      final result = await Navigator.of(context).push(
+        MaterialPageRoute<String>(
+          fullscreenDialog: false,
+          builder: (context) =>
+              AddToOrder.create(
+                context: context,
+                menuCode: menuCode,
+                item: menuItem,
+                options: widget.options,
+              ),
+        ),
+      );
+      if (result == 'Yes') {
+        Scaffold.of(context)
+          ..removeCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text('Item added to the order.'),
+            ),
+          );
+      }
+      widget.callBack();
+    } else {
+      _exceptionDialog(
+          context,
+          'Restaurant is closed',
+          'RESTAURANT_IS_CLOSED',
+          '${session.currentRestaurant.name} cannot take your order at this moment. Sorry.',
+      );
     }
   }
 
@@ -128,6 +168,7 @@ class _ExpandableListViewState extends State<ExpandableListView> {
 
   @override
   Widget build(BuildContext context) {
+    auth = Provider.of<AuthBase>(context);
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
     sortedMenuItems.clear();

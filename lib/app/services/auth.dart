@@ -7,10 +7,14 @@ class UserAuth {
     @required this.uid,
     @required this.photoUrl,
     @required this.displayName,
+    @required this.isAnonymous,
+    @required this.isEmailVerified,
   });
   final String uid;
   final String photoUrl;
   final String displayName;
+  final bool isAnonymous;
+  final bool isEmailVerified;
 }
 
 abstract class AuthBase {
@@ -21,6 +25,12 @@ abstract class AuthBase {
   Future<void> createUserWithEmailAndPassword(String email, String password);
   Future<void> resetPassword(String email);
   Future<void> signOut();
+  Future<void> convertUserWithEmail(String email, String password, String name);
+  Future<void> updateUserName(String name, FirebaseUser currentUser);
+  Future<bool> userIsAnonymous();
+  Future<bool> userEmailVerified();
+  Future<void> sendEmailVerification();
+  Future<void> reloadUser();
 }
 
 class Auth implements AuthBase {
@@ -34,6 +44,8 @@ class Auth implements AuthBase {
             uid: user.uid,
             displayName: user.displayName,
             photoUrl: user.photoUrl,
+            isAnonymous: user.isAnonymous,
+            isEmailVerified: user.isEmailVerified
           );
   }
 
@@ -94,5 +106,42 @@ class Auth implements AuthBase {
   @override
   Future<void> signOut() async {
     await _fireBaseAuth.signOut();
+  }
+  @override
+  Future<void> convertUserWithEmail(String email, String password, String name) async {
+    final currentUser = await _fireBaseAuth.currentUser();
+    final credential = EmailAuthProvider.getCredential(email: email, password: password);
+    await currentUser.linkWithCredential(credential);
+    await updateUserName(name, currentUser);
+  }
+
+  @override
+  Future<void> updateUserName(String name, FirebaseUser currentUser) async {
+    var userUpdateInfo = UserUpdateInfo();
+    userUpdateInfo.displayName = name;
+    await currentUser.updateProfile(userUpdateInfo);
+    await currentUser.reload();
+  }
+
+  @override
+  Future<bool> userIsAnonymous() async {
+    return await _fireBaseAuth.currentUser().then((value) => value.isAnonymous);
+  }
+
+  @override
+  Future<bool> userEmailVerified() async {
+    return await _fireBaseAuth.currentUser().then((value) => value.isEmailVerified);
+  }
+
+  @override
+  Future<void> sendEmailVerification() async {
+    final currentUser = await _fireBaseAuth.currentUser();
+    await currentUser.sendEmailVerification();
+  }
+
+  @override
+  Future<void> reloadUser() async {
+    final currentUser = await _fireBaseAuth.currentUser();
+    await currentUser.reload();
   }
 }

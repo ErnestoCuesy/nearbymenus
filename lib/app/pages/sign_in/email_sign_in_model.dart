@@ -4,7 +4,7 @@ import 'package:nearbymenus/app/utilities/validators.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:flutter/foundation.dart';
 
-enum EmailSignInFormType { signIn, register, resetPassword }
+enum EmailSignInFormType { signIn, register, resetPassword, convert }
 
 class EmailSignInModel with UserCredentialsValidators, ChangeNotifier {
   EmailSignInModel({
@@ -12,6 +12,7 @@ class EmailSignInModel with UserCredentialsValidators, ChangeNotifier {
     @required this.session,
     this.email,
     this.password,
+    this.name,
     this.formType = EmailSignInFormType.signIn,
     this.isLoading = false,
     this.submitted = false,
@@ -21,6 +22,7 @@ class EmailSignInModel with UserCredentialsValidators, ChangeNotifier {
   final Session session;
   String email;
   String password;
+  String name;
   EmailSignInFormType formType;
   bool isLoading;
   bool submitted;
@@ -43,6 +45,11 @@ class EmailSignInModel with UserCredentialsValidators, ChangeNotifier {
           await auth.resetPassword(email);
         }
         break;
+        case EmailSignInFormType.convert: {
+          await auth.convertUserWithEmail(email, password, name);
+          await auth.sendEmailVerification();
+        }
+        break;
       }
     } catch (e) {
       if (e.code == 'PASSWORD_RESET' || e.code == 'EMAIL_NOT_VERIFIED') {
@@ -60,6 +67,7 @@ class EmailSignInModel with UserCredentialsValidators, ChangeNotifier {
         buttonText = 'Sign In';
       }
       break;
+      case EmailSignInFormType.convert:
       case EmailSignInFormType.register: {
         buttonText = 'Create an account';
       }
@@ -79,6 +87,7 @@ class EmailSignInModel with UserCredentialsValidators, ChangeNotifier {
         buttonText = 'Don\'t have an account? Register';
       }
       break;
+      case EmailSignInFormType.convert:
       case EmailSignInFormType.register: {
         buttonText = 'Have an account? Sign In';
       }
@@ -95,6 +104,7 @@ class EmailSignInModel with UserCredentialsValidators, ChangeNotifier {
   bool get canSubmit {
     bool canSubmitFlag = false;
     switch (formType) {
+      case EmailSignInFormType.convert:
       case EmailSignInFormType.register:
       case EmailSignInFormType.signIn: {
         if (emailValidator.isValid(email) &&

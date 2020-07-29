@@ -37,9 +37,10 @@ class LandingPage extends StatelessWidget {
           UserAuth user = snapshot.data;
           if (user == null) {
             if (FlavourConfig.isPatron()) {
-              auth.signInAnonymously();
+              return SignInPage(allowAnonymousSignIn: true,);
+            } else {
+              return SignInPage(allowAnonymousSignIn: false,);
             }
-            return SignInPage();
           }
           _setUser(database, session, user);
           return FutureBuilder<UserDetails>(
@@ -47,11 +48,13 @@ class LandingPage extends StatelessWidget {
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 final userDetails = snapshot.data;
-                if (userDetails.email == null || userDetails.email == '' ||
-                    userDetails.role == null || userDetails.role == '') {
-                  database.setUserDetails(session.userDetails);
-                } else {
-                  session.userDetails = userDetails;
+                if (!user.isAnonymous) {
+                  if (userDetails.email == null || userDetails.email == '' ||
+                      userDetails.role == null || userDetails.role == '') {
+                    database.setUserDetails(session.userDetails);
+                  } else {
+                    session.userDetails = userDetails;
+                  }
                 }
                 if (FlavourConfig.isManager()) {
                   return Provider<IAPManagerBase>(

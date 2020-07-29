@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/custom_raised_button.dart';
+import 'package:nearbymenus/app/common_widgets/empty_content.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/images/item_image_page.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_menu_browser.dart';
@@ -20,7 +21,15 @@ class _RestaurantPatronPageState extends State<RestaurantPatronPage> {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         fullscreenDialog: false,
-        builder: (context) => ExpandableMenuBrowser(),
+        builder: (context) => session.currentRestaurant.restaurantMenus.isNotEmpty
+            ? ExpandableMenuBrowser()
+            : Scaffold(
+              appBar: AppBar(title: Text(''),),
+              body: EmptyContent(
+                  title: 'Empty menu',
+                  message: 'This restaurant hasn\'t loaded any menus yet',
+                ),
+            ),
       ),
     );
   }

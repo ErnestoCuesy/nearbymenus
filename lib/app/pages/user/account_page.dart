@@ -32,6 +32,7 @@ class _AccountPageState extends State<AccountPage> {
   Future<void> _signOut() async {
     try {
       session.userDetails.orderOnHold = null;
+      session.currentOrder = null;
       database.setUserDetails(session.userDetails);
       await auth.signOut();
     } catch (e) {
@@ -56,7 +57,7 @@ class _AccountPageState extends State<AccountPage> {
     final screenHeight = MediaQuery.of(context).size.height;
     final imageAsset = Provider.of<LogoImageAsset>(context);
     String nameEmail = session.userDetails.name;
-    if (!FlavourConfig.isPatron()) {
+    if (session.userDetails.email != '') {
       nameEmail = nameEmail + ' (${session.userDetails.email})';
     }
     return [
@@ -219,7 +220,6 @@ class _AccountPageState extends State<AccountPage> {
           style: Theme.of(context).primaryTextTheme.headline6,
         ),
         actions: <Widget>[
-          if (!FlavourConfig.isPatron())
           FlatButton(
             child: Text(
               'Logout',

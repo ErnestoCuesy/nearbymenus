@@ -29,4 +29,10 @@ class Session {
     this.subscription = subscription != null ? subscription : this.subscription;
   }
 
+  bool userDetailsCaptured() {
+    return userDetails.name != '' &&
+           userDetails.address1 != '' &&
+           userDetails.address2 != '' &&
+           userDetails.telephone != '';
+  }
 }

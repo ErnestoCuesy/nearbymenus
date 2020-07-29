@@ -1,17 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
+import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/utilities/logo_image_asset.dart';
 import 'package:provider/provider.dart';
 import 'email_sign_in_page.dart';
 import 'sign_in_button.dart';
 
 class SignInPage extends StatelessWidget {
+  final bool allowAnonymousSignIn;
+
+  const SignInPage({Key key, this.allowAnonymousSignIn}) : super(key: key);
+
+  void _showSignInError(BuildContext context, PlatformException exception) {
+    PlatformExceptionAlertDialog(
+      title: 'Sign In failed',
+      exception: exception,
+    ).show(context);
+  }
+
+  Future<void> _signInAnonymously(BuildContext context) async {
+    final auth = Provider.of<AuthBase>(context, listen: true);
+    try {
+      await auth.signInAnonymously();
+    } on PlatformException catch (e) {
+      _showSignInError(context, e);
+    }
+  }
 
   void _signInWithEmail(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         fullscreenDialog: true,
-        builder: (context) => EmailSignInPage(),
+        builder: (context) => EmailSignInPage(convertAnonymous: false,),
       ),
     );
   }
@@ -55,6 +77,16 @@ class SignInPage extends StatelessWidget {
                 ? Colors.black
                 : Theme.of(context).colorScheme.primary,
             onPressed: () => _signInWithEmail(context),
+          ),
+          SizedBox(height: 24.0),
+          // ANON
+          if (allowAnonymousSignIn)
+          FlatButton(
+            child: Text(
+                'I just want to browse',
+              style: Theme.of(context).textTheme.headline5,
+            ),
+            onPressed: () => _signInAnonymously(context),
           ),
           SizedBox(height: 36.0),
         ],
