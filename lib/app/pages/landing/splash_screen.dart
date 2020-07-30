@@ -39,7 +39,7 @@ class SplashScreenState extends State<SplashScreen> {
                       ),
                       Text(
                         "Please wait...",
-                        style: Theme.of(context).accentTextTheme.subtitle,
+                        style: Theme.of(context).accentTextTheme.subtitle2,
                       )
                     ],
                   ),

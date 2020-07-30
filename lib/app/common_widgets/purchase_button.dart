@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nearbymenus/app/common_widgets/custom_raised_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
-import 'package:nearbymenus/app/models/bundle.dart';
-import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/services/iap_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
