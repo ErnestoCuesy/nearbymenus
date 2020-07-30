@@ -13,7 +13,8 @@ class EmailSignInModel with UserCredentialsValidators, ChangeNotifier {
     this.email,
     this.password,
     this.name,
-    this.formType = EmailSignInFormType.signIn,
+    this.formType,
+    this.convertAnonymous,
     this.isLoading = false,
     this.submitted = false,
   });
@@ -24,12 +25,14 @@ class EmailSignInModel with UserCredentialsValidators, ChangeNotifier {
   String password;
   String name;
   EmailSignInFormType formType;
+  bool convertAnonymous;
   bool isLoading;
   bool submitted;
 
   Future<void> submit() async {
     updateWith(submitted: true, isLoading: true);
     session.userDetails = UserDetails(email: email);
+    session.currentOrder = null;
     try {
       // await Future.delayed(Duration(seconds: 3)); // Simulate slow network
       switch (formType) {
@@ -92,14 +95,15 @@ class EmailSignInModel with UserCredentialsValidators, ChangeNotifier {
         buttonText = 'Have an account? Sign In';
       }
       break;
-      case EmailSignInFormType.resetPassword:
-        buttonText = 'Sign In';
+      case EmailSignInFormType.resetPassword: {
+          buttonText = 'Sign In';
+      }
       break;
     }
     return buttonText;
   }
 
-  String get tertiaryButtonText => 'Forgot your password?';
+  String get tertiaryButtonText => formType == EmailSignInFormType.convert ? '' : 'Forgot your password?';
 
   bool get canSubmit {
     bool canSubmitFlag = false;

@@ -28,6 +28,7 @@ class _AccountPageState extends State<AccountPage> {
       name: '', address1: '', acceptingStaffRequests: false);
   int _ordersLeft = 0;
   String _lastBundlePurchase = '';
+  bool isAnonymousUser = false;
 
   Future<void> _signOut() async {
     try {
@@ -52,13 +53,42 @@ class _AccountPageState extends State<AccountPage> {
     }
   }
 
+  void _changeDetails(BuildContext context) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (BuildContext context) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Change your details',
+            style: TextStyle(color: Theme.of(context).appBarTheme.color),
+          ),
+          elevation: 2.0,
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Card(
+              child: UserDetailsForm.create(
+                context: context,
+                userDetails: session.userDetails,
+              ),
+            ),
+          ),
+        ),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      );
+    }));
+  }
+
   List<Widget> _buildAccountDetails(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final imageAsset = Provider.of<LogoImageAsset>(context);
     String nameEmail = session.userDetails.name;
-    if (session.userDetails.email != '') {
+    if (!isAnonymousUser) {
       nameEmail = nameEmail + ' (${session.userDetails.email})';
+    } else {
+      nameEmail = 'Anonymous user';
     }
     return [
       Container(
@@ -74,37 +104,14 @@ class _AccountPageState extends State<AccountPage> {
         sectionTitle: 'Your details',
         cardTitle:
             nameEmail,
-        cardSubtitle: session.userDetails.address1 == null
+        cardSubtitle: session.userDetails.address1 == ''
             ? 'Address unknown'
             : '${session.userDetails.address1}\n'
             '${session.userDetails.address2}\n'
             '${session.userDetails.address3}\n'
             '${session.userDetails.address4}\n'
             '${session.userDetails.telephone}',
-        onPressed: () => Navigator.of(context)
-            .push(MaterialPageRoute(builder: (BuildContext context) {
-          return Scaffold(
-            appBar: AppBar(
-              title: Text(
-                'Change your details',
-                style: TextStyle(color: Theme.of(context).appBarTheme.color),
-              ),
-              elevation: 2.0,
-            ),
-            body: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Card(
-                  child: UserDetailsForm.create(
-                      context: context,
-                      userDetails: session.userDetails,
-                  ),
-                ),
-              ),
-            ),
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          );
-        })),
+        onPressed: isAnonymousUser ? null : () => _changeDetails(context),
       ),
       // SUBSCRIPTION
       if (FlavourConfig.isManager())
@@ -137,6 +144,10 @@ class _AccountPageState extends State<AccountPage> {
           ),
         ),
     ];
+  }
+
+  Future<bool> _checkAnonymous() async {
+    return await auth.currentUser().then((value) => value.isAnonymous);
   }
 
   Future<int> _loadOrdersLeft() async {
@@ -182,7 +193,7 @@ class _AccountPageState extends State<AccountPage> {
               cardSubtitle,
             ),
             trailing: IconButton(
-              icon: Icon(Icons.arrow_forward),
+              icon: Icon(isAnonymousUser ? null : Icons.arrow_forward),
               onPressed: onPressed,
             ),
           ),
@@ -212,6 +223,7 @@ class _AccountPageState extends State<AccountPage> {
     if (FlavourConfig.isManager()) {
       _loadOrdersLeft().then((value) => _ordersLeft = value ?? 0);
     }
+    _checkAnonymous().then((value) => isAnonymousUser = value);
     var accountText = 'Your profile';
     return Scaffold(
       appBar: AppBar(
@@ -233,7 +245,7 @@ class _AccountPageState extends State<AccountPage> {
         stream: database.userDetailsStream(),
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.active || !snapshot.hasData) {
-            return PlatformProgressIndicator();
+            return Center(child: PlatformProgressIndicator());
           } else {
             session.userDetails = snapshot.data;
             if (FlavourConfig.isManager()) {

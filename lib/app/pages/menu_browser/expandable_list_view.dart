@@ -40,7 +40,7 @@ class _ExpandableListViewState extends State<ExpandableListView> {
   Future<bool> _askForSignIn(BuildContext context) async {
     return await PlatformAlertDialog(
       title: 'Sign In required',
-      content: 'You need to sign-in to continue.',
+      content: 'You need to sign-in to continue. Verification of your email address may be required.',
       cancelActionText: 'Keep browsing',
       defaultActionText: 'Sign In',
     ).show(context);
@@ -82,6 +82,10 @@ class _ExpandableListViewState extends State<ExpandableListView> {
       await auth.reloadUser();
       emailVerified = await auth.userEmailVerified();
       if (emailVerified) {
+        database.setUserId(await auth.currentUser().then((value) => value.uid));
+        if (session.currentOrder != null) {
+          session.updateDeliveryDetails();
+        }
         if (!session.userDetailsCaptured()) {
           if (await _confirmDetailsCapture(context)) {
             detailsCaptured = await Navigator.of(context).push(
@@ -110,7 +114,7 @@ class _ExpandableListViewState extends State<ExpandableListView> {
           context,
           'Email address not verified yet',
           'EMAIL_NOT_VERIFIED',
-          'Please check your inbox and follow the link sent to verify your email address.',
+          'Please check your inbox and follow the link we sent you to verify your email address.',
         );
       }
     }

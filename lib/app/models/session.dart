@@ -35,4 +35,10 @@ class Session {
            userDetails.address2 != '' &&
            userDetails.telephone != '';
   }
+
+  void updateDeliveryDetails() {
+    currentOrder.name = userDetails.name;
+    currentOrder.deliveryAddress = '${userDetails.address1} ${userDetails.address2} ${userDetails.address3} ${userDetails.address4}';
+    currentOrder.telephone = userDetails.telephone;
+  }
 }

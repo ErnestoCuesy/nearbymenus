@@ -17,7 +17,7 @@ class Order {
   final String restaurantId;
   final String restaurantName;
   final String managerId;
-  final String userId;
+  String userId;
   double timestamp;
   int status;
   String name;

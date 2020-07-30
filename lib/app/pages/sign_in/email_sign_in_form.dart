@@ -21,7 +21,9 @@ class EmailSignInForm extends StatefulWidget {
       create: (context) => EmailSignInModel(
           auth: auth,
           session: session,
-          formType: convertAnonymous ? EmailSignInFormType.convert : EmailSignInFormType.signIn),
+          formType: convertAnonymous ? EmailSignInFormType.convert : EmailSignInFormType.signIn,
+          convertAnonymous: convertAnonymous,
+      ),
       child: Consumer<EmailSignInModel>(
         builder: (context, model, _) => EmailSignInForm(model: model, convertAnonymous: convertAnonymous,),
       ),

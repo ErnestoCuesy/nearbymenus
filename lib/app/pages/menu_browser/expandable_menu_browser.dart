@@ -106,6 +106,7 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
           notes: ''
       );
     }
+    session.currentOrder.userId = database.userId;
     if (session.userDetails.orderOnHold != null && session.userDetails.orderOnHold.length > 0) {
       session.currentOrder = Order.fromMap(session.userDetails.orderOnHold, null);
     }

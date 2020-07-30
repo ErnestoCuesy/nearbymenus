@@ -51,9 +51,7 @@ class UserDetailsModel with UserDetailsValidators, ChangeNotifier {
       await database.setUserDetails(userDetails);
       session.setUserDetails(userDetails);
       if (session.currentOrder != null) {
-        session.currentOrder.name = session.userDetails.name;
-        session.currentOrder.deliveryAddress = '${session.userDetails.address1} ${session.userDetails.address2} ${session.userDetails.address3} ${session.userDetails.address4}';
-        session.currentOrder.telephone = session.userDetails.telephone;
+        session.updateDeliveryDetails();
       }
     } catch (e) {
       print(e);
