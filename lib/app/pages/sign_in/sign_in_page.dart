@@ -59,8 +59,8 @@ class SignInPage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(24.0),
             child: Container(
-              width: screenWidth / 3,
-              height: screenHeight / 3,
+              width: screenWidth / 4,
+              height: screenHeight / 4,
               child: imageAsset.image,
             ),
           ),
