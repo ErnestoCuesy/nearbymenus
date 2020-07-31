@@ -27,6 +27,10 @@ class ItemImageDetailsModel with ItemImageValidators, ChangeNotifier {
   Map<dynamic, dynamic> itemImages;
   ImagePicker _imagePicker = ImagePicker();
 
+  String fileName;
+  StorageReference storageReference;
+  StorageUploadTask uploadTask;
+
   ItemImageDetailsModel(
       {@required this.database,
         @required this.restaurant,
@@ -73,9 +77,10 @@ class ItemImageDetailsModel with ItemImageValidators, ChangeNotifier {
   }
 
   Future uploadPic() async {
-    String fileName = 'images/${restaurant.id}/Image_$id';
-    StorageReference storageReference = _storage.ref().child(fileName);
-    StorageUploadTask uploadTask = storageReference.putFile(imageFile);
+    fileName = 'images/${restaurant.id}/Image_$id';
+    storageReference = _storage.ref().child(fileName);
+    uploadTask = storageReference.putFile(imageFile);
+    updateWith(isLoading: true);
     try {
       final StorageTaskSnapshot downloadUrl = await uploadTask.onComplete;
       url = await downloadUrl.ref.getDownloadURL();
@@ -83,11 +88,13 @@ class ItemImageDetailsModel with ItemImageValidators, ChangeNotifier {
     } catch (e) {
       print(e);
     }
+    updateWith(isLoading: false);
+    uploadTask = null;
   }
 
   String get primaryButtonText => 'Save';
 
-  bool get canSave => itemImageDescriptionValidator.isValid(description);
+  bool get canSave => itemImageDescriptionValidator.isValid(description) && !isLoading;
 
   String get itemImageDescriptionErrorText {
     bool showErrorText = !itemImageDescriptionValidator.isValid(description);

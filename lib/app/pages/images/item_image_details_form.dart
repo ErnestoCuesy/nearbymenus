@@ -1,3 +1,4 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nearbymenus/app/common_widgets/custom_raised_button.dart';
@@ -139,6 +140,36 @@ class _ItemImageDetailsFormState extends State<ItemImageDetailsForm> {
       ),
       SizedBox(
         height: 8.0,
+      ),
+      if (model.uploadTask != null)
+      StreamBuilder<StorageTaskEvent>(
+        stream: model.uploadTask.events,
+        builder: (context, snapshot) {
+          var event = snapshot?.data?.snapshot;
+          double progressPercent = event != null
+                  ? event.bytesTransferred / event.totalByteCount
+                  : 0;
+          return Column(
+            children: <Widget>[
+              if (model.uploadTask.isComplete)
+                Text('Complete'),
+              if (model.uploadTask.isPaused)
+                FlatButton(
+                  child: Icon(Icons.play_arrow),
+                  onPressed: model.uploadTask.resume,
+                ),
+              if (model.uploadTask.isInProgress)
+                FlatButton(
+                  child: Icon(Icons.pause),
+                  onPressed: model.uploadTask.pause,
+                ),
+              LinearProgressIndicator(value: progressPercent,),
+              Text(
+                '${(progressPercent * 100).toStringAsFixed(2)} % '
+              )
+            ],
+          );
+        }
       ),
     ];
   }
