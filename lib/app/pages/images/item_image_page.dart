@@ -70,10 +70,12 @@ class _ItemImagePageState extends State<ItemImagePage> {
                 height: height,
                 child: Column(
                   children: [
-                    Text(''),
-                    Expanded(child: image),
-                    Padding(
+                    Expanded(child: Padding(
                       padding: const EdgeInsets.all(16.0),
+                      child: image,
+                    )),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
                       child: Text(
                         itemImage.url != '' ? itemImage.description : '',
                         textAlign: TextAlign.center,
