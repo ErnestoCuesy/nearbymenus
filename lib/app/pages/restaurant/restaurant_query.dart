@@ -47,7 +47,7 @@ class _RestaurantQueryState extends State<RestaurantQuery> {
         builder: (context, snapshot) {
           return ListItemsBuilder<Restaurant>(
             title: 'No nearby restaurants found',
-            message: 'You seem to be far away from them',
+            message: 'You seem to be far away from them. Make sure location services are on and restart the app.',
             snapshot: snapshot,
             itemBuilder: (context, restaurant) {
               return Card(

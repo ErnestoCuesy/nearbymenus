@@ -41,7 +41,7 @@ class LocationServicesError extends StatelessWidget {
             FormSubmitButton(
               context: context,
               color: _buttonColor(),
-              text: 'Retry',
+              text: 'Continue',
               onPressed: callBack,
             ),
           ],

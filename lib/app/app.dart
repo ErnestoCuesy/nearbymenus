@@ -142,14 +142,13 @@ class _MyAppState extends State<MyApp> {
           return;
         }).then((position) async {
       if (position != null) {
-        _currentLocation = position;
+        setState(() {
+          _currentLocation = position;
+        });
         print(
             'Current location: ${_currentLocation
                 .latitude} : ${_currentLocation
                 .longitude}');
-        setState(() {
-          _currentLocation = position;
-        });
       }
     });
   }
@@ -197,6 +196,9 @@ class _MyAppState extends State<MyApp> {
     } else {
       _determineCurrentLocation();
       if (!_locationPermissionGranted || _geolocatorTimedOut) {
+        setState(() {
+          _currentLocation = Position(latitude: 0, longitude: 0);
+        });
         return LocationServicesError(
           callBack: () => _callBack(),
           message: 'Please make sure location services are enabled and location permissions granted.',);
