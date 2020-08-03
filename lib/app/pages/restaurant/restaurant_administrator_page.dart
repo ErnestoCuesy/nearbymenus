@@ -10,6 +10,7 @@ import 'package:nearbymenus/app/pages/option_builder/option/option_page.dart';
 import 'package:nearbymenus/app/pages/orders/active_orders.dart';
 import 'package:nearbymenus/app/pages/orders/inactive_orders.dart';
 import 'package:nearbymenus/app/pages/orders/order_totals.dart';
+import 'package:nearbymenus/app/pages/sign_in/email_sign_in_page.dart';
 import 'package:provider/provider.dart';
 
 class RestaurantAdministratorPage extends StatefulWidget {
@@ -129,11 +130,7 @@ class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPag
             height: buttonSize,
             width: buttonSize,
             color: Theme.of(context).buttonTheme.colorScheme.surface,
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (BuildContext context) => ItemImagePage(viewOnly: false,),
-              ),
-            ),
+            onPressed: session.isAnonymousUser ? () => _convertUser(context) : () => _images(context),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -163,11 +160,7 @@ class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPag
             height: buttonSize,
             width: buttonSize,
             color: Theme.of(context).buttonTheme.colorScheme.surface,
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (BuildContext context) => ActiveOrders(),
-              ),
-            ),
+            onPressed: session.isAnonymousUser ? () => _convertUser(context) : () => _activeOrders(context),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -190,11 +183,7 @@ class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPag
             height: buttonSize,
             width: buttonSize,
             color: Theme.of(context).buttonTheme.colorScheme.surface,
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (BuildContext context) => InactiveOrders(),
-              ),
-            ),
+            onPressed: session.isAnonymousUser ? () => _convertUser(context) : () => _inactiveOrders(context),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -222,11 +211,7 @@ class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPag
           height: buttonSize,
           width: buttonSize,
           color: Theme.of(context).buttonTheme.colorScheme.surface,
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (BuildContext context) => OrderTotals(),
-            ),
-          ),
+          onPressed: session.isAnonymousUser ? () => _convertUser(context) : () => _orderTotals(context),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -245,6 +230,47 @@ class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPag
       ]
     )
     ];
+  }
+
+  void _images(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) => ItemImagePage(viewOnly: false,),
+      ),
+    );
+  }
+
+  void _activeOrders(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) => ActiveOrders(),
+      ),
+    );
+  }
+
+  void _inactiveOrders(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) => InactiveOrders(),
+      ),
+    );
+  }
+
+  void _orderTotals(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) => OrderTotals(),
+      ),
+    );
+  }
+
+  void _convertUser(BuildContext context) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<bool>(
+        fullscreenDialog: false,
+        builder: (BuildContext context) => EmailSignInPage(convertAnonymous: true,),
+      ),
+    );
   }
 
   @override

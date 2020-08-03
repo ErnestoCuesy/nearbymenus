@@ -66,23 +66,31 @@ class _ExpandableListViewState extends State<ExpandableListView> {
     ).show(context);
   }
 
+  void _convertUser(BuildContext context) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<bool>(
+        fullscreenDialog: false,
+        builder: (BuildContext context) => EmailSignInPage(convertAnonymous: true,),
+      ),
+    );
+  }
+
   Future<bool> _userCanProceed(BuildContext context) async {
     bool emailVerified = false;
     bool detailsCaptured = false;
-    if (await auth.userIsAnonymous()) {
+    session.isAnonymousUser = await auth.userIsAnonymous();
+    if (session.isAnonymousUser) {
       if (await _askForSignIn(context)) {
-        await Navigator.of(context).push(
-          MaterialPageRoute<bool>(
-            fullscreenDialog: false,
-            builder: (context) => EmailSignInPage(convertAnonymous: true,),
-          ),
-        );
+        _convertUser(context);
       }
     } else {
       await auth.reloadUser();
+      session.userDetails.email = 'Email not verified yet';
       emailVerified = await auth.userEmailVerified();
       if (emailVerified) {
         database.setUserId(await auth.currentUser().then((value) => value.uid));
+        session.userDetails.email = await auth.userEmail();
+        database.setUserDetails(session.userDetails);
         if (session.currentOrder != null) {
           session.updateDeliveryDetails();
         }

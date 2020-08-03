@@ -36,12 +36,9 @@ class LandingPage extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.active) {
           UserAuth user = snapshot.data;
           if (user == null) {
-            if (FlavourConfig.isPatron()) {
-              return SignInPage(allowAnonymousSignIn: true,);
-            } else {
-              return SignInPage(allowAnonymousSignIn: false,);
-            }
+             return SignInPage(allowAnonymousSignIn: true,);
           }
+          session.isAnonymousUser = user.isAnonymous;
           _setUser(database, session, user);
           return FutureBuilder<UserDetails>(
             future: database.userDetailsSnapshot(user.uid),
@@ -59,7 +56,7 @@ class LandingPage extends StatelessWidget {
                 if (FlavourConfig.isManager()) {
                   return Provider<IAPManagerBase>(
                     create: (context) =>
-                        IAPManager(userID: session.userDetails.email),
+                        IAPManager(userID: user.isAnonymous ? null : session.userDetails.email),
                     child: CheckPurchases(),
                   );
                 } else {

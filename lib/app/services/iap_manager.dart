@@ -196,6 +196,7 @@ class IAPManager implements IAPManagerBase {
   Offerings _offerings;
   Subscription _subscription;
   StreamController<Subscription> controller = StreamController<Subscription>();
+  final String API_KEY = 'AeegEYeSxBwqtfZXZtbeMWVTOnAhyxiA';
 
   @override
   Stream<Subscription> get onSubscriptionChanged => controller.stream;
@@ -207,7 +208,11 @@ class IAPManager implements IAPManagerBase {
   Future<void> init() async {
     try {
       Purchases.setDebugLogsEnabled(false);
-      await Purchases.setup("AeegEYeSxBwqtfZXZtbeMWVTOnAhyxiA", appUserId: userID);
+      if (userID == null || userID == '') {
+        await Purchases.setup(API_KEY);
+      } else {
+        await Purchases.setup(API_KEY, appUserId: userID);
+      }
       await Purchases.setAllowSharingStoreAccount(false);
       _purchaserInfo = await Purchases.getPurchaserInfo();
       _offerings = await Purchases.getOfferings();

@@ -83,7 +83,7 @@ class SignInPage extends StatelessWidget {
           if (allowAnonymousSignIn)
           FlatButton(
             child: Text(
-                'I just want to browse',
+                'I\'ll sign-in later',
               style: Theme.of(context).textTheme.headline5,
             ),
             onPressed: () => _signInAnonymously(context),

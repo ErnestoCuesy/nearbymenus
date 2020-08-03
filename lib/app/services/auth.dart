@@ -7,12 +7,14 @@ class UserAuth {
     @required this.uid,
     @required this.photoUrl,
     @required this.displayName,
+    @required this.email,
     @required this.isAnonymous,
     @required this.isEmailVerified,
   });
   final String uid;
   final String photoUrl;
   final String displayName;
+  final String email;
   final bool isAnonymous;
   final bool isEmailVerified;
 }
@@ -31,6 +33,7 @@ abstract class AuthBase {
   Future<bool> userEmailVerified();
   Future<void> sendEmailVerification();
   Future<void> reloadUser();
+  Future<String> userEmail();
 }
 
 class Auth implements AuthBase {
@@ -43,6 +46,7 @@ class Auth implements AuthBase {
         : UserAuth(
             uid: user.uid,
             displayName: user.displayName,
+            email: user.email,
             photoUrl: user.photoUrl,
             isAnonymous: user.isAnonymous,
             isEmailVerified: user.isEmailVerified
@@ -143,5 +147,9 @@ class Auth implements AuthBase {
   Future<void> reloadUser() async {
     final currentUser = await _fireBaseAuth.currentUser();
     await currentUser.reload();
+  }
+
+  Future<String> userEmail() async {
+    return await _fireBaseAuth.currentUser().then((value) => value.email);
   }
 }

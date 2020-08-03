@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
+import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/bundle.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/orders/locked_orders.dart';
+import 'package:nearbymenus/app/pages/sign_in/email_sign_in_page.dart';
 import 'package:nearbymenus/app/pages/user/upsell_screen.dart';
 import 'package:nearbymenus/app/pages/user/user_details_form.dart';
 import 'package:nearbymenus/app/services/auth.dart';
@@ -28,7 +31,6 @@ class _AccountPageState extends State<AccountPage> {
       name: '', address1: '', acceptingStaffRequests: false);
   int _ordersLeft = 0;
   String _lastBundlePurchase = '';
-  bool isAnonymousUser = false;
 
   Future<void> _signOut() async {
     try {
@@ -80,12 +82,78 @@ class _AccountPageState extends State<AccountPage> {
     }));
   }
 
+  void _upSell(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        fullscreenDialog: false,
+        builder: (context) => UpsellScreen(
+          ordersLeft: _ordersLeft,
+          blockedOrders: null,
+        ),
+      ),
+    );
+  }
+
+  void _lockedOrders(BuildContext context) {
+    Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (BuildContext context) => LockedOrders(),
+        ),
+    );
+  }
+
+  Future<bool> _askForSignIn(BuildContext context) async {
+    return await PlatformAlertDialog(
+      title: 'Sign In required',
+      content: 'You need to sign-in to continue. Verification of your email address may be required.',
+      cancelActionText: 'Keep browsing',
+      defaultActionText: 'Sign In',
+    ).show(context);
+  }
+
+  void _convertUser(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        fullscreenDialog: false,
+        builder: (BuildContext context) => EmailSignInPage(convertAnonymous: true,),
+      ),
+    );
+  }
+
+  void _userCanProceed({BuildContext context, Function(BuildContext) nextAction}) async {
+    bool emailVerified = false;
+    if (session.isAnonymousUser) {
+      if (await _askForSignIn(context)) {
+        _convertUser(context);
+      }
+    } else {
+      await auth.reloadUser();
+      session.userDetails.email = 'Email not verified yet';
+      emailVerified = await auth.userEmailVerified();
+      if (emailVerified) {
+        database.setUserId(await auth.currentUser().then((value) => value.uid));
+        session.userDetails.email = await auth.userEmail();
+        database.setUserDetails(session.userDetails);
+        nextAction(context);
+      } else {
+        await PlatformExceptionAlertDialog(
+          title: 'Email address not verified yet',
+          exception: PlatformException(
+            code: 'EMAIL_NOT_VERIFIED',
+            message: 'Please check your inbox and follow the link we sent you to verify your email address.',
+            details: 'Please check your inbox and follow the link we sent you to verify your email address.',
+          ),
+        ).show(context);
+      }
+    }
+  }
+
   List<Widget> _buildAccountDetails(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final imageAsset = Provider.of<LogoImageAsset>(context);
     String nameEmail = session.userDetails.name;
-    if (!isAnonymousUser) {
+    if (!session.isAnonymousUser) {
       nameEmail = nameEmail + ' (${session.userDetails.email})';
     } else {
       nameEmail = 'Anonymous user';
@@ -111,7 +179,7 @@ class _AccountPageState extends State<AccountPage> {
             '${session.userDetails.address3}\n'
             '${session.userDetails.address4}\n'
             '${session.userDetails.telephone}',
-        onPressed: isAnonymousUser ? null : () => _changeDetails(context),
+        onPressed: () => _userCanProceed(context: context, nextAction: _changeDetails),
       ),
       // SUBSCRIPTION
       if (FlavourConfig.isManager())
@@ -120,34 +188,16 @@ class _AccountPageState extends State<AccountPage> {
           cardTitle: 'Orders left: $_ordersLeft',
           cardSubtitle:
               'Last purchase was on: $_lastBundlePurchase',
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                  fullscreenDialog: false,
-                  builder: (context) => UpsellScreen(
-                        ordersLeft: _ordersLeft,
-                        blockedOrders: null,
-                      ),
-              ),
-            );
-          },
+          onPressed: () => _userCanProceed(context: context, nextAction: _upSell),
         ),
       if (FlavourConfig.isManager())
         _userDetailsSection(
           sectionTitle: 'Locked orders',
           cardTitle: 'Tap to see and unlock orders across all your restaurants',
           cardSubtitle: '',
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (BuildContext context) => LockedOrders(),
-            ),
+          onPressed: () => _userCanProceed(context: context, nextAction: _lockedOrders),
           ),
-        ),
     ];
-  }
-
-  Future<bool> _checkAnonymous() async {
-    return await auth.currentUser().then((value) => value.isAnonymous);
   }
 
   Future<int> _loadOrdersLeft() async {
@@ -193,7 +243,7 @@ class _AccountPageState extends State<AccountPage> {
               cardSubtitle,
             ),
             trailing: IconButton(
-              icon: Icon(isAnonymousUser ? null : Icons.arrow_forward),
+              icon: Icon(Icons.arrow_forward),
               onPressed: onPressed,
             ),
           ),
@@ -215,6 +265,15 @@ class _AccountPageState extends State<AccountPage> {
     );
   }
 
+  Future<String> _reloadUser() async {
+    await auth.reloadUser();
+    if (await auth.userEmailVerified()) {
+      return await auth.userEmail();
+    } else {
+      return 'Email not verified yet';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     auth = Provider.of<AuthBase>(context);
@@ -223,7 +282,7 @@ class _AccountPageState extends State<AccountPage> {
     if (FlavourConfig.isManager()) {
       _loadOrdersLeft().then((value) => _ordersLeft = value ?? 0);
     }
-    _checkAnonymous().then((value) => isAnonymousUser = value);
+    _reloadUser().then((value) => session.userDetails.email = value ?? 'Email not verified yet');
     var accountText = 'Your profile';
     return Scaffold(
       appBar: AppBar(
@@ -232,6 +291,7 @@ class _AccountPageState extends State<AccountPage> {
           style: Theme.of(context).primaryTextTheme.headline6,
         ),
         actions: <Widget>[
+          if (!session.isAnonymousUser)
           FlatButton(
             child: Text(
               'Logout',

@@ -18,6 +18,7 @@ class Session {
   Subscription subscription = Subscription();
   int pendingStaffAuthorizations;
   Order currentOrder;
+  bool isAnonymousUser;
 
   Session({this.position});
 
