@@ -10,8 +10,9 @@ import 'sign_in_button.dart';
 
 class SignInPage extends StatelessWidget {
   final bool allowAnonymousSignIn;
+  final bool convertAnonymous;
 
-  const SignInPage({Key key, this.allowAnonymousSignIn}) : super(key: key);
+  const SignInPage({Key key, this.allowAnonymousSignIn, this.convertAnonymous}) : super(key: key);
 
   void _showSignInError(BuildContext context, PlatformException exception) {
     PlatformExceptionAlertDialog(
@@ -33,7 +34,7 @@ class SignInPage extends StatelessWidget {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         fullscreenDialog: true,
-        builder: (context) => EmailSignInPage(convertAnonymous: false,),
+        builder: (context) => EmailSignInPage(convertAnonymous: convertAnonymous,),
       ),
     );
   }

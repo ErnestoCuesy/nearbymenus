@@ -4,8 +4,11 @@ import 'package:nearbymenus/app/common_widgets/custom_raised_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
+import 'package:nearbymenus/app/pages/sign_in/conversion_process.dart';
+import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/models/session.dart';
+import 'package:nearbymenus/app/services/navigation_service.dart';
 import 'package:provider/provider.dart';
 
 class StaffAuthorizationPage extends StatefulWidget {
@@ -15,14 +18,16 @@ class StaffAuthorizationPage extends StatefulWidget {
 }
 
 class _StaffAuthorizationPageState extends State<StaffAuthorizationPage> {
+  Auth auth;
   Session session;
   Database database;
+  NavigationService navigationService;
   bool staffRequestPending = false;
   Restaurant get restaurant => session.currentRestaurant;
   double buttonSize = 180.0;
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  List<Widget> _buildAccountDetails(BuildContext context) {
+  List<Widget> _buildAccessRequestItems(BuildContext context) {
     String staffAccessSubtitle =
         'You are not allowed to access orders';
     if (!restaurant.acceptingStaffRequests) {
@@ -49,7 +54,7 @@ class _StaffAuthorizationPageState extends State<StaffAuthorizationPage> {
             height: buttonSize,
             width: buttonSize,
             color: Theme.of(context).buttonTheme.colorScheme.surface,
-        onPressed: () => _requestRestaurantAccess(context),
+        onPressed: () => _checkConvertedUser(context),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -67,6 +72,20 @@ class _StaffAuthorizationPageState extends State<StaffAuthorizationPage> {
         )
       )
     ];
+  }
+
+  Future<void> _checkConvertedUser(BuildContext context) async {
+//    Navigator.of(context).push(
+//      MaterialPageRoute<bool>(
+//        fullscreenDialog: false,
+//        builder: (BuildContext context) => EmailSignInPage(convertAnonymous: true,),
+//      ),
+//    );
+    final ConversionProcess conversionProcess = ConversionProcess(navigationService: navigationService, session: session, auth: auth, database: database);
+    if (!await conversionProcess.userCanProceed()) {
+    return;
+    }
+    _requestRestaurantAccess(context);
   }
 
   Future<void> _requestRestaurantAccess(BuildContext context) async {
@@ -109,8 +128,10 @@ class _StaffAuthorizationPageState extends State<StaffAuthorizationPage> {
 
   @override
   Widget build(BuildContext context) {
+    auth = Provider.of<AuthBase>(context);
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
+    navigationService = Provider.of<NavigationService>(context);
     var accountText = 'Your access status';
     return Scaffold(
       key: _scaffoldKey,
@@ -121,11 +142,11 @@ class _StaffAuthorizationPageState extends State<StaffAuthorizationPage> {
         ),
       ),
       body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: _buildAccountDetails(context),
-          ),
-      ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: _buildAccessRequestItems(context),
+            ),
+        ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     );
   }

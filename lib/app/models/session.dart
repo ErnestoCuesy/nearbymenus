@@ -3,6 +3,7 @@ import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/services/iap_manager.dart';
+import 'package:rxdart/rxdart.dart';
 
 const String ROLE_NONE = 'None';
 const String ROLE_MANAGER = 'Manager';
@@ -19,6 +20,9 @@ class Session {
   int pendingStaffAuthorizations;
   Order currentOrder;
   bool isAnonymousUser;
+
+  BehaviorSubject<bool> _subjectAnonymousUserFlag = BehaviorSubject<bool>.seeded(false);
+  Observable<bool> get anonymousUserFlagObservable => _subjectAnonymousUserFlag.stream;
 
   Session({this.position});
 
@@ -41,5 +45,13 @@ class Session {
     currentOrder.name = userDetails.name;
     currentOrder.deliveryAddress = '${userDetails.address1} ${userDetails.address2} ${userDetails.address3} ${userDetails.address4}';
     currentOrder.telephone = userDetails.telephone;
+  }
+
+  void broadcastAnonymousUserStatus(bool value) {
+    _subjectAnonymousUserFlag.add(value);
+  }
+
+  void dispose() {
+    _subjectAnonymousUserFlag.close();
   }
 }

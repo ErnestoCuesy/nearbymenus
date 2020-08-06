@@ -10,6 +10,7 @@ import 'package:nearbymenus/app/pages/landing/location_services_error.dart';
 import 'package:nearbymenus/app/pages/landing/splash_screen.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
+import 'package:nearbymenus/app/services/navigation_service.dart';
 import 'package:nearbymenus/app/services/notification_streams.dart';
 import 'package:nearbymenus/app/utilities/app_theme.dart';
 import 'package:nearbymenus/app/utilities/logo_image_asset.dart';
@@ -31,6 +32,7 @@ class _MyAppState extends State<MyApp> {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   bool _locationPermissionGranted = true;
   bool _geolocatorTimedOut = false;
+  GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
 // Streams are created so that app can respond to notification-related events since the plugin is initialised in the `main` function
   final BehaviorSubject<ReceivedNotification> didReceiveLocalNotificationSubject =
@@ -175,8 +177,10 @@ class _MyAppState extends State<MyApp> {
             Provider<AuthBase>(create: (context) => Auth()),
             Provider<Database>(create: (context) => FirestoreDatabase()),
             Provider<Session>(create: (context) => Session(position: _currentLocation)),
+            Provider<NavigationService>(create: (context) => NavigationService(navigatorKey: _navigatorKey),)
           ],
           child: MaterialApp(
+            navigatorKey: _navigatorKey,
             title: 'Nearby Menus',
             theme: AppTheme.createTheme(context),
             home: LandingPage(),

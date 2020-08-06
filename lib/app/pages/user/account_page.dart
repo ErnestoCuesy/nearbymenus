@@ -111,9 +111,9 @@ class _AccountPageState extends State<AccountPage> {
     ).show(context);
   }
 
-  void _convertUser(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
+  Future<bool> _convertUser(BuildContext context) async {
+    return await Navigator.of(context).push(
+      MaterialPageRoute<bool>(
         fullscreenDialog: false,
         builder: (BuildContext context) => EmailSignInPage(convertAnonymous: true,),
       ),
@@ -122,9 +122,10 @@ class _AccountPageState extends State<AccountPage> {
 
   void _userCanProceed({BuildContext context, Function(BuildContext) nextAction}) async {
     bool emailVerified = false;
+    session.isAnonymousUser = await auth.userIsAnonymous();
     if (session.isAnonymousUser) {
       if (await _askForSignIn(context)) {
-        _convertUser(context);
+        await _convertUser(context);
       }
     } else {
       await auth.reloadUser();
@@ -154,7 +155,11 @@ class _AccountPageState extends State<AccountPage> {
     final imageAsset = Provider.of<LogoImageAsset>(context);
     String nameEmail = session.userDetails.name;
     if (!session.isAnonymousUser) {
-      nameEmail = nameEmail + ' (${session.userDetails.email})';
+      if (session.userDetails.email != '') {
+        nameEmail = nameEmail + ' (${session.userDetails.email})';
+      } else {
+        nameEmail = 'Email not verified yet';
+      }
     } else {
       nameEmail = 'Anonymous user';
     }
@@ -169,6 +174,7 @@ class _AccountPageState extends State<AccountPage> {
       ),
       // NAME AND ADDRESS
       _userDetailsSection(
+        context: context,
         sectionTitle: 'Your details',
         cardTitle:
             nameEmail,
@@ -184,6 +190,7 @@ class _AccountPageState extends State<AccountPage> {
       // SUBSCRIPTION
       if (FlavourConfig.isManager())
         _userDetailsSection(
+          context: context,
           sectionTitle: 'Bundle details',
           cardTitle: 'Orders left: $_ordersLeft',
           cardSubtitle:
@@ -192,6 +199,7 @@ class _AccountPageState extends State<AccountPage> {
         ),
       if (FlavourConfig.isManager())
         _userDetailsSection(
+          context: context,
           sectionTitle: 'Locked orders',
           cardTitle: 'Tap to see and unlock orders across all your restaurants',
           cardSubtitle: '',
@@ -217,7 +225,8 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   Widget _userDetailsSection(
-      {String sectionTitle,
+      {BuildContext context,
+      String sectionTitle,
       String cardTitle,
       String cardSubtitle,
       VoidCallback onPressed}) {
@@ -282,7 +291,7 @@ class _AccountPageState extends State<AccountPage> {
     if (FlavourConfig.isManager()) {
       _loadOrdersLeft().then((value) => _ordersLeft = value ?? 0);
     }
-    _reloadUser().then((value) => session.userDetails.email = value ?? 'Email not verified yet');
+    _reloadUser().then((value) => session.userDetails.email = value);
     var accountText = 'Your profile';
     return Scaffold(
       appBar: AppBar(

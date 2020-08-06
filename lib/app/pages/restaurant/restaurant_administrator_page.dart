@@ -264,8 +264,8 @@ class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPag
     );
   }
 
-  void _convertUser(BuildContext context) async {
-    await Navigator.of(context).push(
+  void _convertUser(BuildContext context) {
+    Navigator.of(context).push(
       MaterialPageRoute<bool>(
         fullscreenDialog: false,
         builder: (BuildContext context) => EmailSignInPage(convertAnonymous: true,),

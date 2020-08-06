@@ -36,16 +36,17 @@ class LandingPage extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.active) {
           UserAuth user = snapshot.data;
           if (user == null) {
-             return SignInPage(allowAnonymousSignIn: true,);
+             return SignInPage(allowAnonymousSignIn: true, convertAnonymous: false,);
           }
           session.isAnonymousUser = user.isAnonymous;
+          session.broadcastAnonymousUserStatus(user.isAnonymous);
           _setUser(database, session, user);
           return FutureBuilder<UserDetails>(
             future: database.userDetailsSnapshot(user.uid),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 final userDetails = snapshot.data;
-                if (!user.isAnonymous) {
+                if (!user.isAnonymous && user.isEmailVerified) {
                   if (userDetails.email == null || userDetails.email == '' ||
                       userDetails.role == null || userDetails.role == '') {
                     database.setUserDetails(session.userDetails);

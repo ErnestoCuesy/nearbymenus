@@ -2,16 +2,15 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_container.dart';
 import 'package:nearbymenus/app/pages/orders/add_to_order.dart';
-import 'package:nearbymenus/app/pages/sign_in/email_sign_in_page.dart';
-import 'package:nearbymenus/app/pages/user/user_details_form.dart';
+import 'package:nearbymenus/app/pages/sign_in/conversion_process.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
+import 'package:nearbymenus/app/services/navigation_service.dart';
 import 'package:provider/provider.dart';
 
 class ExpandableListView extends StatefulWidget {
@@ -30,30 +29,13 @@ class _ExpandableListViewState extends State<ExpandableListView> {
   Auth auth;
   Session session;
   Database database;
+  NavigationService navigationService;
   Map<dynamic, dynamic> items;
   bool expandItemsFlag = false;
   Map<dynamic, dynamic> sortedMenuItems = Map<dynamic, dynamic>();
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
 
   Map<dynamic, dynamic> get menu => widget.menu;
-
-  Future<bool> _askForSignIn(BuildContext context) async {
-    return await PlatformAlertDialog(
-      title: 'Sign In required',
-      content: 'You need to sign-in to continue. Verification of your email address may be required.',
-      cancelActionText: 'Keep browsing',
-      defaultActionText: 'Sign In',
-    ).show(context);
-  }
-
-  Future<bool> _confirmDetailsCapture(BuildContext context) async {
-    return await PlatformAlertDialog(
-      title: 'Delivery details missing',
-      content: 'We\'re missing your delivery details. Your details will not be shared with anyone else.',
-      cancelActionText: 'Keep browsing',
-      defaultActionText: 'Capture my details',
-    ).show(context);
-  }
 
   Future<void> _exceptionDialog(BuildContext context, String title, String code, String message) async {
     await PlatformExceptionAlertDialog(
@@ -66,71 +48,9 @@ class _ExpandableListViewState extends State<ExpandableListView> {
     ).show(context);
   }
 
-  void _convertUser(BuildContext context) async {
-    await Navigator.of(context).push(
-      MaterialPageRoute<bool>(
-        fullscreenDialog: false,
-        builder: (BuildContext context) => EmailSignInPage(convertAnonymous: true,),
-      ),
-    );
-  }
-
-  Future<bool> _userCanProceed(BuildContext context) async {
-    bool emailVerified = false;
-    bool detailsCaptured = false;
-    session.isAnonymousUser = await auth.userIsAnonymous();
-    if (session.isAnonymousUser) {
-      if (await _askForSignIn(context)) {
-        _convertUser(context);
-      }
-    } else {
-      await auth.reloadUser();
-      session.userDetails.email = 'Email not verified yet';
-      emailVerified = await auth.userEmailVerified();
-      if (emailVerified) {
-        database.setUserId(await auth.currentUser().then((value) => value.uid));
-        session.userDetails.email = await auth.userEmail();
-        database.setUserDetails(session.userDetails);
-        if (session.currentOrder != null) {
-          session.updateDeliveryDetails();
-        }
-        if (!session.userDetailsCaptured()) {
-          if (await _confirmDetailsCapture(context)) {
-            detailsCaptured = await Navigator.of(context).push(
-              MaterialPageRoute<bool>(
-                fullscreenDialog: false,
-                builder: (context) =>
-                    Scaffold(
-                      appBar: AppBar(
-                        title: Text('Please enter your delivery details'),
-                      ),
-                      body: SingleChildScrollView(
-                        child: UserDetailsForm.create(
-                            context: context,
-                            userDetails: session.userDetails
-                        ),
-                      ),
-                    ),
-              ),
-            );
-          }
-        } else {
-          detailsCaptured = true;
-        }
-      } else {
-        _exceptionDialog(
-          context,
-          'Email address not verified yet',
-          'EMAIL_NOT_VERIFIED',
-          'Please check your inbox and follow the link we sent you to verify your email address.',
-        );
-      }
-    }
-    return detailsCaptured ?? false;
-  }
-
   Future<void> _addMenuItemToOrder(BuildContext context, String menuCode, Map<dynamic, dynamic> menuItem) async {
-    if (!await _userCanProceed(context)) {
+    final ConversionProcess conversionProcess = ConversionProcess(navigationService: navigationService, session: session, auth: auth, database: database);
+    if (!await conversionProcess.userCanProceed()) {
       return;
     }
     if (session.currentRestaurant.isOpen || FlavourConfig.isManager()) {
@@ -183,6 +103,7 @@ class _ExpandableListViewState extends State<ExpandableListView> {
     auth = Provider.of<AuthBase>(context);
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
+    navigationService = Provider.of<NavigationService>(context);
     sortedMenuItems.clear();
     final itemCount = menu.entries
         .where((element) {

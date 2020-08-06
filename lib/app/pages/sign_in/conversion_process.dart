@@ -1,0 +1,114 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
+import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
+import 'package:nearbymenus/app/models/session.dart';
+import 'package:nearbymenus/app/pages/sign_in/email_sign_in_page.dart';
+import 'package:nearbymenus/app/pages/user/user_details_form.dart';
+import 'package:nearbymenus/app/services/auth.dart';
+import 'package:nearbymenus/app/services/database.dart';
+import 'package:nearbymenus/app/services/navigation_service.dart';
+
+class ConversionProcess {
+  final NavigationService navigationService;
+  final Session session;
+  final Auth auth;
+  final Database database;
+
+  ConversionProcess({this.navigationService, this.session, this.auth, this.database});
+
+
+  Future<bool> _askForSignIn() async {
+    return await PlatformAlertDialog(
+      title: 'Sign In required',
+      content: 'You need to sign-in to continue. Verification of your email address may be required.',
+      cancelActionText: 'Keep browsing',
+      defaultActionText: 'Sign In',
+    ).show(navigationService.context);
+  }
+
+  Future<bool> _confirmDetailsCapture() async {
+    return await PlatformAlertDialog(
+      title: 'Contact details missing',
+      content: 'We\'re missing your contact details. Your details will not be shared with anyone else.',
+      cancelActionText: 'Keep browsing',
+      defaultActionText: 'Capture my details',
+    ).show(navigationService.context);
+  }
+
+  Future<void> _exceptionDialog(String title, String code, String message) async {
+    await PlatformExceptionAlertDialog(
+      title: title,
+      exception: PlatformException(
+        code: code,
+        message: message,
+        details: message,
+      ),
+    ).show(navigationService.context);
+  }
+
+  void _convertUser() async {
+    //await Navigator.of(context).push(
+    await navigationService.push(
+      MaterialPageRoute<bool>(
+        fullscreenDialog: false,
+        builder: (BuildContext context) => EmailSignInPage(convertAnonymous: true,),
+      ),
+    );
+  }
+
+  Future<bool> userCanProceed() async {
+    bool emailVerified = false;
+    bool detailsCaptured = false;
+    session.isAnonymousUser = await auth.userIsAnonymous();
+    if (session.isAnonymousUser) {
+      if (await _askForSignIn()) {
+        _convertUser();
+      }
+    } else {
+      await auth.reloadUser();
+      session.userDetails.email = 'Email not verified yet';
+      emailVerified = await auth.userEmailVerified();
+      if (emailVerified) {
+        database.setUserId(await auth.currentUser().then((value) => value.uid));
+        session.userDetails.email = await auth.userEmail();
+        database.setUserDetails(session.userDetails);
+        if (session.currentOrder != null) {
+          session.updateDeliveryDetails();
+        }
+        if (!session.userDetailsCaptured()) {
+          if (await _confirmDetailsCapture()) {
+            detailsCaptured = await navigationService.push(
+              MaterialPageRoute<bool>(
+                fullscreenDialog: false,
+                builder: (context) =>
+                    Scaffold(
+                      appBar: AppBar(
+                        title: Text('Please enter your contact details'),
+                      ),
+                      body: SingleChildScrollView(
+                        child: UserDetailsForm.create(
+                            context: context,
+                            userDetails: session.userDetails
+                        ),
+                      ),
+                    ),
+              ),
+            );
+          }
+        } else {
+          detailsCaptured = true;
+        }
+      } else {
+        _exceptionDialog(
+          'Email address not verified yet',
+          'EMAIL_NOT_VERIFIED',
+          'Please check your inbox and follow the link we sent you to verify your email address.',
+        );
+      }
+    }
+    return detailsCaptured ?? false;
+  }
+
+}

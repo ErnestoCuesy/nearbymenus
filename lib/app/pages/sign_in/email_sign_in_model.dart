@@ -51,6 +51,7 @@ class EmailSignInModel with UserCredentialsValidators, ChangeNotifier {
         case EmailSignInFormType.convert: {
           await auth.convertUserWithEmail(email, password, name);
           await auth.sendEmailVerification();
+          session.broadcastAnonymousUserStatus(false);
         }
         break;
       }
