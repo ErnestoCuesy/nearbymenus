@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:nearbymenus/app/common_widgets/custom_raised_button.dart';
-import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
 import 'package:nearbymenus/app/pages/sign_in/conversion_process.dart';
@@ -54,7 +52,7 @@ class _StaffAuthorizationPageState extends State<StaffAuthorizationPage> {
             height: buttonSize,
             width: buttonSize,
             color: Theme.of(context).buttonTheme.colorScheme.surface,
-        onPressed: () => _checkConvertedUser(context),
+        onPressed: () => _convertUser(context ,_requestRestaurantAccess),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -74,56 +72,40 @@ class _StaffAuthorizationPageState extends State<StaffAuthorizationPage> {
     ];
   }
 
-  Future<void> _checkConvertedUser(BuildContext context) async {
-//    Navigator.of(context).push(
-//      MaterialPageRoute<bool>(
-//        fullscreenDialog: false,
-//        builder: (BuildContext context) => EmailSignInPage(convertAnonymous: true,),
-//      ),
-//    );
-    final ConversionProcess conversionProcess = ConversionProcess(navigationService: navigationService, session: session, auth: auth, database: database);
+  void _convertUser(BuildContext context, Function(BuildContext) nextAction) async {
+    final ConversionProcess conversionProcess = ConversionProcess(
+        navigationService: navigationService,
+        session: session,
+        auth: auth,
+        database: database);
     if (!await conversionProcess.userCanProceed()) {
-    return;
+      return;
     }
-    _requestRestaurantAccess(context);
+    nextAction(context);
   }
 
   Future<void> _requestRestaurantAccess(BuildContext context) async {
-    if (session.userDetails.name == null ||
-        session.userDetails.name == '') {
-        await PlatformExceptionAlertDialog(
-            title: 'Empty user name',
-            exception: PlatformException(
-            code: 'USERNAME_IS_EMPTY',
-            message:
-            'Please enter your name in the profile page before requesting access.',
-            details:
-            'Please enter your name in the profile page before requesting access',
-        ),
-      ).show(context);
-    } else {
-      final double timestamp = dateFromCurrentDate() / 1.0;
-      database.setMessageDetails(UserMessage(
-        id: documentIdFromCurrentDate(),
-        timestamp: timestamp,
-        fromUid: database.userId,
-        toUid: session.currentRestaurant.managerId,
-        restaurantId: session.currentRestaurant.id,
-        fromRole: ROLE_STAFF,
-        toRole: ROLE_MANAGER,
-        fromName: '${session.userDetails.name} (${session.userDetails.email})',
-        delivered: false,
-        type: 'Access to ${session.currentRestaurant.name}',
-        authFlag: false,
-        attendedFlag: false,
-      ));
-      //Navigator.of(context).pop();
-      _scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: Text('Access request sent, pending approval... please wait'),
-        ),
-      );
-    }
+    final double timestamp = dateFromCurrentDate() / 1.0;
+    database.setMessageDetails(UserMessage(
+      id: documentIdFromCurrentDate(),
+      timestamp: timestamp,
+      fromUid: database.userId,
+      toUid: session.currentRestaurant.managerId,
+      restaurantId: session.currentRestaurant.id,
+      fromRole: ROLE_STAFF,
+      toRole: ROLE_MANAGER,
+      fromName: '${session.userDetails.name} (${session.userDetails.email})',
+      delivered: false,
+      type: 'Access to ${session.currentRestaurant.name}',
+      authFlag: false,
+      attendedFlag: false,
+    ));
+    //Navigator.of(context).pop();
+    _scaffoldKey.currentState.showSnackBar(
+      SnackBar(
+        content: Text('Access request sent, pending approval... please wait'),
+      ),
+    );
   }
 
   @override

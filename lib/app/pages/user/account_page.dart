@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
-import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/bundle.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/orders/locked_orders.dart';
-import 'package:nearbymenus/app/pages/sign_in/email_sign_in_page.dart';
+import 'package:nearbymenus/app/pages/sign_in/conversion_process.dart';
 import 'package:nearbymenus/app/pages/user/upsell_screen.dart';
 import 'package:nearbymenus/app/pages/user/user_details_form.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/models/session.dart';
+import 'package:nearbymenus/app/services/navigation_service.dart';
 import 'package:nearbymenus/app/utilities/logo_image_asset.dart';
 import 'package:provider/provider.dart';
 
@@ -27,6 +26,7 @@ class _AccountPageState extends State<AccountPage> {
   AuthBase auth;
   Session session;
   Database database;
+  NavigationService navigationService;
   Restaurant restaurant = Restaurant(
       name: '', address1: '', acceptingStaffRequests: false);
   int _ordersLeft = 0;
@@ -102,51 +102,16 @@ class _AccountPageState extends State<AccountPage> {
     );
   }
 
-  Future<bool> _askForSignIn(BuildContext context) async {
-    return await PlatformAlertDialog(
-      title: 'Sign In required',
-      content: 'You need to sign-in to continue. Verification of your email address may be required.',
-      cancelActionText: 'Keep browsing',
-      defaultActionText: 'Sign In',
-    ).show(context);
-  }
-
-  Future<bool> _convertUser(BuildContext context) async {
-    return await Navigator.of(context).push(
-      MaterialPageRoute<bool>(
-        fullscreenDialog: false,
-        builder: (BuildContext context) => EmailSignInPage(convertAnonymous: true,),
-      ),
-    );
-  }
-
-  void _userCanProceed({BuildContext context, Function(BuildContext) nextAction}) async {
-    bool emailVerified = false;
-    session.isAnonymousUser = await auth.userIsAnonymous();
-    if (session.isAnonymousUser) {
-      if (await _askForSignIn(context)) {
-        await _convertUser(context);
-      }
-    } else {
-      await auth.reloadUser();
-      session.userDetails.email = 'Email not verified yet';
-      emailVerified = await auth.userEmailVerified();
-      if (emailVerified) {
-        database.setUserId(await auth.currentUser().then((value) => value.uid));
-        session.userDetails.email = await auth.userEmail();
-        database.setUserDetails(session.userDetails);
-        nextAction(context);
-      } else {
-        await PlatformExceptionAlertDialog(
-          title: 'Email address not verified yet',
-          exception: PlatformException(
-            code: 'EMAIL_NOT_VERIFIED',
-            message: 'Please check your inbox and follow the link we sent you to verify your email address.',
-            details: 'Please check your inbox and follow the link we sent you to verify your email address.',
-          ),
-        ).show(context);
-      }
+  void _convertUser(BuildContext context, Function(BuildContext) nextAction) async {
+    final ConversionProcess conversionProcess = ConversionProcess(
+        navigationService: navigationService,
+        session: session,
+        auth: auth,
+        database: database);
+    if (!await conversionProcess.userCanProceed()) {
+      return;
     }
+    nextAction(context);
   }
 
   List<Widget> _buildAccountDetails(BuildContext context) {
@@ -185,7 +150,7 @@ class _AccountPageState extends State<AccountPage> {
             '${session.userDetails.address3}\n'
             '${session.userDetails.address4}\n'
             '${session.userDetails.telephone}',
-        onPressed: () => _userCanProceed(context: context, nextAction: _changeDetails),
+        onPressed: () => _convertUser(context, _changeDetails),
       ),
       // SUBSCRIPTION
       if (FlavourConfig.isManager())
@@ -195,7 +160,7 @@ class _AccountPageState extends State<AccountPage> {
           cardTitle: 'Orders left: $_ordersLeft',
           cardSubtitle:
               'Last purchase was on: $_lastBundlePurchase',
-          onPressed: () => _userCanProceed(context: context, nextAction: _upSell),
+          onPressed: () => _convertUser(context, _upSell),
         ),
       if (FlavourConfig.isManager())
         _userDetailsSection(
@@ -203,7 +168,7 @@ class _AccountPageState extends State<AccountPage> {
           sectionTitle: 'Locked orders',
           cardTitle: 'Tap to see and unlock orders across all your restaurants',
           cardSubtitle: '',
-          onPressed: () => _userCanProceed(context: context, nextAction: _lockedOrders),
+          onPressed: () => _convertUser(context, _lockedOrders),
           ),
     ];
   }
@@ -288,6 +253,7 @@ class _AccountPageState extends State<AccountPage> {
     auth = Provider.of<AuthBase>(context);
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
+    navigationService = Provider.of<NavigationService>(context);
     if (FlavourConfig.isManager()) {
       _loadOrdersLeft().then((value) => _ordersLeft = value ?? 0);
     }

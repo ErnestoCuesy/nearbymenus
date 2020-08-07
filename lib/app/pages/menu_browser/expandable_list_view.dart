@@ -49,10 +49,14 @@ class _ExpandableListViewState extends State<ExpandableListView> {
   }
 
   Future<void> _addMenuItemToOrder(BuildContext context, String menuCode, Map<dynamic, dynamic> menuItem) async {
-    final ConversionProcess conversionProcess = ConversionProcess(navigationService: navigationService, session: session, auth: auth, database: database);
-    if (!await conversionProcess.userCanProceed()) {
-      return;
-    }
+      final ConversionProcess conversionProcess = ConversionProcess(
+          navigationService: navigationService,
+          session: session,
+          auth: auth,
+          database: database);
+      if (!await conversionProcess.userCanProceed()) {
+        return;
+      }
     if (session.currentRestaurant.isOpen || FlavourConfig.isManager()) {
       final result = await Navigator.of(context).push(
         MaterialPageRoute<String>(

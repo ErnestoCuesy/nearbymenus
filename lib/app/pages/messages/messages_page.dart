@@ -7,7 +7,10 @@ import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
 import 'package:nearbymenus/app/pages/messages/access_options.dart';
+import 'package:nearbymenus/app/pages/sign_in/conversion_process.dart';
+import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
+import 'package:nearbymenus/app/services/navigation_service.dart';
 import 'package:nearbymenus/app/utilities/format.dart';
 import 'package:provider/provider.dart';
 
@@ -17,8 +20,10 @@ class MessagesPage extends StatefulWidget {
 }
 
 class _MessagesPageState extends State<MessagesPage> {
+  Auth auth;
   Session session;
   Database database;
+  NavigationService navigationService;
   String role = ROLE_PATRON;
 
   Future<void> _deleteMessage(BuildContext context, UserMessage message) async {
@@ -115,13 +120,9 @@ class _MessagesPageState extends State<MessagesPage> {
                         ),
                       ],
                     ),
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        fullscreenDialog: false,
-                        builder: (context) =>
-                            AccessOptions(message: message,),
-                      ),
-                    ),
+                    onTap: () {
+                      _convertUser(context, message, _accessOptions);
+                    },
                   ),
                 ),
               );
@@ -130,10 +131,33 @@ class _MessagesPageState extends State<MessagesPage> {
     );
   }
 
+  void _accessOptions(BuildContext context, UserMessage message) {
+    Navigator.of(context).push(MaterialPageRoute(
+        fullscreenDialog: false,
+        builder: (context) =>
+            AccessOptions(message: message,),
+      ),
+    );
+  }
+
+  void _convertUser(BuildContext context, UserMessage message, Function(BuildContext, UserMessage) nextAction) async {
+    final ConversionProcess conversionProcess = ConversionProcess(
+        navigationService: navigationService,
+        session: session,
+        auth: auth,
+        database: database);
+    if (!await conversionProcess.userCanProceed()) {
+      return;
+    }
+    nextAction(context, message);
+  }
+
   @override
   Widget build(BuildContext context) {
+    auth = Provider.of<AuthBase>(context);
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
+    navigationService = Provider.of<NavigationService>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(

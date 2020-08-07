@@ -10,7 +10,10 @@ import 'package:nearbymenus/app/pages/option_builder/option/option_page.dart';
 import 'package:nearbymenus/app/pages/orders/active_orders.dart';
 import 'package:nearbymenus/app/pages/orders/inactive_orders.dart';
 import 'package:nearbymenus/app/pages/orders/order_totals.dart';
-import 'package:nearbymenus/app/pages/sign_in/email_sign_in_page.dart';
+import 'package:nearbymenus/app/pages/sign_in/conversion_process.dart';
+import 'package:nearbymenus/app/services/auth.dart';
+import 'package:nearbymenus/app/services/database.dart';
+import 'package:nearbymenus/app/services/navigation_service.dart';
 import 'package:provider/provider.dart';
 
 class RestaurantAdministratorPage extends StatefulWidget {
@@ -21,7 +24,10 @@ class RestaurantAdministratorPage extends StatefulWidget {
 }
 
 class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPage> {
+  Auth auth;
   Session session;
+  Database database;
+  NavigationService navigationService;
   Restaurant get restaurant => session.currentRestaurant;
   double buttonSize = 180.0;
 
@@ -130,7 +136,7 @@ class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPag
             height: buttonSize,
             width: buttonSize,
             color: Theme.of(context).buttonTheme.colorScheme.surface,
-            onPressed: session.isAnonymousUser ? () => _convertUser(context) : () => _images(context),
+            onPressed: () => _convertUser(context, _images),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -160,7 +166,7 @@ class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPag
             height: buttonSize,
             width: buttonSize,
             color: Theme.of(context).buttonTheme.colorScheme.surface,
-            onPressed: session.isAnonymousUser ? () => _convertUser(context) : () => _activeOrders(context),
+            onPressed: () => _convertUser(context, _activeOrders),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -183,7 +189,7 @@ class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPag
             height: buttonSize,
             width: buttonSize,
             color: Theme.of(context).buttonTheme.colorScheme.surface,
-            onPressed: session.isAnonymousUser ? () => _convertUser(context) : () => _inactiveOrders(context),
+            onPressed: () => _convertUser(context, _inactiveOrders),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -211,7 +217,7 @@ class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPag
           height: buttonSize,
           width: buttonSize,
           color: Theme.of(context).buttonTheme.colorScheme.surface,
-          onPressed: session.isAnonymousUser ? () => _convertUser(context) : () => _orderTotals(context),
+          onPressed: () => _convertUser(context, _orderTotals),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -264,18 +270,24 @@ class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPag
     );
   }
 
-  void _convertUser(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute<bool>(
-        fullscreenDialog: false,
-        builder: (BuildContext context) => EmailSignInPage(convertAnonymous: true,),
-      ),
-    );
+  void _convertUser(BuildContext context, Function(BuildContext) nextAction) async {
+    final ConversionProcess conversionProcess = ConversionProcess(
+        navigationService: navigationService,
+        session: session,
+        auth: auth,
+        database: database);
+    if (!await conversionProcess.userCanProceed()) {
+      return;
+    }
+    nextAction(context);
   }
 
   @override
   Widget build(BuildContext context) {
+    auth = Provider.of<AuthBase>(context);
     session = Provider.of<Session>(context);
+    database = Provider.of<Database>(context);
+    navigationService = Provider.of<NavigationService>(context);
     return Scaffold(
         appBar: AppBar(
           title: Text(
