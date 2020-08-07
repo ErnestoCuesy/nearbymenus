@@ -139,10 +139,20 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
         telephoneNumberValidator.isValid(telephoneNumber) &&
         workingHoursFrom != null &&
         workingHoursTo != null &&
+        _validPaymentMethods() &&
+        _validDeliveryOption() &&
         !isLoading) {
       canSubmitFlag = true;
     }
     return canSubmitFlag;
+  }
+
+  bool _validPaymentMethods() {
+    return acceptCard || acceptCash || acceptOther;
+  }
+
+  bool _validDeliveryOption() {
+    return foodCollection || foodDeliveries;
   }
 
   String get restaurantNameErrorText {
