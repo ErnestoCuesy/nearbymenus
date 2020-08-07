@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/custom_raised_button.dart';
 import 'package:nearbymenus/app/common_widgets/empty_content.dart';
+import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
+import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/images/item_image_page.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_menu_browser.dart';
 import 'package:nearbymenus/app/pages/orders/active_orders.dart';
+import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
 class RestaurantPatronPage extends StatefulWidget {
@@ -16,6 +19,7 @@ class RestaurantPatronPage extends StatefulWidget {
 
 class _RestaurantPatronPageState extends State<RestaurantPatronPage> {
   Session session;
+  Database database;
 
   void _expandableMenuBrowserPage(BuildContext context) {
     Navigator.of(context).push(
@@ -128,6 +132,7 @@ class _RestaurantPatronPageState extends State<RestaurantPatronPage> {
   @override
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
+    database = Provider.of<Database>(context);
     return Scaffold(
         appBar: AppBar(
           title: Text(
@@ -135,11 +140,25 @@ class _RestaurantPatronPageState extends State<RestaurantPatronPage> {
             style: TextStyle(color: Theme.of(context).appBarTheme.color),
           ),
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: _buildContents(context),
-          ),
+        body: StreamBuilder<Restaurant>(
+          stream: database.selectedRestaurantStream(session.currentRestaurant.id),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: PlatformProgressIndicator());
+            } else {
+              if (snapshot.hasData) {
+                session.currentRestaurant = snapshot.data;
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: _buildContents(context),
+                  ),
+                );
+              } else {
+                return Placeholder();
+              }
+            }
+          }
         ));
   }
 }

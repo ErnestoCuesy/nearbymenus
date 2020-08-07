@@ -46,6 +46,7 @@ abstract class Database {
   Stream<List<UserMessage>> staffMessages(String restaurantId, String toRole);
   Stream<List<UserMessage>> patronMessages(String uid);
   Stream<List<Restaurant>> patronRestaurants();
+  Stream<Restaurant> selectedRestaurantStream(String restaurantId);
   Stream<List<Menu>> restaurantMenus(String restaurantId);
   Stream<List<MenuItem>> menuItems(String menuItemId);
   Stream<List<Option>> restaurantOptions(String restaurantId);
@@ -236,6 +237,12 @@ class FirestoreDatabase implements Database {
   @override
   Stream<List<Restaurant>> patronRestaurants() => _service.collectionStream(
     path: APIPath.restaurants(),
+    builder: (data, documentId) => Restaurant.fromMap(data, documentId),
+  );
+
+  @override
+  Stream<Restaurant> selectedRestaurantStream(String restaurantId) => _service.documentStream(
+    path: APIPath.restaurant(restaurantId),
     builder: (data, documentId) => Restaurant.fromMap(data, documentId),
   );
 
