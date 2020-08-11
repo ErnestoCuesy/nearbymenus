@@ -12,26 +12,34 @@ class CheckPurchases extends StatelessWidget {
 
   Future<void> _setBundleAndUnlock(Database database, List<Bundle> bundleSnapshot, Map<String, dynamic> allPurchasesDates) async {
     bundleSnapshot.forEach((bundle) {
-      allPurchasesDates.removeWhere((key, value) => value == bundle.id);
+      allPurchasesDates.removeWhere((key, value) => value.toString().contains(bundle.id));
     });
     String bundleDate;
     String bundleCode;
     int ordersInBundle = 0;
+    int totalOrders = 0;
     allPurchasesDates.forEach((key, value) async {
       bundleCode = key;
-      bundleDate = value;
+      String date = value;
+      var tempSplitDate = date.split('.');
+      var tempDate = tempSplitDate[0].split('Z');
+      bundleDate = tempDate[0];
       switch (bundleCode) {
         case 'in_app_mp0':
-          ordersInBundle += 50;
+          ordersInBundle = 50;
+          totalOrders += ordersInBundle;
           break;
         case 'in_app_mp1':
-          ordersInBundle += 100;
+          ordersInBundle = 100;
+          totalOrders += ordersInBundle;
           break;
         case 'in_app_mp2':
-          ordersInBundle += 500;
+          ordersInBundle = 500;
+          totalOrders += ordersInBundle;
           break;
         case 'in_app_mp3':
-          ordersInBundle += 1000;
+          ordersInBundle = 1000;
+          totalOrders += ordersInBundle;
           break;
       }
       try {
@@ -44,9 +52,9 @@ class CheckPurchases extends StatelessWidget {
         print('DB Bundle set and unlock failed: $e');
       }
     });
-    if (ordersInBundle > 0) {
+    if (totalOrders > 0) {
       await database.setBundleCounterTransaction(
-          database.userId, ordersInBundle);
+          database.userId, totalOrders);
     }
   }
 

@@ -208,11 +208,8 @@ class IAPManager implements IAPManagerBase {
   Future<void> init() async {
     try {
       Purchases.setDebugLogsEnabled(false);
-      if (userID == null || userID == '') {
-        await Purchases.setup(API_KEY);
-      } else {
-        await Purchases.setup(API_KEY, appUserId: userID);
-      }
+      String rcUserID = (userID == null || userID == '') ? 'anonymous' : userID;
+      await Purchases.setup(API_KEY, appUserId: rcUserID);
       await Purchases.setAllowSharingStoreAccount(false);
       _purchaserInfo = await Purchases.getPurchaserInfo();
       _offerings = await Purchases.getOfferings();
