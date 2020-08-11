@@ -15,6 +15,7 @@ class EmailSignInModel with UserCredentialsValidators, ChangeNotifier {
     this.name,
     this.formType,
     this.convertAnonymous,
+    this.acceptTermsAndConditions,
     this.isLoading = false,
     this.submitted = false,
   });
@@ -26,6 +27,7 @@ class EmailSignInModel with UserCredentialsValidators, ChangeNotifier {
   String name;
   EmailSignInFormType formType;
   bool convertAnonymous;
+  bool acceptTermsAndConditions;
   bool isLoading;
   bool submitted;
 
@@ -111,7 +113,15 @@ class EmailSignInModel with UserCredentialsValidators, ChangeNotifier {
     bool canSubmitFlag = false;
     switch (formType) {
       case EmailSignInFormType.convert:
-      case EmailSignInFormType.register:
+      case EmailSignInFormType.register: {
+        if (emailValidator.isValid(email) &&
+            passwordValidator.isValid(password) &&
+            acceptTermsAndConditions &&
+            !isLoading) {
+          canSubmitFlag = true;
+        }
+      }
+      break;
       case EmailSignInFormType.signIn: {
         if (emailValidator.isValid(email) &&
             passwordValidator.isValid(password) &&
@@ -153,16 +163,20 @@ class EmailSignInModel with UserCredentialsValidators, ChangeNotifier {
 
   void updatePassword(String password) => updateWith(password: password);
 
+  void updateTermsAndConditions(bool acceptTermsAndConditions) => updateWith(acceptTermsAndConditions: acceptTermsAndConditions);
+
   void updateWith({
     String email,
     String password,
     EmailSignInFormType formType,
+    bool acceptTermsAndConditions,
     bool isLoading,
     bool submitted,
   }) {
       this.email = email ?? this.email;
       this.password = password ?? this.password;
       this.formType = formType ?? this.formType;
+      this.acceptTermsAndConditions = acceptTermsAndConditions ?? this.acceptTermsAndConditions;
       this.isLoading = isLoading ?? this.isLoading;
       this.submitted = this.submitted;
       notifyListeners();

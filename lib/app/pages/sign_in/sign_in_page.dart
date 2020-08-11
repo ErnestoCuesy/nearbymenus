@@ -93,8 +93,8 @@ class SignInPage extends StatelessWidget {
           if (convertAnonymous)
             FlatButton(
               child: Text(
-                'You need to sign-in or create an account. \nTap here to see why.',
-                style: Theme.of(context).textTheme.headline5,
+                'You\'re currently an anonymous user.\nYou need to sign-in or create an account. \nTap here to learn why.',
+                style: Theme.of(context).textTheme.bodyText2,
                 textAlign: TextAlign.center,
               ),
               onPressed: () => _displayWhy(context),
@@ -106,18 +106,18 @@ class SignInPage extends StatelessWidget {
   }
 
   void _displayWhy(BuildContext context) {
-    String reason = 'You need an account because of the following reasons: \n\n- Email verification to prevent abuse';
+    String reason = 'If you want to continue you need to register an account for the following reason(s): \n\n- We want to keep a clean database and discourage spammers';
     if (FlavourConfig.isManager()) {
-      reason = reason + '\n- Purchase order bundles\n- Content verification by Nearby Menus';
+      reason = reason + '\n\n- You will be able to purchase order bundles to unlock your restaurant orders\n\n- You will be able to add images to your restaurant gallery\n\n- You will be able to grant access to restaurant orders to NM Staff users';
     } else if (FlavourConfig.isStaff()) {
-      reason = reason + '\n- Staff identification for restaurant access';
+      reason = reason + '\n- Restaurant managers need to know who you are to grant you restaurant access';
     } else {
-      reason = reason + '\n- Your contact details for order deliveries';
+      reason = reason + '\n- Your contact details are needed for order deliveries';
     }
     PlatformAlertDialog(
       title: 'Why you need an account',
       content: reason,
-      defaultActionText: 'Ok',
+      defaultActionText: 'I GET IT',
     ).show(context);
   }
 

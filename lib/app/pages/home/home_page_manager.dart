@@ -25,7 +25,7 @@ class _HomePageManagerState extends State<HomePageManager> {
   Map<TabItem, WidgetBuilder> get widgetBuilders {
     return {
       TabItem.restaurant: (_) => RestaurantPage(),
-      TabItem.messages: (_) => MessagesPage(),
+      TabItem.messages: (_) => CheckConvertedUser(child: MessagesPage()),
       TabItem.userAccount: (_) => CheckConvertedUser(child: AccountPage(),),
     };
   }

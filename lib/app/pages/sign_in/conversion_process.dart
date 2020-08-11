@@ -32,7 +32,7 @@ class ConversionProcess {
   Future<bool> _confirmDetailsCapture() async {
     String content = '\nWe\'re missing your contact details. Your contact details ';
     if (FlavourConfig.isManager()) {
-      content = content + 'may be needed for future communications from Nearby Menus';
+      content = content + 'may be needed for future communications from Nearby Menus.';
     } else if (FlavourConfig.isStaff()) {
       content = content + 'are needed so you can request access to restaurants.';
     } else {

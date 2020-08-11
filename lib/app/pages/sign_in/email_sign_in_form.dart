@@ -5,6 +5,7 @@ import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.d
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/sign_in/email_sign_in_model.dart';
+import 'package:nearbymenus/app/pages/sign_in/terms_and_conditions.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
@@ -25,6 +26,7 @@ class EmailSignInForm extends StatefulWidget {
           session: session,
           formType: convertAnonymous ? EmailSignInFormType.convert : EmailSignInFormType.signIn,
           convertAnonymous: convertAnonymous,
+          acceptTermsAndConditions: false,
       ),
       child: Consumer<EmailSignInModel>(
         builder: (context, model, _) => EmailSignInForm(model: model, convertAnonymous: convertAnonymous,),
@@ -115,6 +117,18 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
       SizedBox(
         height: 8.0,
       ),
+      if (model.formType == EmailSignInFormType.register ||
+          model.formType == EmailSignInFormType.convert)
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildAcceptTermsAndConditionsBTN(),
+            _buildAcceptTermsAndConditionsCB()
+          ],
+        ),
+      SizedBox(
+        height: 16.0,
+      ),
       FormSubmitButton(
         context: context,
         text: model.primaryButtonText,
@@ -186,6 +200,33 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
       textInputAction: TextInputAction.next,
       onChanged: model.updateEmail,
       onEditingComplete: () => _emailEditingComplete(),
+    );
+  }
+
+  Widget _buildAcceptTermsAndConditionsCB() {
+    return CheckboxListTile(
+      title: const Text('I agree to Terms and Conditions'),
+      value: model.acceptTermsAndConditions,
+      onChanged: null,
+    );
+  }
+
+  Widget _buildAcceptTermsAndConditionsBTN() {
+    return FlatButton(
+      child: Text(
+          'Tap here to see our Terms and Conditions',
+          style: Theme.of(context).textTheme.bodyText2,
+      ),
+      onPressed: () async {
+        if (!model.isLoading) {
+          model.acceptTermsAndConditions = await PlatformAlertDialog(
+            title: 'Terms and conditions',
+            content: TERMS_AND_CONDITIONS,
+            defaultActionText: 'I AGREE',
+            cancelActionText: 'I DON\'T AGREE',
+          ).show(context);
+        }
+      },
     );
   }
 
