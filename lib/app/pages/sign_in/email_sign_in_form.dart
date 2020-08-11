@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
+import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/sign_in/email_sign_in_model.dart';
 import 'package:nearbymenus/app/services/auth.dart';
@@ -63,6 +65,15 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
     try {
       // await Future.delayed(Duration(seconds: 3)); // Simulate slow network
       await model.submit();
+      if (widget.convertAnonymous &&
+          !model.session.isAnonymousUser &&
+          FlavourConfig.isManager()) {
+        PlatformAlertDialog(
+          title: 'Log-out required',
+          content: 'You\'ll be logged-out so you can log back in with your new credentials.',
+          defaultActionText: 'Ok',
+        ).show(context).then((value) async => await model.auth.signOut());
+      }
       Navigator.of(context).pop(true);
     } on PlatformException catch (e) {
       PlatformExceptionAlertDialog(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/services/auth.dart';
@@ -89,10 +90,35 @@ class SignInPage extends StatelessWidget {
             ),
             onPressed: () => _signInAnonymously(context),
           ),
+          if (convertAnonymous)
+            FlatButton(
+              child: Text(
+                'You need to sign-in or create an account. \nTap here to see why.',
+                style: Theme.of(context).textTheme.headline5,
+                textAlign: TextAlign.center,
+              ),
+              onPressed: () => _displayWhy(context),
+            ),
           SizedBox(height: 36.0),
         ],
       ),
     );
+  }
+
+  void _displayWhy(BuildContext context) {
+    String reason = 'You need an account because of the following reasons: \n\n- Email verification to prevent abuse';
+    if (FlavourConfig.isManager()) {
+      reason = reason + '\n- Purchase order bundles\n- Content verification by Nearby Menus';
+    } else if (FlavourConfig.isStaff()) {
+      reason = reason + '\n- Staff identification for restaurant access';
+    } else {
+      reason = reason + '\n- Your contact details for order deliveries';
+    }
+    PlatformAlertDialog(
+      title: 'Why you need an account',
+      content: reason,
+      defaultActionText: 'Ok',
+    ).show(context);
   }
 
   Widget _buildHeader(BuildContext context) {
