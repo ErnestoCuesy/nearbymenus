@@ -7,10 +7,7 @@ import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_container.dart';
 import 'package:nearbymenus/app/pages/orders/add_to_order.dart';
-import 'package:nearbymenus/app/pages/sign_in/conversion_process.dart';
-import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
-import 'package:nearbymenus/app/services/navigation_service.dart';
 import 'package:provider/provider.dart';
 
 class ExpandableListView extends StatefulWidget {
@@ -26,10 +23,8 @@ class ExpandableListView extends StatefulWidget {
 }
 
 class _ExpandableListViewState extends State<ExpandableListView> {
-  Auth auth;
   Session session;
   Database database;
-  NavigationService navigationService;
   Map<dynamic, dynamic> items;
   bool expandItemsFlag = false;
   Map<dynamic, dynamic> sortedMenuItems = Map<dynamic, dynamic>();
@@ -49,14 +44,6 @@ class _ExpandableListViewState extends State<ExpandableListView> {
   }
 
   Future<void> _addMenuItemToOrder(BuildContext context, String menuCode, Map<dynamic, dynamic> menuItem) async {
-      final ConversionProcess conversionProcess = ConversionProcess(
-          navigationService: navigationService,
-          session: session,
-          auth: auth,
-          database: database);
-      if (!await conversionProcess.userCanProceed()) {
-        return;
-      }
     if (session.currentRestaurant.isOpen || FlavourConfig.isManager()) {
       final result = await Navigator.of(context).push(
         MaterialPageRoute<String>(
@@ -104,10 +91,8 @@ class _ExpandableListViewState extends State<ExpandableListView> {
 
   @override
   Widget build(BuildContext context) {
-    auth = Provider.of<AuthBase>(context);
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
-    navigationService = Provider.of<NavigationService>(context);
     sortedMenuItems.clear();
     final itemCount = menu.entries
         .where((element) {

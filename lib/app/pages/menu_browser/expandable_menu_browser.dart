@@ -7,7 +7,10 @@ import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_list_view.dart';
 import 'package:nearbymenus/app/pages/orders/view_order.dart';
+import 'package:nearbymenus/app/pages/sign_in/conversion_process.dart';
+import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
+import 'package:nearbymenus/app/services/navigation_service.dart';
 import 'package:provider/provider.dart';
 
 class ExpandableMenuBrowser extends StatefulWidget {
@@ -17,8 +20,10 @@ class ExpandableMenuBrowser extends StatefulWidget {
 }
 
 class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
+  Auth auth;
   Session session;
   Database database;
+  NavigationService navigationService;
   Restaurant restaurant;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
@@ -54,6 +59,14 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
   }
 
   void _shoppingCartAction(BuildContext context) async {
+    final ConversionProcess conversionProcess = ConversionProcess(
+        navigationService: navigationService,
+        session: session,
+        auth: auth,
+        database: database);
+    if (!await conversionProcess.userCanProceed()) {
+      return;
+    }
     if (orderOnHold) {
       Navigator.of(context).push(
         MaterialPageRoute<void>(
@@ -114,8 +127,10 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
 
   @override
   Widget build(BuildContext context) {
+    auth = Provider.of<AuthBase>(context);
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
+    navigationService = Provider.of<NavigationService>(context);
     Map<dynamic, dynamic> menus;
     Map<dynamic, dynamic> options;
     Map<dynamic, dynamic> sortedMenus = Map<dynamic, dynamic>();

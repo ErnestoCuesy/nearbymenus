@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/sign_in/email_sign_in_page.dart';
 import 'package:nearbymenus/app/pages/user/user_details_form.dart';
@@ -29,9 +30,18 @@ class ConversionProcess {
   }
 
   Future<bool> _confirmDetailsCapture() async {
+    String content = '\nWe\'re missing your contact details. Your contact details ';
+    if (FlavourConfig.isManager()) {
+      content = content + 'may be needed for future communications from Nearby Menus';
+    } else if (FlavourConfig.isStaff()) {
+      content = content + 'are needed so you can request access to restaurants.';
+    } else {
+      content = content + 'are needed so we can deliver orders to you.';
+    }
+    content = content + '\nYour details will not be shared with anyone else.';
     return await PlatformAlertDialog(
       title: 'Contact details missing',
-      content: 'We\'re missing your contact details. Your details will not be shared with anyone else.',
+      content: content,
       cancelActionText: 'Keep browsing',
       defaultActionText: 'Capture my details',
     ).show(navigationService.context);

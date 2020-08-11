@@ -155,7 +155,7 @@ class _RestaurantPatronPageState extends State<RestaurantPatronPage> {
                   ),
                 );
               } else {
-                return Placeholder();
+                return EmptyContent(title: 'Restaurant not found', message: '',);
               }
             }
           }
