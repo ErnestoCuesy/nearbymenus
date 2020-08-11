@@ -33,6 +33,7 @@ class Restaurant {
   final Map<dynamic, dynamic> foodDeliveryFlags;
   Map<dynamic, dynamic> restaurantOptions;
   bool itemImagesInitialized;
+  bool adminVerified;
 
   Restaurant({
     this.id,
@@ -64,6 +65,7 @@ class Restaurant {
     this.foodDeliveryFlags,
     this.restaurantOptions,
     this.itemImagesInitialized,
+    this.adminVerified,
   });
 
   factory Restaurant.fromMap(Map<dynamic, dynamic> value, String documentId) {
@@ -107,6 +109,7 @@ class Restaurant {
         restaurantOptions: value['restaurantOptions'] ?? {},
         foodDeliveryFlags: value['foodDeliveryFlags'] ?? {},
         itemImagesInitialized: value['itemImagesInitialized'] ?? false,
+        adminVerified: value['adminVerified'] ?? false,
     );
   }
 
@@ -137,6 +140,7 @@ class Restaurant {
       'foodDeliveryFlags': foodDeliveryFlags ?? {},
       'itemImagesInitialized': itemImagesInitialized ?? false,
       'allowCancellations': allowCancellations,
+      'adminVerified': adminVerified ?? false,
     };
   }
 

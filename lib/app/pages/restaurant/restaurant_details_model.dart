@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
+import 'package:nearbymenus/app/models/user_message.dart';
 import 'package:nearbymenus/app/utilities/validators.dart';
 import 'package:nearbymenus/app/services/database.dart';
 
@@ -34,6 +35,7 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
   bool foodDeliveries;
   bool foodCollection;
   bool allowCancellations;
+  bool adminVerified;
   Map<dynamic, dynamic> restaurantMenus;
   Map<dynamic, dynamic> restaurantOptions;
   bool isLoading;
@@ -66,6 +68,7 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     this.foodDeliveries = false,
     this.foodCollection = false,
     this.allowCancellations = false,
+    this.adminVerified = false,
     this.restaurantMenus,
     this.restaurantOptions,
     this.isLoading = false,
@@ -103,6 +106,7 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
           foodDeliveries: foodDeliveries,
           foodCollection: foodCollection,
           allowCancellations: allowCancellations,
+          adminVerified: adminVerified,
           restaurantFlags: {
             'open': open,
             'active': active,
@@ -121,6 +125,23 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
           restaurantOptions: restaurantOptions,
         ),
       );
+      if (!adminVerified) {
+        final double timestamp = dateFromCurrentDate() / 1.0;
+        database.setMessageDetails(UserMessage(
+          id: documentIdFromCurrentDate(),
+          timestamp: timestamp,
+          fromUid: database.userId,
+          toUid: '',
+          restaurantId: id,
+          fromRole: ROLE_MANAGER,
+          toRole: ROLE_ADMIN,
+          fromName: '${session.userDetails.name} (${session.userDetails.email})',
+          delivered: false,
+          type: 'Admin verification required for $name',
+          authFlag: false,
+          attendedFlag: false,
+        ));
+      }
     } catch (e) {
       print(e);
       updateWith(isLoading: false);
@@ -215,7 +236,7 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
 
   void updateNotes(String notes) => updateWith(notes: notes);
 
-  void updateActive(bool active) => updateWith(active: active);
+  void updateActive(bool active) => updateWith(active: active && adminVerified);
 
   void updateOpen(bool open) => updateWith(open: open);
 

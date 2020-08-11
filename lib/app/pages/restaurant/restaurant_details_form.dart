@@ -47,6 +47,7 @@ class RestaurantDetailsForm extends StatefulWidget {
         foodDeliveries: restaurant.foodDeliveries ?? false,
         foodCollection: restaurant.foodCollection ?? false,
         allowCancellations: restaurant.allowCancellations ?? false,
+        adminVerified: restaurant.adminVerified ?? false,
         restaurantMenus: restaurant.restaurantMenus ?? {},
         restaurantOptions: restaurant.restaurantOptions ?? {},
       ),
@@ -145,6 +146,13 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
         defaultActionText: 'Yes',
       ).show(context);
       await model.save(useCurrentLocation);
+      if (!model.adminVerified) {
+        await PlatformAlertDialog(
+          title: 'Restaurant content verification',
+          content: 'Your restaurant content needs to be verified first by Nearby Menus before the listing can be activated. We\'ll send you a notification soon.\nHowever, you can continue with your menus set-up.',
+          defaultActionText: 'Ok',
+        ).show(context);
+      }
       Navigator.of(context).pop();
     } on PlatformException catch (e) {
       PlatformExceptionAlertDialog(
