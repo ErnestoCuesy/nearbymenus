@@ -1,5 +1,6 @@
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
+import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/utilities/validators.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:flutter/foundation.dart';
@@ -33,7 +34,7 @@ class EmailSignInModel with UserCredentialsValidators, ChangeNotifier {
 
   Future<void> submit() async {
     updateWith(submitted: true, isLoading: true);
-    session.userDetails = UserDetails(email: email);
+    session.userDetails = UserDetails(email: email, agreementDate: documentIdFromCurrentDate());
     session.currentOrder = null;
     try {
       // await Future.delayed(Duration(seconds: 3)); // Simulate slow network

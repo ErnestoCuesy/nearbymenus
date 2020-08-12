@@ -219,12 +219,12 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
       ),
       onPressed: () async {
         if (!model.isLoading) {
-          model.acceptTermsAndConditions = await PlatformAlertDialog(
-            title: 'Terms and conditions',
-            content: TERMS_AND_CONDITIONS,
-            defaultActionText: 'I AGREE',
-            cancelActionText: 'I DON\'T AGREE',
-          ).show(context);
+          await Navigator.of(context).push(
+            MaterialPageRoute<bool>(
+              fullscreenDialog: true,
+              builder: (context) => TermsAndConditions(),
+            ),
+          ).then((value) => model.updateTermsAndConditions(value));
         }
       },
     );

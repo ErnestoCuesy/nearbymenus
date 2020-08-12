@@ -7,6 +7,7 @@ class UserDetails {
   String address3;
   String address4;
   String telephone;
+  String agreementDate;
   Map<dynamic, dynamic> orderOnHold;
 
   UserDetails({
@@ -18,6 +19,7 @@ class UserDetails {
     this.address3 = '',
     this.address4 = '',
     this.telephone = '',
+    this.agreementDate,
     this.orderOnHold,
   });
 
@@ -34,6 +36,7 @@ class UserDetails {
         address3: data['address3'],
         address4: data['address4'],
         telephone: data['telephone'] ?? '',
+        agreementDate: data['agreementDate'],
         orderOnHold: data['orderOnHold'] ?? {},
     );
   }
@@ -48,6 +51,7 @@ class UserDetails {
       'address3': address3,
       'address4': address4,
       'telephone': telephone,
+      'agreementDate': agreementDate,
       'orderOnHold': orderOnHold,
     };
   }
