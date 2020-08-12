@@ -12,7 +12,7 @@ class CheckPurchases extends StatelessWidget {
 
   Future<void> _setBundleAndUnlock(Database database, List<Bundle> bundleSnapshot, Map<String, dynamic> allPurchasesDates) async {
     bundleSnapshot.forEach((bundle) {
-      allPurchasesDates.removeWhere((key, value) => value.toString().contains(bundle.id));
+      allPurchasesDates.removeWhere((key, value) => value.toString().contains(bundle.id.toString()));
     });
     String bundleDate;
     String bundleCode;
