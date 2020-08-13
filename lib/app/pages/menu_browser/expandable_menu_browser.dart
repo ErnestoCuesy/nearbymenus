@@ -1,3 +1,4 @@
+import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -27,6 +28,7 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
   Restaurant restaurant;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
+  ScrollController _scrollController = ScrollController();
 
   bool get orderOnHold =>
       session.currentOrder.orderItems.length > 0 &&
@@ -39,16 +41,20 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
 
   Widget _buildContents(BuildContext context, Map<dynamic, dynamic> menus,
     Map<dynamic, dynamic> options, dynamic sortedKeys) {
-    return ListView.builder(
-      itemCount: sortedKeys.length,
-      itemBuilder: (BuildContext context, int index) {
-        final menu = menus[sortedKeys[index]];
-        return ExpandableListView(
-          callBack: _callBack,
-          menu: menu,
-          options: options,
-        );
-      },
+    return DraggableScrollbar.semicircle(
+      controller: _scrollController,
+      child: ListView.builder(
+        controller: _scrollController,
+        itemCount: sortedKeys.length,
+        itemBuilder: (BuildContext context, int index) {
+          final menu = menus[sortedKeys[index]];
+          return ExpandableListView(
+            callBack: _callBack,
+            menu: menu,
+            options: options,
+          );
+        },
+      ),
     );
   }
 
