@@ -7,6 +7,7 @@ import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/pages/orders/locked_orders.dart';
 import 'package:nearbymenus/app/pages/sign_in/conversion_process.dart';
+import 'package:nearbymenus/app/pages/sign_in/terms_and_conditions.dart';
 import 'package:nearbymenus/app/pages/user/upsell_screen.dart';
 import 'package:nearbymenus/app/pages/user/user_details_form.dart';
 import 'package:nearbymenus/app/services/auth.dart';
@@ -170,7 +171,60 @@ class _AccountPageState extends State<AccountPage> {
           cardSubtitle: '',
           onPressed: () => _convertUser(context, _lockedOrders),
           ),
+      // ABOUT
+        _userDetailsSection(
+          context: context,
+          sectionTitle: 'About',
+          cardTitle: 'Terms and Conditions',
+          cardSubtitle: '',
+          onPressed: () => _termsAndConditions(context),
+        ),
+      if (!FlavourConfig.isAdmin())
+      _userDetailsSection(
+        context: context,
+        sectionTitle: 'Delete account',
+        cardTitle: 'Tap here to delete your account',
+        cardSubtitle: '',
+        onPressed: () => _deleteAccount(context),
+      ),
     ];
+  }
+
+  void _deleteAccount(BuildContext context) async {
+    String extraNotice = '';
+    if (FlavourConfig.isManager()) {
+      extraNotice = ' Any orders left in your purchased bundles will be lost.';
+    }
+    if (FlavourConfig.isManager() && session.userDetails.hasRestaurants) {
+      await PlatformAlertDialog(
+        title: 'You have restaurants',
+        content:
+        'Please delete all your restaurants first before deleting your account.',
+        defaultActionText: 'OK',
+      ).show(context);
+    } else if (await PlatformAlertDialog(
+      title: 'Confirm account deletion',
+      content:
+      'Do you really want to delete your account?' + extraNotice,
+      cancelActionText: 'No',
+      defaultActionText: 'Yes',
+    ).show(context)) {
+      try {
+        database.deleteUser(database.userId);
+        auth.deleteUser();
+      } catch (e) {
+        print(e);
+      }
+    }
+  }
+
+  void _termsAndConditions(BuildContext context) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (context) => TermsAndConditions(askAgreement: false,),
+      ),
+    );
   }
 
   Future<int> _loadOrdersLeft() async {
@@ -240,11 +294,15 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   Future<String> _reloadUser() async {
-    await auth.reloadUser();
-    if (await auth.userEmailVerified()) {
-      return await auth.userEmail();
-    } else {
-      return 'Email not verified yet';
+    try {
+      await auth.reloadUser();
+      if (await auth.userEmailVerified()) {
+            return await auth.userEmail();
+          } else {
+            return 'Email not verified yet';
+          }
+    } catch (e) {
+      print(e);
     }
   }
 

@@ -222,7 +222,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
           await Navigator.of(context).push(
             MaterialPageRoute<bool>(
               fullscreenDialog: true,
-              builder: (context) => TermsAndConditions(),
+              builder: (context) => TermsAndConditions(askAgreement: true,),
             ),
           ).then((value) => model.updateTermsAndConditions(value));
         }

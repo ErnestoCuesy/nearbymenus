@@ -40,10 +40,11 @@ abstract class Database {
   Future<void> deleteOptionItem(OptionItem optionItem);
   Future<void> deleteOrder(Order order);
   Future<void> deleteImage(String restaurantId, int imageId);
+  Future<void> deleteUser(String uid);
 
   Stream<UserDetails> userDetailsStream();
   Stream<Authorizations> authorizationsStream(String restaurantId);
-  Stream<List<Restaurant>> managerRestaurants(String restaurantId);
+  Stream<List<Restaurant>> managerRestaurants(String managerId);
   Stream<List<UserMessage>> managerMessages(String uid, String toRole);
   Stream<List<UserMessage>> staffMessages(String restaurantId, String toRole);
   Stream<List<UserMessage>> patronMessages(String uid);
@@ -207,6 +208,11 @@ class FirestoreDatabase implements Database {
   @override
   Future<void> deleteImage(String restaurantId, int imageId) async {
     await _service.deleteData(path: APIPath.itemImage(restaurantId, imageId));
+  }
+
+  @override
+  Future<void> deleteUser(String uid) async {
+    await _service.deleteData(path: APIPath.userDetails(uid));
   }
 
   @override

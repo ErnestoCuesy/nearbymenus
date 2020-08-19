@@ -72,6 +72,11 @@ class _RestaurantPageState extends State<RestaurantPage> {
     return StreamBuilder<List<Restaurant>>(
       stream: database.managerRestaurants(database.userId),
       builder: (context, snapshot) {
+        session.userDetails.hasRestaurants = false;
+        if (snapshot.hasData && snapshot.data.length > 0) {
+          session.userDetails.hasRestaurants = true;
+        }
+        database.setUserDetails(session.userDetails);
         return ListItemsBuilder<Restaurant>(
             title: 'No restaurants found',
             message: 'Tap the + button to add a new restaurant',

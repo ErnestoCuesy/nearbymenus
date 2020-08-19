@@ -8,6 +8,7 @@ class UserDetails {
   String address4;
   String telephone;
   String agreementDate;
+  bool hasRestaurants;
   Map<dynamic, dynamic> orderOnHold;
 
   UserDetails({
@@ -20,6 +21,7 @@ class UserDetails {
     this.address4 = '',
     this.telephone = '',
     this.agreementDate,
+    this.hasRestaurants,
     this.orderOnHold,
   });
 
@@ -37,6 +39,7 @@ class UserDetails {
         address4: data['address4'],
         telephone: data['telephone'] ?? '',
         agreementDate: data['agreementDate'],
+        hasRestaurants: data['hasRestaurants'] ?? false,
         orderOnHold: data['orderOnHold'] ?? {},
     );
   }
@@ -52,6 +55,7 @@ class UserDetails {
       'address4': address4,
       'telephone': telephone,
       'agreementDate': agreementDate,
+      'hasRestaurants': hasRestaurants,
       'orderOnHold': orderOnHold,
     };
   }

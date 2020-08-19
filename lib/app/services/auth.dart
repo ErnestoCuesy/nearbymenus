@@ -34,6 +34,7 @@ abstract class AuthBase {
   Future<void> sendEmailVerification();
   Future<void> reloadUser();
   Future<String> userEmail();
+  Future<void> deleteUser();
 }
 
 class Auth implements AuthBase {
@@ -134,7 +135,11 @@ class Auth implements AuthBase {
 
   @override
   Future<bool> userEmailVerified() async {
-    return await _fireBaseAuth.currentUser().then((value) => value.isEmailVerified);
+    try {
+      return await _fireBaseAuth.currentUser().then((value) => value.isEmailVerified);
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
@@ -146,10 +151,25 @@ class Auth implements AuthBase {
   @override
   Future<void> reloadUser() async {
     final currentUser = await _fireBaseAuth.currentUser();
-    await currentUser.reload();
+    try {
+      await currentUser.reload();
+    } catch (e) {
+      print(e);
+    }
   }
 
+  @override
   Future<String> userEmail() async {
     return await _fireBaseAuth.currentUser().then((value) => value.email);
+  }
+
+  @override
+  Future<void> deleteUser() async {
+    try {
+      final user = await _fireBaseAuth.currentUser();
+      user.delete();
+    } catch (e) {
+      print(e);
+    }
   }
 }

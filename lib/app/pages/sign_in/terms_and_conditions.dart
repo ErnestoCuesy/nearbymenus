@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/pages/sign_in/terms_and_conditions_text.dart';
 
 class TermsAndConditions extends StatelessWidget {
+  final bool askAgreement;
+
+  const TermsAndConditions({Key key, this.askAgreement}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,6 +20,7 @@ class TermsAndConditions extends StatelessWidget {
                     TERMS_AND_CONDITIONS_TEXT,
                   ),
                 ),
+                if (askAgreement)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: FlatButton(
@@ -28,6 +33,7 @@ class TermsAndConditions extends StatelessWidget {
                     },
                   ),
                 ),
+                if (askAgreement)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: FlatButton(

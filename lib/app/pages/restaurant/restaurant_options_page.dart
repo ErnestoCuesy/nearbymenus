@@ -52,11 +52,14 @@ class _RestaurantOptionsPageState extends State<RestaurantOptionsPage> {
 
   List<Widget> _buildContents(BuildContext context) {
     return [
-      Text(
-          session.currentRestaurant.name,
-          style: FlavourConfig.isAdmin()
-              ? Theme.of(context).accentTextTheme.headline4
-              : Theme.of(context).primaryTextTheme.headline4
+      Padding(
+        padding: const EdgeInsets.only(top: 16.0),
+        child: Text(
+            session.currentRestaurant.name,
+            style: FlavourConfig.isAdmin()
+                ? Theme.of(context).accentTextTheme.headline4
+                : Theme.of(context).primaryTextTheme.headline4
+        ),
       ),
       SizedBox(
         height: 32.0,
