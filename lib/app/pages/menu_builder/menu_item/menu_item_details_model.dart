@@ -52,6 +52,7 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
     final item = MenuItem(
       id: id,
       menuId: menu.id,
+      restaurantId: restaurant.id,
       name: name,
       description: description,
       sequence: sequence,

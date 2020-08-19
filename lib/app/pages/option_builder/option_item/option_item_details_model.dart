@@ -35,6 +35,7 @@ class OptionItemDetailsModel with OptionItemValidators, ChangeNotifier {
     }
     final item = OptionItem(
       id: id,
+      restaurantId: restaurant.id,
       optionId: option.id,
       name: name,
     );

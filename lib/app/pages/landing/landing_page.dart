@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
-import 'package:nearbymenus/app/pages/home/home_page_staff_and_patron.dart';
+import 'package:nearbymenus/app/pages/home/home_page.dart';
 import 'package:nearbymenus/app/pages/landing/check_purchases.dart';
 import 'package:nearbymenus/app/pages/sign_in/sign_in_page.dart';
 import 'package:nearbymenus/app/services/auth.dart';
@@ -20,6 +20,8 @@ class LandingPage extends StatelessWidget {
       role = ROLE_MANAGER;
     } else if (FlavourConfig.isStaff()) {
       role = ROLE_STAFF;
+    } else if (FlavourConfig.isAdmin()) {
+      role = ROLE_ADMIN;
     }
     session.userDetails.role = role;
   }
@@ -36,7 +38,9 @@ class LandingPage extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.active) {
           UserAuth user = snapshot.data;
           if (user == null) {
-             return SignInPage(allowAnonymousSignIn: true, convertAnonymous: false,);
+             return SignInPage(
+               allowAnonymousSignIn: FlavourConfig.isAdmin() ? false : true,
+               convertAnonymous: false,);
           }
           session.isAnonymousUser = user.isAnonymous;
           session.broadcastAnonymousUserStatus(user.isAnonymous);
@@ -61,7 +65,7 @@ class LandingPage extends StatelessWidget {
                     child: CheckPurchases(),
                   );
                 } else {
-                  return HomePageStaffAndPatron();
+                  return HomePage();
                 }
               } else {
                 return Scaffold(

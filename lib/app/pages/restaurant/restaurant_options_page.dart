@@ -1,23 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/common_widgets/custom_raised_button.dart';
 import 'package:nearbymenus/app/common_widgets/empty_content.dart';
+import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
+import 'package:nearbymenus/app/models/user_message.dart';
 import 'package:nearbymenus/app/pages/images/item_image_page.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_menu_browser.dart';
 import 'package:nearbymenus/app/pages/orders/active_orders.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
-class RestaurantPatronPage extends StatefulWidget {
+class RestaurantOptionsPage extends StatefulWidget {
 
   @override
-  _RestaurantPatronPageState createState() =>
-      _RestaurantPatronPageState();
+  _RestaurantOptionsPageState createState() =>
+      _RestaurantOptionsPageState();
 }
 
-class _RestaurantPatronPageState extends State<RestaurantPatronPage> {
+class _RestaurantOptionsPageState extends State<RestaurantOptionsPage> {
   Session session;
   Database database;
 
@@ -50,8 +53,10 @@ class _RestaurantPatronPageState extends State<RestaurantPatronPage> {
   List<Widget> _buildContents(BuildContext context) {
     return [
       Text(
-          '${session.currentRestaurant.name}',
-          style: Theme.of(context).primaryTextTheme.headline4
+          session.currentRestaurant.name,
+          style: FlavourConfig.isAdmin()
+              ? Theme.of(context).accentTextTheme.headline4
+              : Theme.of(context).primaryTextTheme.headline4
       ),
       SizedBox(
         height: 32.0,
@@ -103,9 +108,11 @@ class _RestaurantPatronPageState extends State<RestaurantPatronPage> {
           ],
         ),
       ),
+      if (!FlavourConfig.isAdmin())
       SizedBox(
         height: 32.0,
       ),
+      if (!FlavourConfig.isAdmin())
       CustomRaisedButton(
         height: 150.0,
         width: 250.0,
@@ -126,17 +133,114 @@ class _RestaurantPatronPageState extends State<RestaurantPatronPage> {
           ],
         ),
       ),
+      if (FlavourConfig.isAdmin())
+      SizedBox(
+        height: 32.0,
+      ),
+      if (FlavourConfig.isAdmin())
+      CustomRaisedButton(
+        height: 150.0,
+        width: 250.0,
+        color: Theme.of(context).buttonTheme.colorScheme.surface,
+        onPressed: () => _approveRestaurant(),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              session.currentRestaurant.adminVerified ? 'Block Restaurant' : 'Approve Restaurant',
+              style: Theme.of(context).accentTextTheme.headline6,
+            ),
+            SizedBox(height: 16.0,),
+            Icon(
+              session.currentRestaurant.adminVerified ? Icons.block : Icons.assignment_turned_in,
+              size: 36.0,
+            ),
+          ],
+        ),
+      ),
+      if (FlavourConfig.isAdmin())
+        SizedBox(
+          height: 32.0,
+        ),
+      if (FlavourConfig.isAdmin())
+        CustomRaisedButton(
+          height: 150.0,
+          width: 250.0,
+          color: Theme.of(context).buttonTheme.colorScheme.surface,
+          onPressed: () => _deleteRestaurant(context),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Delete Restaurant',
+                style: Theme.of(context).accentTextTheme.headline6,
+              ),
+              SizedBox(height: 16.0,),
+              Icon(
+                Icons.delete_forever,
+                size: 36.0,
+              ),
+            ],
+          ),
+        ),
     ];
+  }
+
+  void _deleteRestaurant(BuildContext context) async {
+    if (await PlatformAlertDialog(
+      title: 'Confirm restaurant deletion',
+      content:
+      'Do you really want to delete this restaurant?',
+      cancelActionText: 'No',
+      defaultActionText: 'Yes',
+    ).show(context)) {
+      database.deleteRestaurant(session.currentRestaurant);
+    }
+  }
+
+  void _approveRestaurant() {
+    session.currentRestaurant.adminVerified = !session.currentRestaurant.adminVerified;
+    session.currentRestaurant.restaurantFlags.update('active', (value) => session.currentRestaurant.adminVerified);
+    database.setRestaurant(session.currentRestaurant);
+    String message;
+    if (session.currentRestaurant.adminVerified) {
+      message = 'We have approved your restaurant';
+    } else {
+      message = 'We have blocked your restaurant due to non-conformance to our Terms and Conditions';
+    }
+    final double timestamp = dateFromCurrentDate() / 1.0;
+    database.setMessageDetails(UserMessage(
+      id: documentIdFromCurrentDate(),
+      timestamp: timestamp,
+      fromUid: database.userId,
+      toUid: session.currentRestaurant.managerId,
+      restaurantId: session.currentRestaurant.id,
+      fromRole: ROLE_ADMIN,
+      toRole: ROLE_MANAGER,
+      fromName: '${session.userDetails.name}',
+      delivered: false,
+      type: message,
+      authFlag: false,
+      attendedFlag: false,
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
+    String roleOptions = ' options';
+    if (FlavourConfig.isAdmin()) {
+      roleOptions = 'Administrator' + roleOptions;
+    } else if (FlavourConfig.isPatron()) {
+      roleOptions = 'Patron' + roleOptions;
+    } else {
+      roleOptions = 'Staff' + roleOptions;
+    }
     return Scaffold(
         appBar: AppBar(
           title: Text(
-            '${session.currentRestaurant.name}',
+            roleOptions,
             style: TextStyle(color: Theme.of(context).appBarTheme.color),
           ),
         ),
@@ -148,10 +252,12 @@ class _RestaurantPatronPageState extends State<RestaurantPatronPage> {
             } else {
               if (snapshot.hasData) {
                 session.currentRestaurant = snapshot.data;
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: _buildContents(context),
+                return SingleChildScrollView(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: _buildContents(context),
+                    ),
                   ),
                 );
               } else {

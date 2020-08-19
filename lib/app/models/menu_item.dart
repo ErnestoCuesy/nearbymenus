@@ -1,5 +1,6 @@
 class MenuItem {
   final String id;
+  final String restaurantId;
   final String menuId;
   final String name;
   final String description;
@@ -10,6 +11,7 @@ class MenuItem {
 
   MenuItem({
     this.id,
+    this.restaurantId,
     this.menuId,
     this.name,
     this.description,
@@ -25,6 +27,7 @@ class MenuItem {
     }
     return MenuItem(
       id: data['id'],
+      restaurantId: data['restaurantId'],
       menuId: data['menuId'],
       name: data['name'],
       description: data['description'],
@@ -38,6 +41,7 @@ class MenuItem {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'restaurantId': restaurantId,
       'menuId': menuId,
       'name': name,
       'description': description,
@@ -50,7 +54,7 @@ class MenuItem {
 
   @override
   String toString() {
-    return 'id: $id, menuId: $menuId, name: $name, description: $description, price: $price, options: $options, sequence: $sequence, hidden: $hidden';
+    return 'id: $id, restaurantId: $restaurantId, menuId: $menuId, name: $name, description: $description, price: $price, options: $options, sequence: $sequence, hidden: $hidden';
   }
 
 }

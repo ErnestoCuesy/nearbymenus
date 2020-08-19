@@ -44,6 +44,24 @@ class FirestoreService {
     });
   }
 
+  Future<void> deleteRestaurantData({
+    @required String collectionPath,
+    @required String fieldName,
+    @required String fieldValue
+  }) async {
+    print('$collectionPath, $fieldValue, $fieldValue');
+    Firestore.instance
+        .collection(collectionPath)
+        .where(fieldName, isEqualTo: fieldValue)
+        .getDocuments()
+        .then((value) {
+          value.documents.forEach((element) {
+            print('$collectionPath/${element.documentID}');
+            deleteData(path: '$collectionPath/${element.documentID}');
+          });
+    });
+  }
+
   Stream<T> documentStream<T>({
     @required String path,
     @required T builder(Map<String, dynamic> data, String documentID),

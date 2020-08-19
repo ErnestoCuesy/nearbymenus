@@ -1,10 +1,12 @@
 class OptionItem {
   final String id;
+  final String restaurantId;
   final String optionId;
   final String name;
 
   OptionItem({
     this.id,
+    this.restaurantId,
     this.optionId,
     this.name,
   });
@@ -15,6 +17,7 @@ class OptionItem {
     }
     return OptionItem(
       id: data['id'],
+      restaurantId: data['restaurantId'],
       optionId: data['optionId'],
       name: data['name'],
     );
@@ -23,6 +26,7 @@ class OptionItem {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'restaurantId': restaurantId,
       'optionId': optionId,
       'name': name,
     };
@@ -30,7 +34,7 @@ class OptionItem {
 
   @override
   String toString() {
-    return 'id: $id, menuId: $optionId, name: $name';
+    return 'id: $id, restaurantId: $restaurantId, menuId: $optionId, name: $name';
   }
 
 }

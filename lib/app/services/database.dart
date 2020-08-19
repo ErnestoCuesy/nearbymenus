@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:nearbymenus/app/models/authorizations.dart';
 import 'package:nearbymenus/app/models/item_image.dart';
 import 'package:nearbymenus/app/models/menu_item.dart';
@@ -38,6 +39,7 @@ abstract class Database {
   Future<void> deleteOption(Option option);
   Future<void> deleteOptionItem(OptionItem optionItem);
   Future<void> deleteOrder(Order order);
+  Future<void> deleteImage(String restaurantId, int imageId);
 
   Stream<UserDetails> userDetailsStream();
   Stream<Authorizations> authorizationsStream(String restaurantId);
@@ -45,6 +47,7 @@ abstract class Database {
   Stream<List<UserMessage>> managerMessages(String uid, String toRole);
   Stream<List<UserMessage>> staffMessages(String restaurantId, String toRole);
   Stream<List<UserMessage>> patronMessages(String uid);
+  Stream<List<UserMessage>> adminMessages();
   Stream<List<Restaurant>> patronRestaurants();
   Stream<Restaurant> selectedRestaurantStream(String restaurantId);
   Stream<List<Menu>> restaurantMenus(String restaurantId);
@@ -58,6 +61,7 @@ abstract class Database {
   Stream<List<Order>> blockedOrders(String managerId);
   Stream<List<ItemImage>> itemImages(String itemImageId);
 
+  Future<List<ItemImage>> itemImagesSnapshot(String restaurantId);
   Future<UserDetails> userDetailsSnapshot(String uid);
   Future<List<Authorizations>> authorizationsSnapshot();
   Future<int> ordersLeft(String uid);
@@ -155,8 +159,24 @@ class FirestoreDatabase implements Database {
 
   @override
   Future<void> deleteRestaurant(Restaurant restaurant) async {
-    await _service.deleteData(path: APIPath.restaurant(restaurant.id));
+    final FirebaseStorage _storage = FirebaseStorage(storageBucket: 'gs://nearby-menus-be6e3.appspot.com');
+    final images = await itemImagesSnapshot(restaurant.id);
+    images.forEach((image) {
+      deleteImage(restaurant.id, image.id);
+      if (image.url != '') {
+        _storage.ref()
+            .child('images/${restaurant.id}/Image_${image.id}')
+            .delete();
+      }
+    });
+    await _service.deleteRestaurantData(collectionPath: APIPath.orders(), fieldName: 'restaurantId', fieldValue: restaurant.id);
+    await _service.deleteRestaurantData(collectionPath: APIPath.optionItems(), fieldName: 'restaurantId', fieldValue: restaurant.id);
+    await _service.deleteRestaurantData(collectionPath: APIPath.options(), fieldName: 'restaurantId', fieldValue: restaurant.id);
+    await _service.deleteRestaurantData(collectionPath: APIPath.menuItems(), fieldName: 'restaurantId', fieldValue: restaurant.id);
+    await _service.deleteRestaurantData(collectionPath: APIPath.menus(), fieldName: 'restaurantId', fieldValue: restaurant.id);
     await _service.deleteData(path: APIPath.authorization(restaurant.id));
+    await _service.deleteData(path: APIPath.itemImg(restaurant.id));
+    await _service.deleteData(path: APIPath.restaurant(restaurant.id));
   }
 
   @override
@@ -182,6 +202,11 @@ class FirestoreDatabase implements Database {
   @override
   Future<void> deleteOrder(Order order) async {
     await _service.deleteData(path: APIPath.order(order.id));
+  }
+
+  @override
+  Future<void> deleteImage(String restaurantId, int imageId) async {
+    await _service.deleteData(path: APIPath.itemImage(restaurantId, imageId));
   }
 
   @override
@@ -230,6 +255,15 @@ class FirestoreDatabase implements Database {
     path: APIPath.messages(),
     queryBuilder: uid != null
         ? (query) => query.where('toUid', isEqualTo: uid)
+        : null,
+    builder: (data, documentId) => UserMessage.fromMap(data, documentId),
+  );
+
+  @override
+  Stream<List<UserMessage>> adminMessages() => _service.collectionStream(
+    path: APIPath.messages(),
+    queryBuilder: uid != null
+        ? (query) => query.where('toRole', isEqualTo: 'Admin')
         : null,
     builder: (data, documentId) => UserMessage.fromMap(data, documentId),
   );
@@ -339,9 +373,12 @@ class FirestoreDatabase implements Database {
   @override
   Stream<List<ItemImage>> itemImages(String restaurantId) => _service.collectionStream(
     path: APIPath.itemImages(restaurantId),
-//    queryBuilder: restaurantId != null
-//        ? (query) => query.where('restaurantId', isEqualTo: restaurantId)
-//        : null,
+    builder: (data, documentId) => ItemImage.fromMap(data, documentId),
+  );
+
+  @override
+  Future<List<ItemImage>> itemImagesSnapshot(String restaurantId) => _service.collectionSnapshot(
+    path: APIPath.itemImages(restaurantId),
     builder: (data, documentId) => ItemImage.fromMap(data, documentId),
   );
 

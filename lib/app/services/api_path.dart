@@ -23,4 +23,5 @@ class APIPath {
   static String bundleOrdersCounter(String managerId) => 'bundles/$managerId/bundles/counter';
   static String itemImage(String restaurantId, int itemImageId) => 'itemImages/$restaurantId/images/$itemImageId';
   static String itemImages(String restaurantId) => 'itemImages/$restaurantId/images';
+  static String itemImg(String restaurantId) => 'itemImages/$restaurantId';
 }

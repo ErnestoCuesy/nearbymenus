@@ -90,7 +90,7 @@ class RestaurantListTile extends StatelessWidget {
                 ),
               ),
               Text(
-                restaurant.notes,
+                restaurant.notes.substring(0, restaurant.notes.length > 30 ? 30 : restaurant.notes.length),
               ),
             ],
           ),

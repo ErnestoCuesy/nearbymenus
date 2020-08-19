@@ -1,3 +1,5 @@
+import 'package:nearbymenus/app/config/flavour_config.dart';
+
 abstract class StringValidator {
   bool isValid(String value);
 }
@@ -15,6 +17,23 @@ class NonEmptyStringValidator implements StringValidator {
   bool isValid(String value) {
     if (value == null || value.isEmpty) return false;
     return true;
+  }
+}
+
+class EmailStringValidator implements StringValidator {
+  @override
+  bool isValid(String value) {
+    bool result;
+    if (FlavourConfig.isAdmin()) {
+      result = value == 'ercuesy@gmail.com';
+    } else {
+      if (value == null || value.isEmpty) {
+        result = false;
+      } else {
+        result = true;
+      }
+    }
+    return result;
   }
 }
 
@@ -43,7 +62,7 @@ class DoubleNumericFieldValidator implements DoubleNumberValidator{
 }
 
 class UserCredentialsValidators {
-  final StringValidator emailValidator = NonEmptyStringValidator();
+  final StringValidator emailValidator = EmailStringValidator();
   final StringValidator passwordValidator = NonEmptyStringValidator();
   final String invalidEmailErrorText = 'Email can\'t be empty';
   final String invalidPasswordErrorText = 'Password can\'t be empty';

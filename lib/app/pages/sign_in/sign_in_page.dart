@@ -72,10 +72,10 @@ class SignInPage extends StatelessWidget {
           // EMAIL
           SignInButton(
             text: 'Sign in',
-            textColor: FlavourConfig.isManager()
+            textColor: FlavourConfig.isManager() || FlavourConfig.isAdmin()
                 ? Colors.white
                 : Theme.of(context).buttonTheme.colorScheme.onPrimary,
-            color: FlavourConfig.isManager()
+            color: FlavourConfig.isManager() || FlavourConfig.isAdmin()
                 ? Colors.black
                 : Theme.of(context).colorScheme.primary,
             onPressed: () => _signInWithEmail(context),

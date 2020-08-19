@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:geolocator/geolocator.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 
 class NearRestaurantBloc {
@@ -21,7 +22,9 @@ class NearRestaurantBloc {
           res.coordinates.latitude,
           res.coordinates.longitude,
         ).then((distance) {
-          if (res.active && distance < res.deliveryRadius) {
+          if (FlavourConfig.isAdmin()) {
+            resList.add(res);
+          } else if (res.active && distance < res.deliveryRadius) {
             resList.add(res);
           }
         });

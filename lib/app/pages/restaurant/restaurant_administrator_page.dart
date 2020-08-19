@@ -34,7 +34,7 @@ class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPag
   List<Widget> _buildContents(BuildContext context) {
     return [
       Text(
-        '${restaurant.name}',
+        restaurant.name,
         style: Theme.of(context).accentTextTheme.headline4
       ),
       SizedBox(
@@ -291,7 +291,7 @@ class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPag
     return Scaffold(
         appBar: AppBar(
           title: Text(
-            'Administration',
+            'Restaurant Management',
             style: TextStyle(color: Theme.of(context).appBarTheme.color),
           ),
         ),
