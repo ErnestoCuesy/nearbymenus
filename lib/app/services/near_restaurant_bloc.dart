@@ -35,4 +35,8 @@ class NearRestaurantBloc {
 
   Stream<List<Restaurant>> get stream => _stream.stream;
 
+  void dispose() {
+    _stream.close();
+  }
+
 }

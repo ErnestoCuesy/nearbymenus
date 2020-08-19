@@ -214,7 +214,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
   Widget _buildAcceptTermsAndConditionsBTN() {
     return FlatButton(
       child: Text(
-          'Tap here to see our Terms and Conditions',
+          'Tap here to agree to our Terms and Conditions',
           style: Theme.of(context).textTheme.bodyText2,
       ),
       onPressed: () async {

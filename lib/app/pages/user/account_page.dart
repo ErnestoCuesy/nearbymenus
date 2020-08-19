@@ -211,6 +211,7 @@ class _AccountPageState extends State<AccountPage> {
     ).show(context)) {
       try {
         database.deleteUser(database.userId);
+        Future.delayed(Duration(seconds: 3));
         auth.deleteUser();
       } catch (e) {
         print(e);
