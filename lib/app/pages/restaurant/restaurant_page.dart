@@ -127,6 +127,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
                           value: restaurant.acceptingStaffRequests,
                           onChanged: null,
                         ),
+                        Text('Tap on pencil to edit. Tap on arrow for more. Swipe left to delete.'),
                       ],
                     ),
                     trailing: IconButton(

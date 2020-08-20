@@ -186,7 +186,7 @@ class _AccessOptionsState extends State<AccessOptions> {
             ),
             SizedBox(height: 8.0,),
             Text(
-              'Venue Manager Access',
+              'Sales Access\n(Selected Dates)',
               style: Theme.of(context).accentTextTheme.headline6,
               textAlign: TextAlign.center,
             ),

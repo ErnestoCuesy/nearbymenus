@@ -76,12 +76,6 @@ class _RestaurantQueryState extends State<RestaurantQuery> {
   }
 
   @override
-  void dispose() {
-    bloc.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     database = Provider.of<Database>(context, listen: true);
     session = Provider.of<Session>(context);
