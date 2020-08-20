@@ -27,7 +27,7 @@ abstract class Database {
   Future<void> setOption(Option option);
   Future<void> setOptionItem(OptionItem optionItem);
   Future<void> setOrder(Order order);
-  Future<void> setBundle(String uid, Bundle orderBundle);
+  Future<void> setBundle(String email, Bundle orderBundle);
   Future<int>  setBundleCounterTransaction(String managerId, int quantity);
   Future<void> setOrderTransaction(String managerId, String restaurantId, Order order);
   Future<void> setItemImage(ItemImage itemImage);
@@ -52,9 +52,9 @@ abstract class Database {
   Stream<List<Restaurant>> patronRestaurants();
   Stream<Restaurant> selectedRestaurantStream(String restaurantId);
   Stream<List<Menu>> restaurantMenus(String restaurantId);
-  Stream<List<MenuItem>> menuItems(String menuItemId);
+  Stream<List<MenuItem>> menuItems(Menu menu);
   Stream<List<Option>> restaurantOptions(String restaurantId);
-  Stream<List<OptionItem>> optionItems(String optionId);
+  Stream<List<OptionItem>> optionItems(Option option);
   Stream<List<Order>> activeRestaurantOrders(String restaurantId);
   Stream<List<Order>> inactiveRestaurantOrders(String restaurantId);
   Stream<List<Order>> dayRestaurantOrders(String restaurantId, DateTime dateTime);
@@ -66,7 +66,7 @@ abstract class Database {
   Future<UserDetails> userDetailsSnapshot(String uid);
   Future<List<Authorizations>> authorizationsSnapshot();
   Future<int> ordersLeft(String uid);
-  Future<List<Bundle>> bundlesSnapshot(String managerId);
+  Future<List<Bundle>> bundlesSnapshot(String email);
 }
 
 String documentIdFromCurrentDate() => DateTime.now().toIso8601String();
@@ -103,27 +103,27 @@ class FirestoreDatabase implements Database {
 
   @override
   Future<void> setMenu(Menu menu) async => await _service
-      .setData(path: APIPath.menu(menu.id), data: menu.toMap());
+      .setData(path: APIPath.menu(menu.restaurantId, menu.id), data: menu.toMap());
 
   @override
   Future<void> setMenuItem(MenuItem item) async => await _service
-      .setData(path: APIPath.menuItem(item.id), data: item.toMap());
+      .setData(path: APIPath.menuItem(item.restaurantId, item.id), data: item.toMap());
 
   @override
   Future<void> setOption(Option option) async => await _service
-      .setData(path: APIPath.option(option.id), data: option.toMap());
+      .setData(path: APIPath.option(option.restaurantId, option.id), data: option.toMap());
 
   @override
   Future<void> setOptionItem(OptionItem optionItem) async => await _service
-      .setData(path: APIPath.optionItem(optionItem.id), data: optionItem.toMap());
+      .setData(path: APIPath.optionItem(optionItem.restaurantId, optionItem.id), data: optionItem.toMap());
 
   @override
   Future<void> setOrder(Order order) async => await _service
       .setData(path: APIPath.order(order.id), data: order.toMap());
 
   @override
-  Future<void> setBundle(String managerUid, Bundle orderBundle) async => await _service
-      .setData(path: APIPath.bundle(managerUid, orderBundle.id), data: orderBundle.toMap());
+  Future<void> setBundle(String email, Bundle orderBundle) async => await _service
+      .setData(path: APIPath.bundle(email, orderBundle.id), data: orderBundle.toMap());
 
   @override
   Future<int> setBundleCounterTransaction(String managerId, int quantity) async {
@@ -138,7 +138,7 @@ class FirestoreDatabase implements Database {
   @override
   Future<void> setOrderTransaction(String managerId, String restaurantId, Order order) async {
     await _service.runSetOrderTransaction(
-      orderNumberPath: APIPath.orderNumberCounter(),
+      orderNumberPath: APIPath.orderNumberCounter(restaurantId),
       orderNumberDocumentId: restaurantId,
       orderNumberFieldName: 'lastOrderNumber',
       bundleCounterPath: APIPath.bundles(managerId),
@@ -170,11 +170,12 @@ class FirestoreDatabase implements Database {
             .delete();
       }
     });
-    await _service.deleteRestaurantData(collectionPath: APIPath.orders(), fieldName: 'restaurantId', fieldValue: restaurant.id);
-    await _service.deleteRestaurantData(collectionPath: APIPath.optionItems(), fieldName: 'restaurantId', fieldValue: restaurant.id);
-    await _service.deleteRestaurantData(collectionPath: APIPath.options(), fieldName: 'restaurantId', fieldValue: restaurant.id);
-    await _service.deleteRestaurantData(collectionPath: APIPath.menuItems(), fieldName: 'restaurantId', fieldValue: restaurant.id);
-    await _service.deleteRestaurantData(collectionPath: APIPath.menus(), fieldName: 'restaurantId', fieldValue: restaurant.id);
+    await _service.deleteCollectionData(collectionPath: APIPath.orders(), fieldName: 'restaurantId', fieldValue: restaurant.id);
+    await _service.deleteCollectionData(collectionPath: APIPath.optionItems(restaurant.id), fieldName: 'restaurantId', fieldValue: restaurant.id);
+    await _service.deleteCollectionData(collectionPath: APIPath.options(restaurant.id), fieldName: 'restaurantId', fieldValue: restaurant.id);
+    await _service.deleteCollectionData(collectionPath: APIPath.menuItems(restaurant.id), fieldName: 'restaurantId', fieldValue: restaurant.id);
+    await _service.deleteCollectionData(collectionPath: APIPath.menus(restaurant.id), fieldName: 'restaurantId', fieldValue: restaurant.id);
+    await _service.deleteCollectionData(collectionPath: APIPath.messages(), fieldName: 'restaurantId', fieldValue: restaurant.id);
     await _service.deleteData(path: APIPath.authorization(restaurant.id));
     await _service.deleteData(path: APIPath.itemImg(restaurant.id));
     await _service.deleteData(path: APIPath.restaurant(restaurant.id));
@@ -182,22 +183,22 @@ class FirestoreDatabase implements Database {
 
   @override
   Future<void> deleteMenu(Menu menu) async {
-    await _service.deleteData(path: APIPath.menu(menu.id));
+    await _service.deleteData(path: APIPath.menu(menu.restaurantId, menu.id));
   }
 
   @override
   Future<void> deleteMenuItem(MenuItem item) async {
-    await _service.deleteData(path: APIPath.menuItem(item.id));
+    await _service.deleteData(path: APIPath.menuItem(item.restaurantId, item.id));
   }
 
   @override
   Future<void> deleteOption(Option option) async {
-    await _service.deleteData(path: APIPath.option(option.id));
+    await _service.deleteData(path: APIPath.option(option.restaurantId, option.id));
   }
 
   @override
   Future<void> deleteOptionItem(OptionItem optionItem) async {
-    await _service.deleteData(path: APIPath.optionItem(optionItem.id));
+    await _service.deleteData(path: APIPath.optionItem(optionItem.restaurantId, optionItem.id));
   }
 
   @override
@@ -212,6 +213,7 @@ class FirestoreDatabase implements Database {
 
   @override
   Future<void> deleteUser(String uid) async {
+    //await _service.deleteData(path: APIPath.bundleOrdersCounter(uid));
     await _service.deleteData(path: APIPath.userDetails(uid));
   }
 
@@ -288,7 +290,7 @@ class FirestoreDatabase implements Database {
 
   @override
   Stream<List<Menu>> restaurantMenus(String restaurantId) => _service.collectionStream(
-    path: APIPath.menus(),
+    path: APIPath.menus(restaurantId),
     queryBuilder: restaurantId != null
         ? (query) => query.where('restaurantId', isEqualTo: restaurantId)
         : null,
@@ -296,17 +298,17 @@ class FirestoreDatabase implements Database {
   );
 
   @override
-  Stream<List<MenuItem>> menuItems(String menuId) => _service.collectionStream(
-    path: APIPath.menuItems(),
-    queryBuilder: menuId != null
-        ? (query) => query.where('menuId', isEqualTo: menuId)
+  Stream<List<MenuItem>> menuItems(Menu menu) => _service.collectionStream(
+    path: APIPath.menuItems(menu.restaurantId),
+    queryBuilder: menu.id != null
+        ? (query) => query.where('menuId', isEqualTo: menu.id)
         : null,
     builder: (data, documentId) => MenuItem.fromMap(data, documentId),
   );
 
   @override
   Stream<List<Option>> restaurantOptions(String restaurantId) => _service.collectionStream(
-    path: APIPath.options(),
+    path: APIPath.options(restaurantId),
     queryBuilder: restaurantId != null
         ? (query) => query.where('restaurantId', isEqualTo: restaurantId)
         : null,
@@ -314,10 +316,10 @@ class FirestoreDatabase implements Database {
   );
 
   @override
-  Stream<List<OptionItem>> optionItems(String optionId) => _service.collectionStream(
-    path: APIPath.optionItems(),
-    queryBuilder: optionId != null
-        ? (query) => query.where('optionId', isEqualTo: optionId)
+  Stream<List<OptionItem>> optionItems(Option option) => _service.collectionStream(
+    path: APIPath.optionItems(option.restaurantId),
+    queryBuilder: option.id != null
+        ? (query) => query.where('optionId', isEqualTo: option.id)
         : null,
     builder: (data, documentId) => OptionItem.fromMap(data, documentId),
   );
@@ -407,8 +409,8 @@ class FirestoreDatabase implements Database {
   );
 
   @override
-  Future<List<Bundle>> bundlesSnapshot(String managerId) => _service.collectionSnapshot(
-    path: APIPath.bundles(managerId),
+  Future<List<Bundle>> bundlesSnapshot(String email) => _service.collectionSnapshot(
+    path: APIPath.bundles(email),
     builder: (data, documentId) => Bundle.fromMap(data, documentId),
   );
 

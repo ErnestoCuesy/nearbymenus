@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 
 class CheckPurchases extends StatelessWidget {
 
-  Future<void> _setBundleAndUnlock(Database database, List<Bundle> bundleSnapshot, Map<String, dynamic> allPurchasesDates) async {
+  Future<void> _setBundleAndUnlock(String email, Database database, List<Bundle> bundleSnapshot, Map<String, dynamic> allPurchasesDates) async {
     bundleSnapshot.forEach((bundle) {
       allPurchasesDates.removeWhere((key, value) => value.toString().contains(bundle.id.toString()));
     });
@@ -43,7 +43,7 @@ class CheckPurchases extends StatelessWidget {
           break;
       }
       try {
-        database.setBundle(database.userId, Bundle(
+        database.setBundle(email, Bundle(
           id: bundleDate,
           bundleCode: bundleCode,
           ordersInBundle: ordersInBundle,
@@ -75,11 +75,13 @@ class CheckPurchases extends StatelessWidget {
             print('Subscription data: ${subscription.purchaserInfo.allPurchaseDates}');
           }
           return FutureBuilder<List<Bundle>>(
-              future: database.bundlesSnapshot(database.userId),
+              future: database.bundlesSnapshot(session.userDetails.email == '' || session.userDetails == null
+                  ? 'anon'
+                  : session.userDetails.email),
               builder: (context, snapshot) {
                 if (snapshot.connectionState != ConnectionState.waiting &&
                     snapshot.hasData) {
-                  _setBundleAndUnlock(database, snapshot.data,
+                  _setBundleAndUnlock(session.userDetails.email, database, snapshot.data,
                       session.subscription.purchaserInfo.allPurchaseDates);
                   return MessagesListener(child: HomePageManager());
                 } else {

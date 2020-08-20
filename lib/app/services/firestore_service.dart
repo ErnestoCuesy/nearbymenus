@@ -44,7 +44,7 @@ class FirestoreService {
     });
   }
 
-  Future<void> deleteRestaurantData({
+  Future<void> deleteCollectionData({
     @required String collectionPath,
     @required String fieldName,
     @required String fieldValue
