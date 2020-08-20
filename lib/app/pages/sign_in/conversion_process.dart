@@ -16,8 +16,9 @@ class ConversionProcess {
   final Session session;
   final Auth auth;
   final Database database;
+  final bool captureUserDetails;
 
-  ConversionProcess({this.navigationService, this.session, this.auth, this.database});
+  ConversionProcess({this.navigationService, this.session, this.auth, this.database, this.captureUserDetails});
 
 
   Future<bool> _askForSignIn() async {
@@ -87,25 +88,29 @@ class ConversionProcess {
         if (session.currentOrder != null) {
           session.updateDeliveryDetails();
         }
-        if (!session.userDetailsCaptured()) {
-          if (await _confirmDetailsCapture()) {
-            detailsCaptured = await navigationService.push(
-              MaterialPageRoute<bool>(
-                fullscreenDialog: false,
-                builder: (context) =>
-                    Scaffold(
-                      appBar: AppBar(
-                        title: Text('Please enter your contact details'),
-                      ),
-                      body: SingleChildScrollView(
-                        child: UserDetailsForm.create(
-                            context: context,
-                            userDetails: session.userDetails
+        if (captureUserDetails) {
+          if (!session.userDetailsCaptured()) {
+            if (await _confirmDetailsCapture()) {
+              detailsCaptured = await navigationService.push(
+                MaterialPageRoute<bool>(
+                  fullscreenDialog: false,
+                  builder: (context) =>
+                      Scaffold(
+                        appBar: AppBar(
+                          title: Text('Please enter your contact details'),
+                        ),
+                        body: SingleChildScrollView(
+                          child: UserDetailsForm.create(
+                              context: context,
+                              userDetails: session.userDetails
+                          ),
                         ),
                       ),
-                    ),
-              ),
-            );
+                ),
+              );
+            }
+          } else {
+            detailsCaptured = true;
           }
         } else {
           detailsCaptured = true;
