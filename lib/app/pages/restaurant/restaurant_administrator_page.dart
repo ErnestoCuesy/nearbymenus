@@ -274,7 +274,9 @@ class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPag
         navigationService: navigationService,
         session: session,
         auth: auth,
-        database: database);
+        database: database,
+        captureUserDetails: true,
+    );
     if (!await conversionProcess.userCanProceed()) {
       return;
     }

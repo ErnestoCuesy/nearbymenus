@@ -69,7 +69,9 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
         navigationService: navigationService,
         session: session,
         auth: auth,
-        database: database);
+        database: database,
+        captureUserDetails: true,
+    );
     if (!await conversionProcess.userCanProceed()) {
       return;
     }

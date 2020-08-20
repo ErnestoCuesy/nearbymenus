@@ -77,7 +77,9 @@ class _StaffAuthorizationPageState extends State<StaffAuthorizationPage> {
         navigationService: navigationService,
         session: session,
         auth: auth,
-        database: database);
+        database: database,
+        captureUserDetails: true,
+    );
     if (!await conversionProcess.userCanProceed()) {
       return;
     }

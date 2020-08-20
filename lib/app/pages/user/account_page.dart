@@ -108,7 +108,9 @@ class _AccountPageState extends State<AccountPage> {
         navigationService: navigationService,
         session: session,
         auth: auth,
-        database: database);
+        database: database,
+        captureUserDetails: false
+    );
     if (!await conversionProcess.userCanProceed()) {
       return;
     }
@@ -211,8 +213,7 @@ class _AccountPageState extends State<AccountPage> {
     ).show(context)) {
       try {
         database.deleteUser(database.userId);
-        Future.delayed(Duration(seconds: 3));
-        auth.deleteUser();
+        Future.delayed(Duration(seconds: 3)).then((value) => auth.deleteUser());
       } catch (e) {
         print(e);
       }
@@ -345,7 +346,7 @@ class _AccountPageState extends State<AccountPage> {
             if (FlavourConfig.isManager()) {
               _lastBundlePurchase = '\nYou haven\'t bought any bundles';
               return FutureBuilder<List<Bundle>>(
-                  future: database.bundlesSnapshot(database.userId),
+                  future: database.bundlesSnapshot(session.userDetails.email),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState != ConnectionState.waiting &&
                         snapshot.hasData) {

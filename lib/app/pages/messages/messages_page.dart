@@ -141,11 +141,16 @@ class _MessagesPageState extends State<MessagesPage> {
   }
 
   void _convertUser(BuildContext context, UserMessage message, Function(BuildContext, UserMessage) nextAction) async {
+    if (message.fromRole == ROLE_ADMIN) {
+      return;
+    }
     final ConversionProcess conversionProcess = ConversionProcess(
         navigationService: navigationService,
         session: session,
         auth: auth,
-        database: database);
+        database: database,
+        captureUserDetails: true,
+    );
     if (!await conversionProcess.userCanProceed()) {
       return;
     }
