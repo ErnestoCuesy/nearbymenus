@@ -65,7 +65,7 @@ class _OptionItemPageState extends State<OptionItemPage> {
 
   Widget _buildContents(BuildContext context) {
     return StreamBuilder<List<OptionItem>>(
-      stream: database.optionItems(widget.option.id),
+      stream: database.optionItems(widget.option),
       builder: (context, snapshot) {
         return ListItemsBuilder<OptionItem>(
             title: 'No option items found',

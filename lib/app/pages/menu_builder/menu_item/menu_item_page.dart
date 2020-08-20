@@ -78,7 +78,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
 
   Widget _buildContents(BuildContext context) {
     return StreamBuilder<List<MenuItem>>(
-      stream: database.menuItems(widget.menu.id),
+      stream: database.menuItems(widget.menu),
       builder: (context, snapshot) {
         return ListItemsBuilder<MenuItem>(
             title: 'No menu items found',
