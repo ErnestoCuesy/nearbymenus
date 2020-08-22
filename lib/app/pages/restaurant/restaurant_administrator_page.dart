@@ -104,6 +104,7 @@ class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPag
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          if (session.userDetails.role != ROLE_VENUE)
           CustomRaisedButton(
             height: buttonSize,
             width: buttonSize,
