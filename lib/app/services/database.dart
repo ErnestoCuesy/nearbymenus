@@ -176,6 +176,7 @@ class FirestoreDatabase implements Database {
     await _service.deleteCollectionData(collectionPath: APIPath.menuItems(restaurant.id), fieldName: 'restaurantId', fieldValue: restaurant.id);
     await _service.deleteCollectionData(collectionPath: APIPath.menus(restaurant.id), fieldName: 'restaurantId', fieldValue: restaurant.id);
     await _service.deleteCollectionData(collectionPath: APIPath.messages(), fieldName: 'restaurantId', fieldValue: restaurant.id);
+    await _service.deleteData(path: APIPath.orderNumberCounterDelete(restaurant.id));
     await _service.deleteData(path: APIPath.authorization(restaurant.id));
     await _service.deleteData(path: APIPath.itemImg(restaurant.id));
     await _service.deleteData(path: APIPath.restaurant(restaurant.id));
