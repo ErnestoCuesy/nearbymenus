@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/received_notification.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/landing/landing_page.dart';
 import 'package:nearbymenus/app/common_widgets/location_services_error.dart';
 import 'package:nearbymenus/app/common_widgets/splash_screen.dart';
+import 'package:nearbymenus/app/pages/rating/rate_app.dart';
 import 'package:nearbymenus/app/services/auth.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/services/navigation_service.dart';
@@ -16,6 +18,7 @@ import 'package:nearbymenus/app/utilities/app_theme.dart';
 import 'package:nearbymenus/app/utilities/logo_image_asset.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:rate_my_app/rate_my_app.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:rxdart/subjects.dart';
 
@@ -43,12 +46,44 @@ class _MyAppState extends State<MyApp> {
 
   NotificationAppLaunchDetails notificationAppLaunchDetails;
 
+  RateMyApp rateMyApp;
+  String googlePlayIdentifier = 'com.ernestosoft.nearbymenus';
+  String appStoreIdentifier = '1516295374';
+
   @override
   void initState() {
     super.initState();
     _determineLocationPermissions();
     _initNotifications();
     _requestIOSPermissions();
+    _initRating();
+  }
+
+  void _initRating() {
+    if (FlavourConfig.isManager()) {
+      googlePlayIdentifier = googlePlayIdentifier + '.manager';
+      appStoreIdentifier = '1524613034';
+    } else if (FlavourConfig.isStaff()) {
+      googlePlayIdentifier = googlePlayIdentifier + '.staff';
+      appStoreIdentifier = '1525121267';
+    } else if (FlavourConfig.isAdmin()) {
+      googlePlayIdentifier = googlePlayIdentifier + '.admin';
+      appStoreIdentifier = '';
+    }
+    rateMyApp = RateMyApp(
+      preferencesPrefix: 'rateMyApp_',
+      minDays: 7,
+      minLaunches: 10,
+      remindDays: 7,
+      remindLaunches: 10,
+      googlePlayIdentifier: googlePlayIdentifier,
+      appStoreIdentifier: appStoreIdentifier,
+    );
+    rateMyApp.init().then((_) => RateApp.displayDialog(
+        context: context,
+        rateMyApp: rateMyApp,
+        forceDialog: false,
+    ));
   }
 
   void _initNotifications() async {
@@ -190,9 +225,9 @@ class _MyAppState extends State<MyApp> {
               minWidth: 450,
               defaultScale: true,
               breakpoints: [
-                ResponsiveBreakpoint(breakpoint: 450, name: MOBILE),
-                ResponsiveBreakpoint(breakpoint: 800, name: TABLET, autoScale: true),
-                ResponsiveBreakpoint(breakpoint: 1000, name: TABLET, autoScale: true),
+                ResponsiveBreakpoint.resize(450, name: MOBILE),
+                ResponsiveBreakpoint.autoScale(800, name: TABLET),
+                ResponsiveBreakpoint.autoScale(1000, name: TABLET),
               ],
             ),
           )
