@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
@@ -33,12 +34,14 @@ class ViewOrderModel with ChangeNotifier {
   Future<void> save() async {
     updateWith(isLoading: true, submitted: true);
     _submitOrder();
-    _sendMessage(
-        session.currentRestaurant.managerId,
-        ROLE_PATRON,
-        ROLE_STAFF,
-        'New order to ${session.currentRestaurant.name}'
-    );
+    if (!FlavourConfig.isStaff()) {
+      _sendMessage(
+          session.currentRestaurant.managerId,
+          FlavourConfig.isManager() ? ROLE_MANAGER : ROLE_PATRON,
+          ROLE_STAFF,
+          'New order to ${session.currentRestaurant.name}'
+      );
+    }
   }
 
   Future<void> _submitOrder() async {
