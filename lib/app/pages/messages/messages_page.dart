@@ -61,8 +61,8 @@ class _MessagesPageState extends State<MessagesPage> {
       ),
       builder: (context, snapshot) {
         return ListItemsBuilder<UserMessage>(
-            title: 'Restaurant Access',
-            message: 'You don\'t have restaurant access requests',
+            title: 'Messages',
+            message: 'You don\'t have any messages',
             snapshot: snapshot,
             itemBuilder: (context, message) {
               return Dismissible(
@@ -100,7 +100,7 @@ class _MessagesPageState extends State<MessagesPage> {
                             padding:
                                 const EdgeInsets.only(top: 4.0, bottom: 4.0),
                             child: Text(
-                              'Tap for options',
+                              message.fromRole == ROLE_ADMIN ? 'Tap to acknowledge' : 'Tap for options',
                             ),
                           ),
                           Text(
@@ -142,6 +142,8 @@ class _MessagesPageState extends State<MessagesPage> {
 
   void _convertUser(BuildContext context, UserMessage message, Function(BuildContext, UserMessage) nextAction) async {
     if (message.fromRole == ROLE_ADMIN) {
+      message.attendedFlag = true;
+      database.setMessageDetails(message);
       return;
     }
     final ConversionProcess conversionProcess = ConversionProcess(
@@ -166,7 +168,7 @@ class _MessagesPageState extends State<MessagesPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Restaurant Access',
+          'Messages',
           style: TextStyle(color: Theme.of(context).appBarTheme.color),
         ),
       ),
