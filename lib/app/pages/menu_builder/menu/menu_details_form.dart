@@ -7,6 +7,7 @@ import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_builder/menu/menu_details_model.dart';
 import 'package:nearbymenus/app/services/database.dart';
+import 'package:nearbymenus/app/services/menu_observable_stream.dart';
 import 'package:provider/provider.dart';
 
 class MenuDetailsForm extends StatefulWidget {
@@ -18,6 +19,7 @@ class MenuDetailsForm extends StatefulWidget {
     BuildContext context,
     Menu menu,
     Restaurant restaurant,
+    MenuObservableStream menuStream,
   }) {
     final database = Provider.of<Database>(context);
     final session = Provider.of<Session>(context);
@@ -25,6 +27,7 @@ class MenuDetailsForm extends StatefulWidget {
       create: (context) => MenuDetailsModel(
           database: database,
           session: session,
+          menuStream: menuStream,
           id: menu.id ?? '',
           name: menu.name ?? '',
           notes: menu.notes ?? '',

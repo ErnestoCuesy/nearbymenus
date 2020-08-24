@@ -5,6 +5,7 @@ import 'package:nearbymenus/app/models/menu.dart';
 import 'package:nearbymenus/app/models/option.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
+import 'package:nearbymenus/app/services/menu_item_observable_stream.dart';
 import 'package:nearbymenus/app/utilities/validators.dart';
 import 'package:nearbymenus/app/services/database.dart';
 
@@ -12,7 +13,7 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
   final Database database;
   final Session session;
   final Menu menu;
-  Restaurant restaurant;
+  final MenuItemObservableStream menuItemStream;
   String id;
   String name;
   String description;
@@ -25,12 +26,13 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
 
   Map<dynamic, dynamic> restaurantObjectStagedOptions;
   Map<String, Option> stagedOptions = {};
+  Restaurant get restaurant => session.currentRestaurant;
 
   MenuItemDetailsModel(
       {@required this.database,
        @required this.session,
        @required this.menu,
-       @required this.restaurant,
+       @required this.menuItemStream,
         this.id,
         this.name,
         this.description,
@@ -61,7 +63,6 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
       options: optionIdList,
     );
     try {
-      await database.setMenuItem(item);
       final Map<dynamic, dynamic> items = restaurant.restaurantMenus[menu.id];
       if (items.containsKey(id)) {
         restaurant.restaurantMenus[menu.id].update(id, (_) => item.toMap());
@@ -69,6 +70,7 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
         restaurant.restaurantMenus[menu.id].putIfAbsent(id, () => item.toMap());
       }
       restaurant.restaurantOptions = restaurantObjectStagedOptions;
+      menuItemStream.broadcastEvent(restaurant.restaurantMenus[menu.id]);
       await Restaurant.setRestaurant(database, restaurant);
       if (stagedOptions != null) {
         stagedOptions.forEach((key, value) async {

@@ -3,17 +3,20 @@ import 'package:nearbymenus/app/models/menu_item.dart';
 import 'package:nearbymenus/app/models/menu.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/pages/menu_builder/menu_item/menu_item_details_form.dart';
+import 'package:nearbymenus/app/services/menu_item_observable_stream.dart';
 
 class MenuItemDetailsPage extends StatelessWidget {
   final Restaurant restaurant;
   final Menu menu;
   final MenuItem item;
+  final MenuItemObservableStream menuItemStream;
 
   const MenuItemDetailsPage({
     Key key,
     this.restaurant,
     this.menu,
     this.item,
+    this.menuItemStream,
   }) : super(key: key);
 
   @override
@@ -32,6 +35,7 @@ class MenuItemDetailsPage extends StatelessWidget {
               menu: menu,
               restaurant: restaurant,
               item: item,
+              menuItemStream: menuItemStream,
             ),
           ),
         ),

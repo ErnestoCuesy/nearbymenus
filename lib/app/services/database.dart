@@ -2,8 +2,6 @@ import 'dart:async';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:nearbymenus/app/models/authorizations.dart';
 import 'package:nearbymenus/app/models/item_image.dart';
-import 'package:nearbymenus/app/models/menu_item.dart';
-import 'package:nearbymenus/app/models/menu.dart';
 import 'package:nearbymenus/app/models/option.dart';
 import 'package:nearbymenus/app/models/option_item.dart';
 import 'package:nearbymenus/app/models/order.dart';
@@ -22,8 +20,6 @@ abstract class Database {
   Future<void> setRestaurant(Restaurant restaurant);
   Future<void> setMessageDetails(UserMessage roleNotification);
   Future<void> setAuthorization(String restaurantId, Authorizations authorizations);
-  Future<void> setMenu(Menu menu);
-  Future<void> setMenuItem(MenuItem menuItem);
   Future<void> setOption(Option option);
   Future<void> setOptionItem(OptionItem optionItem);
   Future<void> setOrder(Order order);
@@ -34,8 +30,6 @@ abstract class Database {
 
   Future<void> deleteMessage(String id);
   Future<void> deleteRestaurant(Restaurant restaurant);
-  Future<void> deleteMenu(Menu menu);
-  Future<void> deleteMenuItem(MenuItem menuItem);
   Future<void> deleteOption(Option option);
   Future<void> deleteOptionItem(OptionItem optionItem);
   Future<void> deleteOrder(Order order);
@@ -51,8 +45,6 @@ abstract class Database {
   Stream<List<UserMessage>> adminMessages();
   Stream<List<Restaurant>> patronRestaurants();
   Stream<Restaurant> selectedRestaurantStream(String restaurantId);
-  Stream<List<Menu>> restaurantMenus(String restaurantId);
-  Stream<List<MenuItem>> menuItems(Menu menu);
   Stream<List<Option>> restaurantOptions(String restaurantId);
   Stream<List<OptionItem>> optionItems(Option option);
   Stream<List<Order>> activeRestaurantOrders(String restaurantId);
@@ -100,14 +92,6 @@ class FirestoreDatabase implements Database {
   @override
   Future<void> setAuthorization(String restaurantId, Authorizations authorizations) async => await _service
       .setData(path: APIPath.authorization(restaurantId), data: authorizations.toMap());
-
-  @override
-  Future<void> setMenu(Menu menu) async => await _service
-      .setData(path: APIPath.menu(menu.restaurantId, menu.id), data: menu.toMap());
-
-  @override
-  Future<void> setMenuItem(MenuItem item) async => await _service
-      .setData(path: APIPath.menuItem(item.restaurantId, item.id), data: item.toMap());
 
   @override
   Future<void> setOption(Option option) async => await _service
@@ -173,23 +157,11 @@ class FirestoreDatabase implements Database {
     await _service.deleteCollectionData(collectionPath: APIPath.orders(), fieldName: 'restaurantId', fieldValue: restaurant.id);
     await _service.deleteCollectionData(collectionPath: APIPath.optionItems(restaurant.id), fieldName: 'restaurantId', fieldValue: restaurant.id);
     await _service.deleteCollectionData(collectionPath: APIPath.options(restaurant.id), fieldName: 'restaurantId', fieldValue: restaurant.id);
-    await _service.deleteCollectionData(collectionPath: APIPath.menuItems(restaurant.id), fieldName: 'restaurantId', fieldValue: restaurant.id);
-    await _service.deleteCollectionData(collectionPath: APIPath.menus(restaurant.id), fieldName: 'restaurantId', fieldValue: restaurant.id);
     await _service.deleteCollectionData(collectionPath: APIPath.messages(), fieldName: 'restaurantId', fieldValue: restaurant.id);
     await _service.deleteData(path: APIPath.orderNumberCounterDelete(restaurant.id));
     await _service.deleteData(path: APIPath.authorization(restaurant.id));
     await _service.deleteData(path: APIPath.itemImg(restaurant.id));
     await _service.deleteData(path: APIPath.restaurant(restaurant.id));
-  }
-
-  @override
-  Future<void> deleteMenu(Menu menu) async {
-    await _service.deleteData(path: APIPath.menu(menu.restaurantId, menu.id));
-  }
-
-  @override
-  Future<void> deleteMenuItem(MenuItem item) async {
-    await _service.deleteData(path: APIPath.menuItem(item.restaurantId, item.id));
   }
 
   @override
@@ -287,24 +259,6 @@ class FirestoreDatabase implements Database {
   Stream<Restaurant> selectedRestaurantStream(String restaurantId) => _service.documentStream(
     path: APIPath.restaurant(restaurantId),
     builder: (data, documentId) => Restaurant.fromMap(data, documentId),
-  );
-
-  @override
-  Stream<List<Menu>> restaurantMenus(String restaurantId) => _service.collectionStream(
-    path: APIPath.menus(restaurantId),
-    queryBuilder: restaurantId != null
-        ? (query) => query.where('restaurantId', isEqualTo: restaurantId)
-        : null,
-    builder: (data, documentId) => Menu.fromMap(data, documentId),
-  );
-
-  @override
-  Stream<List<MenuItem>> menuItems(Menu menu) => _service.collectionStream(
-    path: APIPath.menuItems(menu.restaurantId),
-    queryBuilder: menu.id != null
-        ? (query) => query.where('menuId', isEqualTo: menu.id)
-        : null,
-    builder: (data, documentId) => MenuItem.fromMap(data, documentId),
   );
 
   @override

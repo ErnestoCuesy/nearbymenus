@@ -13,6 +13,7 @@ import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_builder/menu_item/menu_item_page.dart';
 import 'package:nearbymenus/app/pages/menu_builder/menu/menu_details_page.dart';
 import 'package:nearbymenus/app/services/database.dart';
+import 'package:nearbymenus/app/services/menu_observable_stream.dart';
 import 'package:provider/provider.dart';
 
 class MenuPage extends StatefulWidget {
@@ -24,6 +25,7 @@ class MenuPage extends StatefulWidget {
 class _MenuPageState extends State<MenuPage> {
   Session session;
   Database database;
+  MenuObservableStream menuStream;
   Restaurant get restaurant => session.currentRestaurant;
 
   void _createMenuDetailsPage(BuildContext context, Menu menu) {
@@ -33,6 +35,7 @@ class _MenuPageState extends State<MenuPage> {
         builder: (context) => MenuDetailsPage(
           restaurant: restaurant,
           menu: menu,
+          menuStream: menuStream,
         ),
       ),
     );
@@ -40,8 +43,9 @@ class _MenuPageState extends State<MenuPage> {
 
   Future<void> _deleteMenu(BuildContext context, Menu menu) async {
     try {
-      await database.deleteMenu(menu);
+      //await database.deleteMenu(menu);
       restaurant.restaurantMenus.remove(menu.id);
+      menuStream.broadcastEvent(restaurant.restaurantMenus);
       Restaurant.setRestaurant(database, restaurant);
     } on PlatformException catch (e) {
       PlatformExceptionAlertDialog(
@@ -79,7 +83,7 @@ class _MenuPageState extends State<MenuPage> {
 
   Widget _buildContents(BuildContext context) {
     return StreamBuilder<List<Menu>>(
-      stream: database.restaurantMenus(restaurant.id),
+      stream: menuStream.stream,
       builder: (context, snapshot) {
         return ListItemsBuilder<Menu>(
             title: 'No menus found',
@@ -134,6 +138,8 @@ class _MenuPageState extends State<MenuPage> {
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
+    menuStream = MenuObservableStream(observable: session.currentRestaurant.restaurantMenus);
+    menuStream.init();
     if (Platform.isAndroid) {
       return Scaffold(
         appBar: AppBar(

@@ -13,6 +13,7 @@ import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_builder/menu_item/menu_item_details_page.dart';
 import 'package:nearbymenus/app/services/database.dart';
+import 'package:nearbymenus/app/services/menu_item_observable_stream.dart';
 import 'package:provider/provider.dart';
 
 class MenuItemPage extends StatefulWidget {
@@ -28,6 +29,10 @@ class MenuItemPage extends StatefulWidget {
 class _MenuItemPageState extends State<MenuItemPage> {
   Session session;
   Database database;
+  MenuItemObservableStream menuItemStream;
+  String get menuId => widget.menu.id;
+  Restaurant get restaurant => session.currentRestaurant;
+  Menu get menu => Menu.fromMap(restaurant.restaurantMenus[menuId], null);
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
 
   void _createMenuItemDetailsPage(BuildContext context, MenuItem item) {
@@ -35,9 +40,10 @@ class _MenuItemPageState extends State<MenuItemPage> {
       MaterialPageRoute<void>(
         fullscreenDialog: false,
         builder: (context) => MenuItemDetailsPage(
-          restaurant: widget.restaurant,
-          menu: widget.menu,
+          restaurant: restaurant,
+          menu: menu,
           item: item,
+          menuItemStream: menuItemStream,
         ),
       ),
     );
@@ -45,9 +51,10 @@ class _MenuItemPageState extends State<MenuItemPage> {
 
   Future<void> _deleteItem(BuildContext context, MenuItem item) async {
     try {
-      await database.deleteMenuItem(item);
-      widget.restaurant.restaurantMenus[widget.menu.id].remove(item.id);
-      Restaurant.setRestaurant(database, widget.restaurant);
+      //await database.deleteMenuItem(item);
+      //widget.restaurant.restaurantMenus[widget.menu.id].remove(item.id);
+      restaurant.restaurantMenus[menuId].remove(item.id);
+      Restaurant.setRestaurant(database, restaurant);
     } on PlatformException catch (e) {
       PlatformExceptionAlertDialog(
         title: 'Operation failed',
@@ -78,7 +85,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
 
   Widget _buildContents(BuildContext context) {
     return StreamBuilder<List<MenuItem>>(
-      stream: database.menuItems(widget.menu),
+      stream: menuItemStream.stream,
       builder: (context, snapshot) {
         return ListItemsBuilder<MenuItem>(
             title: 'No menu items found',
@@ -140,7 +147,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
     List<Widget> optionList = List<Widget>();
     if (item.options.isNotEmpty) {
       item.options.forEach((key) {
-        final value = widget.restaurant.restaurantOptions[key];
+        final value = restaurant.restaurantOptions[key];
         if (value != null) {
           optionList.add(CheckboxListTile(
             title: Text('${value['name']}'),
@@ -157,6 +164,8 @@ class _MenuItemPageState extends State<MenuItemPage> {
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
+    menuItemStream = MenuItemObservableStream(observable: restaurant.restaurantMenus[menuId]);
+    menuItemStream.init();
     if (Platform.isAndroid) {
       return Scaffold(
         appBar: AppBar(
