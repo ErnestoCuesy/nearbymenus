@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
@@ -163,6 +164,7 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
               style: TextStyle(color: Theme.of(context).appBarTheme.color),
             ),
             actions: [
+              if (!FlavourConfig.isAdmin())
               Padding(
                 padding: const EdgeInsets.only(right: 26.0),
                 child: IconButton(
