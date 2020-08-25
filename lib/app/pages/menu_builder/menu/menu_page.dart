@@ -43,7 +43,6 @@ class _MenuPageState extends State<MenuPage> {
 
   Future<void> _deleteMenu(BuildContext context, Menu menu) async {
     try {
-      //await database.deleteMenu(menu);
       restaurant.restaurantMenus.remove(menu.id);
       menuStream.broadcastEvent(restaurant.restaurantMenus);
       Restaurant.setRestaurant(database, restaurant);

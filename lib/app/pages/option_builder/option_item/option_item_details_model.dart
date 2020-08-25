@@ -4,6 +4,7 @@ import 'package:nearbymenus/app/models/option.dart';
 import 'package:nearbymenus/app/models/option_item.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
+import 'package:nearbymenus/app/services/option_item_observable_stream.dart';
 import 'package:nearbymenus/app/utilities/validators.dart';
 import 'package:nearbymenus/app/services/database.dart';
 
@@ -11,6 +12,7 @@ class OptionItemDetailsModel with OptionItemValidators, ChangeNotifier {
   final Database database;
   final Session session;
   final Option option;
+  final OptionItemObservableStream optionItemStream;
   Restaurant restaurant;
   String id;
   String name;
@@ -22,6 +24,7 @@ class OptionItemDetailsModel with OptionItemValidators, ChangeNotifier {
        @required this.session,
        @required this.option,
        @required this.restaurant,
+       @required this.optionItemStream,
         this.id,
         this.name,
         this.isLoading = false,
@@ -40,13 +43,13 @@ class OptionItemDetailsModel with OptionItemValidators, ChangeNotifier {
       name: name,
     );
     try {
-      await database.setOptionItem(item);
       final Map<dynamic, dynamic> items = restaurant.restaurantOptions[option.id];
       if (items.containsKey(id)) {
         restaurant.restaurantOptions[option.id].update(id, (_) => item.toMap());
       } else {
         restaurant.restaurantOptions[option.id].putIfAbsent(id, () => item.toMap());
       }
+      optionItemStream.broadcastEvent(restaurant.restaurantOptions[option.id]);
       await Restaurant.setRestaurant(database, restaurant);
     } catch (e) {
       print(e);

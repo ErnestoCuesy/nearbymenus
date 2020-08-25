@@ -1,25 +1,25 @@
 import 'dart:async';
 
-import 'package:nearbymenus/app/models/menu_item.dart';
+import 'package:nearbymenus/app/models/option_item.dart';
 import 'package:rxdart/rxdart.dart';
 
-class MenuItemObservableStream {
+class OptionItemObservableStream {
   final Map<String, dynamic> observable;
 
-  MenuItemObservableStream({this.observable});
+  OptionItemObservableStream({this.observable});
 
   BehaviorSubject<Map<String, dynamic>> _subject = BehaviorSubject<Map<String, dynamic>>.seeded(null);
-  Observable<List<MenuItem>> get stream => _subject.stream.transform(streamTransformer);
+  Observable<List<OptionItem>> get stream => _subject.stream.transform(streamTransformer);
 
-  var streamTransformer = StreamTransformer<Map<String, dynamic>, List<MenuItem>>.fromHandlers(
-    handleData: (Map<String, dynamic> data, EventSink<List<MenuItem>> sink) {
-      List<MenuItem> menuItemList = List<MenuItem>();
+  var streamTransformer = StreamTransformer<Map<String, dynamic>, List<OptionItem>>.fromHandlers(
+    handleData: (Map<String, dynamic> data, EventSink<List<OptionItem>> sink) {
+      List<OptionItem> optionItemList = List<OptionItem>();
       data.forEach((key, value) {
         if (key.length > 20) {
-          menuItemList.add(MenuItem.fromMap(value, null));
+          optionItemList.add(OptionItem.fromMap(value, null));
         }
       });
-      sink.add(menuItemList);
+      sink.add(optionItemList);
     },
     handleDone: (sink) => sink.close(),
     handleError: (error, stack, sink) => print('Error: $error')

@@ -7,6 +7,7 @@ import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/option_builder/option/option_details_model.dart';
 import 'package:nearbymenus/app/services/database.dart';
+import 'package:nearbymenus/app/services/option_observable_stream.dart';
 import 'package:provider/provider.dart';
 
 class OptionDetailsForm extends StatefulWidget {
@@ -18,6 +19,7 @@ class OptionDetailsForm extends StatefulWidget {
     BuildContext context,
     Option option,
     Restaurant restaurant,
+    OptionObservableStream optionStream,
   }) {
     final database = Provider.of<Database>(context);
     final session = Provider.of<Session>(context);
@@ -25,6 +27,7 @@ class OptionDetailsForm extends StatefulWidget {
       create: (context) => OptionDetailsModel(
           database: database,
           session: session,
+          optionStream: optionStream,
           id: option.id ?? '',
           name: option.name ?? '',
           numberAllowed: option.numberAllowed ?? 1,

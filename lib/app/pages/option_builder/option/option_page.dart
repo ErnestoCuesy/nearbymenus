@@ -13,6 +13,7 @@ import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/option_builder/option/option_details_page.dart';
 import 'package:nearbymenus/app/pages/option_builder/option_item/option_item_page.dart';
 import 'package:nearbymenus/app/services/database.dart';
+import 'package:nearbymenus/app/services/option_observable_stream.dart';
 import 'package:provider/provider.dart';
 
 class OptionPage extends StatefulWidget {
@@ -24,6 +25,7 @@ class OptionPage extends StatefulWidget {
 class _OptionPageState extends State<OptionPage> {
   Session session;
   Database database;
+  OptionObservableStream optionStream;
   Restaurant get restaurant => session.currentRestaurant;
 
   void _createOptionDetailsPage(BuildContext context, Option option) {
@@ -33,6 +35,7 @@ class _OptionPageState extends State<OptionPage> {
         builder: (context) => OptionDetailsPage(
           restaurant: restaurant,
           option: option,
+          optionStream: optionStream,
         ),
       ),
     );
@@ -40,8 +43,8 @@ class _OptionPageState extends State<OptionPage> {
 
   Future<void> _deleteOption(BuildContext context, Option option) async {
     try {
-      await database.deleteOption(option);
       restaurant.restaurantOptions.remove(option.id);
+      optionStream.broadcastEvent(restaurant.restaurantOptions);
       Restaurant.setRestaurant(database, restaurant);
     } on PlatformException catch (e) {
       PlatformExceptionAlertDialog(
@@ -94,7 +97,7 @@ class _OptionPageState extends State<OptionPage> {
 
   Widget _buildContents(BuildContext context) {
     return StreamBuilder<List<Option>>(
-      stream: database.restaurantOptions(restaurant.id),
+      stream: optionStream.stream,
       builder: (context, snapshot) {
         return ListItemsBuilder<Option>(
             title: 'No options found',
@@ -145,6 +148,8 @@ class _OptionPageState extends State<OptionPage> {
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
+    optionStream = OptionObservableStream(observable: session.currentRestaurant.restaurantOptions);
+    optionStream.init();
     if (Platform.isAndroid) {
       return Scaffold(
         appBar: AppBar(

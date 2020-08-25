@@ -12,6 +12,7 @@ import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/option_builder/option_item/option_item_details_page.dart';
 import 'package:nearbymenus/app/services/database.dart';
+import 'package:nearbymenus/app/services/option_item_observable_stream.dart';
 import 'package:provider/provider.dart';
 
 class OptionItemPage extends StatefulWidget {
@@ -27,6 +28,10 @@ class OptionItemPage extends StatefulWidget {
 class _OptionItemPageState extends State<OptionItemPage> {
   Session session;
   Database database;
+  OptionItemObservableStream optionItemStream;
+  String get optionId => widget.option.id;
+  Restaurant get restaurant => session.currentRestaurant;
+  Option get menu => Option.fromMap(restaurant.restaurantOptions[optionId], null);
 
   void _createOptionItemDetailsPage(BuildContext context, OptionItem item) {
     Navigator.of(context).push(
@@ -36,6 +41,7 @@ class _OptionItemPageState extends State<OptionItemPage> {
           restaurant: widget.restaurant,
           option: widget.option,
           optionItem: item,
+          optionItemStream: optionItemStream,
         ),
       ),
     );
@@ -43,8 +49,7 @@ class _OptionItemPageState extends State<OptionItemPage> {
 
   Future<void> _deleteItem(BuildContext context, OptionItem item) async {
     try {
-      await database.deleteOptionItem(item);
-      widget.restaurant.restaurantOptions[widget.option.id].remove(item.id);
+      restaurant.restaurantOptions[optionId].remove(item.id);
       Restaurant.setRestaurant(database, widget.restaurant);
     } on PlatformException catch (e) {
       PlatformExceptionAlertDialog(
@@ -65,7 +70,7 @@ class _OptionItemPageState extends State<OptionItemPage> {
 
   Widget _buildContents(BuildContext context) {
     return StreamBuilder<List<OptionItem>>(
-      stream: database.optionItems(widget.option),
+      stream: optionItemStream.stream,
       builder: (context, snapshot) {
         return ListItemsBuilder<OptionItem>(
             title: 'No option items found',
@@ -108,6 +113,8 @@ class _OptionItemPageState extends State<OptionItemPage> {
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
+    optionItemStream = OptionItemObservableStream(observable: restaurant.restaurantOptions[optionId]);
+    optionItemStream.init();
     if (Platform.isAndroid) {
       return Scaffold(
         appBar: AppBar(

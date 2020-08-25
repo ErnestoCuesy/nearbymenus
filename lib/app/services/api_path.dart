@@ -16,10 +16,6 @@ class APIPath {
   static String itemImages(String restaurantId) => 'itemImages/$restaurantId/images';
   static String itemImg(String restaurantId) => 'itemImages/$restaurantId';
   // Restaurant collections
-  static String option(String restaurantId, String optionId) => 'restaurants/$restaurantId/options/$optionId';
-  static String options(String restaurantId) => 'restaurants/$restaurantId/options';
-  static String optionItem(String restaurantId, String optionId) => 'restaurants/$restaurantId/optionItems/$optionId';
-  static String optionItems(String restaurantId) => 'restaurants/$restaurantId/optionItems';
   static String orderNumberCounter(String restaurantId) => 'restaurants/$restaurantId/orderNumbers';
   static String orderNumberCounterDelete(String restaurantId) => 'restaurants/$restaurantId/orderNumbers/$restaurantId';
 }

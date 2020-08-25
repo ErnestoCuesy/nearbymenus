@@ -72,11 +72,6 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
       restaurant.restaurantOptions = restaurantObjectStagedOptions;
       menuItemStream.broadcastEvent(restaurant.restaurantMenus[menu.id]);
       await Restaurant.setRestaurant(database, restaurant);
-      if (stagedOptions != null) {
-        stagedOptions.forEach((key, value) async {
-          await database.setOption(value);
-        });
-      }
     } catch (e) {
       print(e);
       updateWith(isLoading: false);

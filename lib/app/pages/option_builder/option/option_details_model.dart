@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/models/option.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
+import 'package:nearbymenus/app/services/option_observable_stream.dart';
 import 'package:nearbymenus/app/utilities/validators.dart';
 import 'package:nearbymenus/app/services/database.dart';
 
 class OptionDetailsModel with RestaurantOptionValidators, ChangeNotifier {
   final Database database;
   final Session session;
+  final OptionObservableStream optionStream;
   Restaurant restaurant;
   String id;
   String name;
@@ -19,6 +21,7 @@ class OptionDetailsModel with RestaurantOptionValidators, ChangeNotifier {
   OptionDetailsModel(
       {@required this.database,
        @required this.session,
+       @required this.optionStream,
       this.restaurant,
       this.id,
       this.name,
@@ -39,7 +42,6 @@ class OptionDetailsModel with RestaurantOptionValidators, ChangeNotifier {
       numberAllowed: numberAllowed,
     );
     try {
-      await database.setOption(option);
       if (restaurant.restaurantOptions.containsKey(id)) {
         final stageOption = restaurant.restaurantOptions[id];
         print('Staged option: $stageOption');
@@ -51,6 +53,7 @@ class OptionDetailsModel with RestaurantOptionValidators, ChangeNotifier {
       } else {
         restaurant.restaurantOptions.putIfAbsent(id, () => option.toMap());
       }
+      optionStream.broadcastEvent(restaurant.restaurantOptions);
       Restaurant.setRestaurant(database, restaurant);
     } catch (e) {
       print(e);

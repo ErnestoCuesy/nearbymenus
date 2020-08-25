@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/models/option.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/pages/option_builder/option/option_details_form.dart';
+import 'package:nearbymenus/app/services/option_observable_stream.dart';
 
 class OptionDetailsPage extends StatelessWidget {
   final Restaurant restaurant;
   final Option option;
+  final OptionObservableStream optionStream;
 
   const OptionDetailsPage(
-      {Key key, this.option, this.restaurant})
+      {Key key, this.option, this.restaurant, this.optionStream})
       : super(key: key);
 
   @override
@@ -26,6 +28,7 @@ class OptionDetailsPage extends StatelessWidget {
               context: context,
               restaurant: restaurant,
               option: option,
+              optionStream: optionStream,
             ),
           ),
         ),

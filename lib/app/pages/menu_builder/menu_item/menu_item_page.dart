@@ -51,8 +51,6 @@ class _MenuItemPageState extends State<MenuItemPage> {
 
   Future<void> _deleteItem(BuildContext context, MenuItem item) async {
     try {
-      //await database.deleteMenuItem(item);
-      //widget.restaurant.restaurantMenus[widget.menu.id].remove(item.id);
       restaurant.restaurantMenus[menuId].remove(item.id);
       Restaurant.setRestaurant(database, restaurant);
     } on PlatformException catch (e) {
