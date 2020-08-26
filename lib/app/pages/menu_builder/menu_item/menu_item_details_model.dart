@@ -82,7 +82,6 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
   String get primaryButtonText => 'Save';
 
   bool get canSave => menuItemNameValidator.isValid(name) &&
-      menuItemDescriptionValidator.isValid(description) &&
       menuItemPriceValidator.isValid(price);
 
   String get menuItemNameErrorText {

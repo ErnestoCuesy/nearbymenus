@@ -229,9 +229,8 @@ class _MenuItemDetailsFormState extends State<MenuItemDetailsForm> {
       textCapitalization: TextCapitalization.sentences,
       cursorColor: Colors.black,
       decoration: InputDecoration(
-        labelText: 'Description',
+        labelText: 'Description (optional)',
         hintText: 'i.e.: Creamy chicken sauteed with baby marrows',
-        errorText: model.menuItemDescriptionErrorText,
         enabled: model.isLoading == false,
       ),
       autocorrect: false,
