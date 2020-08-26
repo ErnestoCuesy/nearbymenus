@@ -168,6 +168,10 @@ class _MenuItemDetailsFormState extends State<MenuItemDetailsForm> {
         children: _buildOptions(),
       ),
       SizedBox(
+        height: 8.0,
+      ),
+      _parentMenuSelector(),
+      SizedBox(
         height: 16.0,
       ),
       FormSubmitButton(
@@ -182,20 +186,6 @@ class _MenuItemDetailsFormState extends State<MenuItemDetailsForm> {
         height: 8.0,
       ),
     ];
-  }
-
-  List<Widget> _buildOptions() {
-    List<Widget> optionList = List<Widget>();
-    widget.optionsMap.forEach((key, value) {
-      optionList.add(CheckboxListTile(
-        title: Text('${value['name']}'),
-        value: model.optionCheck(key),
-        onChanged: (value) {
-          model.updateOptionIdList(key, value);
-        },
-      ));
-    });
-    return optionList;
   }
 
   TextField _buildMenuItemNameTextField() {
@@ -292,6 +282,51 @@ class _MenuItemDetailsFormState extends State<MenuItemDetailsForm> {
       title: const Text('Hide this menu item'),
       value: model.hidden,
       onChanged: model.updateHidden,
+    );
+  }
+
+  List<Widget> _buildOptions() {
+    List<Widget> optionList = List<Widget>();
+    widget.optionsMap.forEach((key, value) {
+      optionList.add(CheckboxListTile(
+        title: Text('${value['name']}'),
+        value: model.optionCheck(key),
+        onChanged: (value) {
+          model.updateOptionIdList(key, value);
+        },
+      ));
+    });
+    return optionList;
+  }
+
+  Widget _parentMenuSelector() {
+    return PopupMenuButton<dynamic>(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Icon(Icons.content_copy),
+            Text('Copy to another menu'),
+          ],
+        ),
+      ),
+      onSelected: (dynamic selectedMenu) {
+        Map<String, dynamic> selMenu = selectedMenu;
+        print(selMenu['id']);
+        model.copyMenuItem(selMenu['id']);
+      },
+      itemBuilder: (BuildContext context) {
+        return model.restaurant.restaurantMenus.values.map((dynamic item) {
+          Map<String, dynamic> itemMap = item;
+          if (itemMap['name'] != model.menu.name) {
+            return PopupMenuItem<dynamic>(
+              child: Text('Copy to ${itemMap['name']}'),
+              value: item,
+            );
+          }
+        }).toList();
+      },
     );
   }
 

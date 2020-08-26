@@ -104,6 +104,33 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
     return showErrorText ? invalidSequenceText : null;
   }
 
+  void copyMenuItem(String newMenuId) async {
+    final item = MenuItem(
+      id: id,
+      menuId: newMenuId,
+      restaurantId: restaurant.id,
+      name: name,
+      description: description,
+      sequence: sequence,
+      hidden: hidden,
+      price: price,
+      options: optionIdList,
+    );
+    try {
+      final Map<dynamic, dynamic> items = restaurant.restaurantMenus[newMenuId];
+      if (items.containsKey(id)) {
+        restaurant.restaurantMenus[newMenuId].update(id, (_) => item.toMap());
+      } else {
+        restaurant.restaurantMenus[newMenuId].putIfAbsent(id, () => item.toMap());
+      }
+      await Restaurant.setRestaurant(database, restaurant);
+    } catch (e) {
+      print(e);
+      updateWith(isLoading: false);
+      rethrow;
+    }
+  }
+
   void updateMenuItemName(String name) => updateWith(name: name);
 
   void updateMenuItemDescription(String description) => updateWith(description: description);
