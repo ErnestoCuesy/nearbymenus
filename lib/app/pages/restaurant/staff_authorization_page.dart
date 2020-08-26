@@ -73,15 +73,17 @@ class _StaffAuthorizationPageState extends State<StaffAuthorizationPage> {
   }
 
   void _convertUser(BuildContext context, Function(BuildContext) nextAction) async {
-    final ConversionProcess conversionProcess = ConversionProcess(
+    if (!session.userProcessComplete) {
+      final ConversionProcess conversionProcess = ConversionProcess(
         navigationService: navigationService,
         session: session,
         auth: auth,
         database: database,
         captureUserDetails: true,
-    );
-    if (!await conversionProcess.userCanProceed()) {
-      return;
+      );
+      if (!await conversionProcess.userCanProceed()) {
+        return;
+      }
     }
     nextAction(context);
   }

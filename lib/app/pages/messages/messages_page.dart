@@ -146,15 +146,17 @@ class _MessagesPageState extends State<MessagesPage> {
       database.setMessageDetails(message);
       return;
     }
-    final ConversionProcess conversionProcess = ConversionProcess(
+    if (!session.userProcessComplete) {
+      final ConversionProcess conversionProcess = ConversionProcess(
         navigationService: navigationService,
         session: session,
         auth: auth,
         database: database,
         captureUserDetails: true,
-    );
-    if (!await conversionProcess.userCanProceed()) {
-      return;
+      );
+      if (!await conversionProcess.userCanProceed()) {
+        return;
+      }
     }
     nextAction(context, message);
   }

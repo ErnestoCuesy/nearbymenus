@@ -37,8 +37,8 @@ class _AccountPageState extends State<AccountPage> {
     try {
       session.userDetails.orderOnHold = null;
       session.currentOrder = null;
-      database.setUserDetails(session.userDetails);
-      await auth.signOut();
+      session.userProcessComplete = false;
+      database.setUserDetails(session.userDetails).then((value) => auth.signOut());
     } catch (e) {
       print(e.toString());
     }
@@ -104,15 +104,17 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   void _convertUser(BuildContext context, Function(BuildContext) nextAction) async {
-    final ConversionProcess conversionProcess = ConversionProcess(
-        navigationService: navigationService,
-        session: session,
-        auth: auth,
-        database: database,
-        captureUserDetails: false
-    );
-    if (!await conversionProcess.userCanProceed()) {
-      return;
+    if (!session.userProcessComplete) {
+      final ConversionProcess conversionProcess = ConversionProcess(
+          navigationService: navigationService,
+          session: session,
+          auth: auth,
+          database: database,
+          captureUserDetails: false
+      );
+      if (!await conversionProcess.userCanProceed()) {
+        return;
+      }
     }
     nextAction(context);
   }

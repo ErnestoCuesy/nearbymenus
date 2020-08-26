@@ -21,6 +21,7 @@ class Session {
   int pendingStaffAuthorizations;
   Order currentOrder;
   bool isAnonymousUser;
+  bool userProcessComplete = false;
 
   BehaviorSubject<bool> _subjectAnonymousUserFlag = BehaviorSubject<bool>.seeded(false);
   Observable<bool> get anonymousUserFlagObservable => _subjectAnonymousUserFlag.stream;

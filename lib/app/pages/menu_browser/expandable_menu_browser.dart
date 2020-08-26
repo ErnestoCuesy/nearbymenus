@@ -66,15 +66,19 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
   }
 
   void _shoppingCartAction(BuildContext context) async {
-    final ConversionProcess conversionProcess = ConversionProcess(
+    if (!session.userProcessComplete) {
+      final ConversionProcess conversionProcess = ConversionProcess(
         navigationService: navigationService,
         session: session,
         auth: auth,
         database: database,
         captureUserDetails: true,
-    );
-    if (!await conversionProcess.userCanProceed()) {
-      return;
+      );
+      if (!await conversionProcess.userCanProceed()) {
+        return;
+      } else {
+        session.userProcessComplete = true;
+      }
     }
     if (orderOnHold) {
       Navigator.of(context).push(
