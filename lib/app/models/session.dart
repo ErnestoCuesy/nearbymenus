@@ -26,6 +26,9 @@ class Session {
   BehaviorSubject<bool> _subjectAnonymousUserFlag = BehaviorSubject<bool>.seeded(false);
   Observable<bool> get anonymousUserFlagObservable => _subjectAnonymousUserFlag.stream;
 
+  BehaviorSubject<int> _subjectOrderCounter = BehaviorSubject<int>.seeded(0);
+  Observable<int> get orderCounterObservable => _subjectOrderCounter.stream;
+
   Session({this.position});
 
   void setUserDetails(UserDetails userDetails) {
@@ -53,7 +56,12 @@ class Session {
     _subjectAnonymousUserFlag.add(value);
   }
 
+  void broadcastOrderCounter(int value) {
+    _subjectOrderCounter.add(value);
+  }
+
   void dispose() {
     _subjectAnonymousUserFlag.close();
+    _subjectOrderCounter.close();
   }
 }

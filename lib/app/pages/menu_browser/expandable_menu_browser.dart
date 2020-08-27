@@ -32,13 +32,10 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
   ScrollController _scrollController = ScrollController();
 
   bool get orderOnHold =>
+      session.currentOrder != null &&
       session.currentOrder.orderItems.length > 0 &&
       session.currentOrder.restaurantId == session.currentRestaurant.id &&
       session.currentOrder.status == ORDER_ON_HOLD;
-
-  int get _numberOfItems => orderOnHold
-      ? session.currentOrder.orderItems.length
-      : 0;
 
   Widget _buildContents(BuildContext context, Map<dynamic, dynamic> menus,
     Map<dynamic, dynamic> options, dynamic sortedKeys) {
@@ -50,19 +47,12 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
         itemBuilder: (BuildContext context, int index) {
           final menu = menus[sortedKeys[index]];
           return ExpandableListView(
-            callBack: _callBack,
             menu: menu,
             options: options,
           );
         },
       ),
     );
-  }
-
-  void _callBack() {
-    setState(() {
-      _checkExistingOrder();
-    });
   }
 
   void _shoppingCartAction(BuildContext context) async {
@@ -88,7 +78,6 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
             context: context,
             order: session.currentOrder,
             scaffoldKey: _scaffoldKey,
-            callBack: _callBack,
           ),
         ),
       );
@@ -180,27 +169,40 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
           ),
           body: _buildContents(context, sortedMenus, options, sortedKeys),
         ),
-        if (_numberOfItems > 0)
-        Positioned(
-          right: 18,
-          top: 5,
-          child: Container(
-            height: 20.0,
-            width: 20.0,
-            alignment: Alignment.center,
-            margin: EdgeInsets.only(top: 35.0, right: 5.0),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12.0),
-                color: Colors.red
-            ),
-            child: Text(
-              _numberOfItems.toString(),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12.0,
-              ),
-            ),
-          ),
+        //if (_numberOfItems > 0)
+        StreamBuilder<int>(
+          stream: session.orderCounterObservable,
+          builder: (context, snapshot) {
+            if (snapshot.hasData && snapshot.data > 0) {
+              return Positioned(
+                right: 18,
+                top: 5,
+                child: Container(
+                  height: 20.0,
+                  width: 20.0,
+                  alignment: Alignment.center,
+                  margin: EdgeInsets.only(top: 35.0, right: 5.0),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12.0),
+                      color: Colors.red
+                  ),
+                  child: Text(
+                    snapshot.data.toString(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12.0,
+                    ),
+                  ),
+                ),
+              );
+            } else {
+              return Positioned(
+                right: 18,
+                top: 5,
+                child: Container(height: 20.0, width: 20.0,),
+              );
+            }
+          }
         ),
       ]
     );

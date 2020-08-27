@@ -44,6 +44,7 @@ class AddToOrderModel with ChangeNotifier {
       options: tempMenuItemOptions,
     ).toMap();
     session.currentOrder.orderItems.add(orderItem);
+    session.broadcastOrderCounter(session.currentOrder.orderItems.length);
     session.userDetails.orderOnHold = session.currentOrder.toMap();
     database.setUserDetails(session.userDetails);
   }

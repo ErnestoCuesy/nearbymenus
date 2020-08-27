@@ -55,6 +55,7 @@ class ViewOrderModel with ChangeNotifier {
           order);
       session.currentOrder = null;
       session.userDetails.orderOnHold = null;
+      session.broadcastOrderCounter(0);
       _setUserDetails();
     } catch (e) {
       print(e);
@@ -125,6 +126,7 @@ class ViewOrderModel with ChangeNotifier {
     order = null;
     session.userDetails.orderOnHold = null;
     session.currentOrder = null;
+    session.broadcastOrderCounter(0);
     _setUserDetails();
   }
 
@@ -136,7 +138,9 @@ class ViewOrderModel with ChangeNotifier {
 
   void deleteOrderItem(int index) {
       order.orderItems.removeAt(index);
+      session.currentOrder = order;
       session.userDetails.orderOnHold = order.toMap();
+      session.broadcastOrderCounter(order.orderItems.length);
       _setUserDetails();
       notifyListeners();
   }

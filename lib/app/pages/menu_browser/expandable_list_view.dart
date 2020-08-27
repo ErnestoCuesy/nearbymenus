@@ -11,11 +11,10 @@ import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
 
 class ExpandableListView extends StatefulWidget {
-  final Function callBack;
   final Map<dynamic, dynamic> menu;
   final Map<dynamic, dynamic> options;
 
-  const ExpandableListView({Key key, this.callBack, this.menu, this.options})
+  const ExpandableListView({Key key, this.menu, this.options})
       : super(key: key);
 
   @override
@@ -69,7 +68,6 @@ class _ExpandableListViewState extends State<ExpandableListView> {
             ),
           );
       }
-      widget.callBack();
     } else {
       _exceptionDialog(
           context,

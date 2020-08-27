@@ -15,17 +15,15 @@ import 'package:nearbymenus/app/utilities/format.dart';
 import 'package:provider/provider.dart';
 
 class ViewOrder extends StatefulWidget {
-  final Function callBack;
   final ViewOrderModel model;
   final GlobalKey<ScaffoldState> scaffoldKey;
 
-  const ViewOrder({Key key, this.callBack, this.model, this.scaffoldKey}) : super(key: key);
+  const ViewOrder({Key key, this.model, this.scaffoldKey}) : super(key: key);
 
   static Widget create({
     BuildContext context,
     GlobalKey<ScaffoldState> scaffoldKey,
     Order order,
-    Function callBack,
   }) {
     final database = Provider.of<Database>(context);
     final session = Provider.of<Session>(context);
@@ -37,7 +35,6 @@ class ViewOrder extends StatefulWidget {
       ),
       child: Consumer<ViewOrderModel>(
         builder: (context, model, _) => ViewOrder(
-          callBack: callBack,
           scaffoldKey: scaffoldKey,
           model: model,
         ),
@@ -96,7 +93,7 @@ class _ViewOrderState extends State<ViewOrder> {
   void _deleteItem(int index) {
     model.deleteOrderItem(index);
     scaffoldKey.currentState.removeCurrentSnackBar();
-    widget.callBack();
+    //widget.callBack();
   }
 
   Future<bool> _confirmCancelOrder(BuildContext context) async {
@@ -137,7 +134,6 @@ class _ViewOrderState extends State<ViewOrder> {
       ),
     );
     Navigator.of(context).pop();
-    widget.callBack();
   }
 
   Widget _buildContents(BuildContext context) {
