@@ -20,6 +20,8 @@ class MenuDetailsModel with RestaurantMenuValidators, ChangeNotifier {
   bool isLoading;
   bool submitted;
 
+  List<int> menuSequences = List<int>();
+
   MenuDetailsModel(
       {@required this.database,
        @required this.session,
@@ -32,7 +34,13 @@ class MenuDetailsModel with RestaurantMenuValidators, ChangeNotifier {
       this.hidden,
       this.isLoading = false,
       this.submitted = false,
-  });
+  }) {
+    restaurant.restaurantMenus.forEach((key, value) {
+      if (sequence != value['sequence']) {
+        menuSequences.add(value['sequence']);
+      }
+    });
+  }
 
   Future<void> save() async {
     updateWith(isLoading: true, submitted: true);
@@ -73,7 +81,7 @@ class MenuDetailsModel with RestaurantMenuValidators, ChangeNotifier {
   String get primaryButtonText => 'Save';
 
   bool get canSave => menuNameValidator.isValid(name) &&
-                      sequenceValidator.isValid(sequence);
+                      sequenceValidator.isValid(sequence, menuSequences);
 
   String get menuNameErrorText {
     bool showErrorText = !menuNameValidator.isValid(name);
@@ -81,7 +89,7 @@ class MenuDetailsModel with RestaurantMenuValidators, ChangeNotifier {
   }
 
   String get sequenceErrorText {
-    bool showErrorText = !sequenceValidator.isValid(sequence);
+    bool showErrorText = !sequenceValidator.isValid(sequence, menuSequences);
     return showErrorText ? invalidSequenceText : null;
   }
 

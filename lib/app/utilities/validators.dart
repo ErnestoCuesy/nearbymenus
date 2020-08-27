@@ -12,6 +12,10 @@ abstract class DoubleNumberValidator {
   bool isValid(double value);
 }
 
+abstract class RangeValidator {
+  bool isValid(int value, List<int> range);
+}
+
 class NonEmptyStringValidator implements StringValidator {
   @override
   bool isValid(String value) {
@@ -41,6 +45,17 @@ class NumericFieldValidator implements NumberValidator{
   @override
   bool isValid(int value) {
     if (value == null || value.isNaN) return false;
+    return true;
+  }
+}
+
+class SequenceFieldValidator implements RangeValidator{
+  @override
+  bool isValid(int value, List<int> range) {
+    if (value == null ||
+        value.isNaN ||
+        value < 1 ||
+        range.contains(value)) return false;
     return true;
   }
 }
@@ -95,19 +110,19 @@ class RestaurantDetailsValidators {
 class RestaurantMenuValidators {
   final StringValidator menuNameValidator = NonEmptyStringValidator();
   final String invalidMenuNameText = 'Menu name can\'t be empty';
-  final NumberValidator sequenceValidator = NumericFieldValidator();
-  final String invalidSequenceText = 'Sequence can\'t be empty and must be greater than zero';
+  final SequenceFieldValidator sequenceValidator = SequenceFieldValidator();
+  final String invalidSequenceText = 'Sequence is not a valid number or is duplicate';
 }
 
 class MenuItemValidators {
   final StringValidator menuItemNameValidator = NonEmptyStringValidator();
   final StringValidator menuItemDescriptionValidator = NonEmptyStringValidator();
   final DoubleNumberValidator menuItemPriceValidator = DoubleNumericFieldValidator();
-  final NumberValidator sequenceValidator = NumericFieldValidator();
+  final SequenceFieldValidator sequenceValidator = SequenceFieldValidator();
   final String invalidMenuItemNameText = 'Menu item name can\'t be empty';
   final String invalidMenuItemDescriptionText = 'Description can\'t be empty';
   final String invalidMenuItemPriceText = 'Price must be a number';
-  final String invalidSequenceText = 'Sequence can\'t be empty and must be greater than zero';
+  final String invalidSequenceText = 'Sequence is not a valid number or it\'s duplicate';
 }
 
 class OptionItemValidators {

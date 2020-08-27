@@ -24,6 +24,7 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
   bool isLoading;
   bool submitted;
 
+  List<int> menuSequences = List<int>();
   Map<dynamic, dynamic> restaurantObjectStagedOptions;
   Map<String, Option> stagedOptions = {};
   Restaurant get restaurant => session.currentRestaurant;
@@ -47,6 +48,18 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
     if (id == null || id == '') {
       id = documentIdFromCurrentDate();
     }
+    restaurant.restaurantMenus.forEach((key, value) {
+      if (key == menu.id) {
+        final Map<String, dynamic> entry = value;
+        entry.forEach((key, value) {
+          if (key.toString().length > 20) {
+            if (sequence != value['sequence']) {
+              menuSequences.add(value['sequence']);
+            }
+          }
+        });
+      }
+    });
   }
   
   Future<void> save() async {
@@ -82,6 +95,7 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
   String get primaryButtonText => 'Save';
 
   bool get canSave => menuItemNameValidator.isValid(name) &&
+      sequenceValidator.isValid(sequence, menuSequences) &&
       menuItemPriceValidator.isValid(price);
 
   String get menuItemNameErrorText {
@@ -100,7 +114,7 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
   }
 
   String get sequenceErrorText {
-    bool showErrorText = !sequenceValidator.isValid(sequence);
+    bool showErrorText = !sequenceValidator.isValid(sequence, menuSequences);
     return showErrorText ? invalidSequenceText : null;
   }
 
@@ -111,7 +125,7 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
       restaurantId: restaurant.id,
       name: name,
       description: description,
-      sequence: sequence,
+      sequence: 99,
       hidden: hidden,
       price: price,
       options: optionIdList,
