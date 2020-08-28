@@ -23,6 +23,11 @@ class RestaurantOptionsPage extends StatefulWidget {
 class _RestaurantOptionsPageState extends State<RestaurantOptionsPage> {
   Session session;
   Database database;
+  List<Restaurant> _restaurantList;
+
+  void _loadRestaurants() async {
+    await database.restaurantSnapshot().then((value) => _restaurantList = value);
+  }
 
   void _expandableMenuBrowserPage(BuildContext context) {
     Navigator.of(context).push(
@@ -186,7 +191,44 @@ class _RestaurantOptionsPageState extends State<RestaurantOptionsPage> {
             ],
           ),
         ),
+      if (FlavourConfig.isAdmin())
+        SizedBox(
+          height: 32.0,
+        ),
+      if (FlavourConfig.isAdmin())
+        _copyRestaurantMenu()
     ];
+  }
+
+  Widget _copyRestaurantMenu() {
+    return PopupMenuButton<Restaurant>(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Icon(Icons.content_copy),
+            Text('Copy menu to another restaurant'),
+          ],
+        ),
+      ),
+      onSelected: (Restaurant selectedRestaurant) {
+        print(selectedRestaurant.name);
+        selectedRestaurant.restaurantMenus = session.currentRestaurant.restaurantMenus;
+        selectedRestaurant.restaurantOptions = session.currentRestaurant.restaurantOptions;
+        database.setRestaurant(selectedRestaurant);
+      },
+      itemBuilder: (BuildContext context) {
+        return _restaurantList.map((Restaurant restaurant) {
+          if (restaurant.id != session.currentRestaurant.id) {
+            return PopupMenuItem<Restaurant>(
+              child: Text(restaurant.name),
+              value: restaurant,
+            );
+          }
+          }).toList();
+        }
+    );
   }
 
   void _deleteRestaurant(BuildContext context) async {
@@ -235,6 +277,7 @@ class _RestaurantOptionsPageState extends State<RestaurantOptionsPage> {
     String roleOptions = ' options';
     if (FlavourConfig.isAdmin()) {
       roleOptions = 'Administrator' + roleOptions;
+      _loadRestaurants();
     } else if (FlavourConfig.isPatron()) {
       roleOptions = 'Patron' + roleOptions;
     } else {

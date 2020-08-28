@@ -29,7 +29,7 @@ class Restaurant {
   final bool allowCancellations;
   final Map<dynamic, dynamic> restaurantFlags;
   final Map<dynamic, dynamic> paymentFlags;
-  final Map<dynamic, dynamic> restaurantMenus;
+  Map<dynamic, dynamic> restaurantMenus;
   final Map<dynamic, dynamic> foodDeliveryFlags;
   Map<dynamic, dynamic> restaurantOptions;
   bool itemImagesInitialized;
