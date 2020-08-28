@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:nearbymenus/app/common_widgets/list_items_builder.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
 import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
+import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/restaurant/restaurant_administrator_page.dart';
@@ -72,6 +73,9 @@ class _RestaurantPageState extends State<RestaurantPage> {
     return StreamBuilder<List<Restaurant>>(
       stream: database.managerRestaurants(database.userId),
       builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: PlatformProgressIndicator());
+        }
         session.userDetails.hasRestaurants = false;
         if (snapshot.hasData && snapshot.data.length > 0) {
           session.userDetails.hasRestaurants = true;
