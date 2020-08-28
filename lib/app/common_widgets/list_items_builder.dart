@@ -32,7 +32,7 @@ class ListItemsBuilder<T> extends StatelessWidget {
       );
     }
     if (snapshot.connectionState == ConnectionState.waiting) {
-      Future.delayed(Duration(seconds: 5));
+      //Future.delayed(Duration(seconds: 5));
       return Center(
         child: EmptyContent(
           title: title,

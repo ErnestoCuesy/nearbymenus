@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/common_widgets/platform_progress_indicator.dart';
 import 'package:nearbymenus/app/models/order.dart';
+import 'package:nearbymenus/app/pages/reports/item_breakdown_report.dart';
 
 class OrderTotalsPage extends StatefulWidget {
   final Stream<List<Order>> stream;
@@ -16,6 +17,8 @@ class OrderTotalsPage extends StatefulWidget {
 class _OrderTotalsPageState extends State<OrderTotalsPage> {
   List<Order> _orderList = List<Order>();
   Map<String, double> _orderTotals = {};
+  Map<String, double> _itemTotals = {};
+  Map<String, double> _paymentMethodTotals = {};
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
 
   void _calculateTotals() {
@@ -28,10 +31,24 @@ class _OrderTotalsPageState extends State<OrderTotalsPage> {
       } else {
         if (order.status == ORDER_CLOSED) {
           _orderTotals.update('closed', (value) => value + order.orderTotal);
+          if (_paymentMethodTotals.containsKey(order.paymentMethod)) {
+            _paymentMethodTotals.update(order.paymentMethod, (value) => value + order.orderTotal);
+          } else {
+            _paymentMethodTotals.putIfAbsent(order.paymentMethod, () => order.orderTotal);
+          }
+          order.orderItems.forEach((item) {
+            if (_itemTotals.containsKey(item['name'])) {
+              _itemTotals.update(item['name'], (value) => value + item['lineTotal']);
+            } else {
+              _itemTotals.putIfAbsent(item['name'], () => item['lineTotal']);
+            }
+          });
         }
       }
     });
     print('Orders totals: $_orderTotals');
+    print('Item totals: $_itemTotals');
+    print('Payment method totals: $_paymentMethodTotals');
   }
 
   @override
@@ -138,7 +155,7 @@ class _OrderTotalsPageState extends State<OrderTotalsPage> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
-                      height: 150,
+                      height: 200,
                       width: 300,
                       child: Card(
                         child: Column(
@@ -154,7 +171,7 @@ class _OrderTotalsPageState extends State<OrderTotalsPage> {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(16.0),
                               child: Text(
                                 '${f.format(_orderTotals['active'] +
                                     _orderTotals['closed'])}',
@@ -163,6 +180,23 @@ class _OrderTotalsPageState extends State<OrderTotalsPage> {
                                     .textTheme
                                     .headline4,
                               ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                IconButton(
+                                  icon: Icon(Icons.format_list_bulleted),
+                                  onPressed: () {
+                                    Navigator.of(context).push(ItemBreakdownReport(_itemTotals));
+                                  },
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.payment),
+                                  onPressed: () {
+                                    Navigator.of(context).push(ItemBreakdownReport(_paymentMethodTotals));
+                                  },
+                                ),
+                              ],
                             ),
                           ],
                         ),
