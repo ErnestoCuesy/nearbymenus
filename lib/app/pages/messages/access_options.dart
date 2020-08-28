@@ -61,11 +61,16 @@ class _AccessOptionsState extends State<AccessOptions> {
         authorizations.authorizedDates
             .putIfAbsent(message.fromUid, () => authorizedIntDates);
       }
+      setState(() {
+        message.authFlag = true;
+      });
    } else {
       authorizations.authorizedRoles.remove(message.fromUid);
       authorizations.authorizedNames.remove(message.fromUid);
       authorizations.authorizedDates.remove(message.fromUid);
-      message.authFlag = false;
+      setState(() {
+        message.authFlag = false;
+      });
     }
     _setDatabaseAuthorization();
   }
