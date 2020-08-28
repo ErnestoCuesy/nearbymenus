@@ -82,11 +82,8 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
         ),
       );
     } else {
-      session.currentOrder = null;
-      if (session.userDetails.orderOnHold != null) {
-        session.userDetails.orderOnHold = null;
-        database.setUserDetails(session.userDetails);
-      }
+      session.userDetails.orderOnHold = null;
+      database.setUserDetails(session.userDetails);
       await PlatformExceptionAlertDialog(
         title: 'Empty Order',
         exception: PlatformException(
@@ -125,6 +122,7 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
     if (session.userDetails.orderOnHold != null && session.userDetails.orderOnHold.length > 0) {
       session.currentOrder = Order.fromMap(session.userDetails.orderOnHold, null);
     }
+    session.broadcastOrderCounter(session.currentOrder.orderItems.length);
   }
 
   @override
