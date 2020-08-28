@@ -44,27 +44,46 @@ class CupertinoHomeScaffold extends StatelessWidget {
             );
           },
         ),
-        if (FlavourConfig.isManager() && session.pendingStaffAuthorizations > 0)
-          Positioned(
-            right: MediaQuery.of(context).size.width / 2 - 35,
-            bottom: 25,
-            child: Container(
-              height: 20.0,
-              width: 20.0,
-              alignment: Alignment.center,
-              margin: EdgeInsets.only(top: 35.0, right: 5.0),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12.0),
-                  color: Colors.red
-              ),
-              child: Text(
-                session.pendingStaffAuthorizations.toString(),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12.0,
-                ),
-              ),
-            ),
+        if (FlavourConfig.isManager())
+          StreamBuilder<int>(
+            stream: session.messageCounterObservable,
+            builder: (context, snapshot) {
+              if (snapshot.hasData && snapshot.data > 0) {
+                return Positioned(
+                  right: MediaQuery
+                      .of(context)
+                      .size
+                      .width / 2 - 35,
+                  bottom: 25,
+                  child: Container(
+                    height: 20.0,
+                    width: 20.0,
+                    alignment: Alignment.center,
+                    margin: EdgeInsets.only(top: 35.0, right: 5.0),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12.0),
+                        color: Colors.red
+                    ),
+                    child: Text(
+                      snapshot.data.toString(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12.0,
+                      ),
+                    ),
+                  ),
+                );
+              } else {
+                return Positioned(
+                  right: MediaQuery
+                      .of(context)
+                      .size
+                      .width / 2 - 35,
+                  bottom: 25,
+                  child: Container(height: 20.0, width: 20.0,),
+                );
+              }
+            }
           ),
       ]
     );

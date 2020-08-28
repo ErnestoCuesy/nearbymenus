@@ -18,7 +18,6 @@ class Session {
   UserDetails userDetails = UserDetails();
   Restaurant currentRestaurant;
   Subscription subscription = Subscription();
-  int pendingStaffAuthorizations;
   Order currentOrder;
   bool isAnonymousUser;
   bool userProcessComplete = false;
@@ -28,6 +27,9 @@ class Session {
 
   BehaviorSubject<int> _subjectOrderCounter = BehaviorSubject<int>.seeded(0);
   Observable<int> get orderCounterObservable => _subjectOrderCounter.stream;
+
+  BehaviorSubject<int> _subjectMessageCounter = BehaviorSubject<int>.seeded(0);
+  Observable<int> get messageCounterObservable => _subjectMessageCounter.stream;
 
   Session({this.position});
 
@@ -60,8 +62,14 @@ class Session {
     _subjectOrderCounter.add(value);
   }
 
+  void broadcastMessageCounter(int value) {
+    print('Counter to broadcast $value');
+    _subjectMessageCounter.add(value);
+  }
+
   void dispose() {
     _subjectAnonymousUserFlag.close();
     _subjectOrderCounter.close();
+    _subjectMessageCounter.close();
   }
 }

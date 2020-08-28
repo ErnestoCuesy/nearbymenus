@@ -64,7 +64,8 @@ class _MessagesListenerState extends State<MessagesListener> {
     return StreamBuilder<List<UserMessage>>(
       stream: _stream,
       builder: (context, snapshot) {
-        session.pendingStaffAuthorizations = 0;
+        session.broadcastMessageCounter(0);
+        int messageCounter = 0;
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
             body: Center(
@@ -79,7 +80,8 @@ class _MessagesListenerState extends State<MessagesListener> {
             if (message.toRole == role && !message.delivered) {
               _notifyUser(message);
               if (message.toRole == ROLE_PATRON ||
-                  message.toRole == ROLE_STAFF) {
+                  message.toRole == ROLE_STAFF  ||
+                  message.toRole == ROLE_ADMIN) {
                 database.deleteMessage(message.id);
               } else {
                 UserMessage readMessage = UserMessage(
@@ -99,9 +101,13 @@ class _MessagesListenerState extends State<MessagesListener> {
                 database.setMessageDetails(readMessage);
               }
             }
-            if (message.attendedFlag == false &&
-                message.toRole == ROLE_MANAGER) {
-              session.pendingStaffAuthorizations++;
+            if (message.toRole == ROLE_MANAGER) {
+              if (!message.attendedFlag) {
+                messageCounter++;
+              } else {
+                messageCounter--;
+              }
+              session.broadcastMessageCounter(messageCounter);
             }
           });
         }

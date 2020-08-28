@@ -75,7 +75,7 @@ class _MessagesPageState extends State<MessagesPage> {
                   margin: EdgeInsets.all(12.0),
                   child: ListTile(
                     isThreeLine: true,
-                    leading: Icon(Icons.message),
+                    leading: message.fromRole == ROLE_STAFF ? Icon(Icons.accessibility) : Icon(Icons.message),
                     title: Padding(
                       padding: const EdgeInsets.only(top: 4.0, bottom: 8.0),
                       child: Column(
@@ -93,14 +93,14 @@ class _MessagesPageState extends State<MessagesPage> {
                             padding:
                                 const EdgeInsets.only(top: 4.0, bottom: 4.0),
                             child: Text(
-                              'Requested by: ${message.fromName}',
+                              message.fromRole == ROLE_ADMIN ? 'Sent by Admin' : 'Requested by: ${message.fromName}',
                             ),
                           ),
                           Padding(
                             padding:
                                 const EdgeInsets.only(top: 4.0, bottom: 4.0),
                             child: Text(
-                              message.fromRole == ROLE_ADMIN ? 'Tap to acknowledge' : 'Tap for options',
+                              message.fromRole == ROLE_ADMIN ? '-' : 'Tap for options',
                             ),
                           ),
                           Text(
@@ -142,8 +142,6 @@ class _MessagesPageState extends State<MessagesPage> {
 
   void _convertUser(BuildContext context, UserMessage message, Function(BuildContext, UserMessage) nextAction) async {
     if (message.fromRole == ROLE_ADMIN) {
-      message.attendedFlag = true;
-      database.setMessageDetails(message);
       return;
     }
     if (!session.userProcessComplete) {

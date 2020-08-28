@@ -109,9 +109,6 @@ class _AccessOptionsState extends State<AccessOptions> {
         attendedFlag: true
     );
     database.setMessageDetails(readMessage);
-    setState(() {
-      session.pendingStaffAuthorizations--;
-    });
   }
 
   List<Widget> _buildContents(BuildContext context) {
