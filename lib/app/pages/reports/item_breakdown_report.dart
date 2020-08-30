@@ -3,18 +3,24 @@ import 'package:intl/intl.dart';
 
 class SubcategoryTotal {
   final String categoryName;
+  final int quantity;
   final double amount;
 
-  SubcategoryTotal(this.categoryName, this.amount);
+  SubcategoryTotal({this.categoryName, this.quantity, this.amount});
 }
 
 class ItemBreakdownReport extends ModalRoute<void> {
-  final Map<String, dynamic> items;
+  final Map<String, dynamic> amounts;
+  final Map<String, dynamic> quantities;
   List<SubcategoryTotal> subcategoryTotals = List<SubcategoryTotal>();
 
-  ItemBreakdownReport(this.items) {
-    items.forEach((key, value) {
-      subcategoryTotals.add(SubcategoryTotal(key, value));
+  ItemBreakdownReport({this.amounts, this.quantities}) {
+    amounts.forEach((key, value) {
+      subcategoryTotals.add(SubcategoryTotal(
+          categoryName: key,
+          quantity: quantities[key],
+          amount: value,
+      ));
     });
   }
 
@@ -52,14 +58,14 @@ class ItemBreakdownReport extends ModalRoute<void> {
     return Center(
       child: Container(
         color: Colors.grey[50],
-        height: height - 100,
-        width: width - 100,
+        height: height - 80,
+        width: width - 80,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               height: height - 200,
-              width: width - 150,
+              width: width - 100,
               child: _itemsList(),
             ),
             Padding(
@@ -83,6 +89,7 @@ class ItemBreakdownReport extends ModalRoute<void> {
         itemBuilder: (BuildContext context, int index) {
           return ListTile(
             isThreeLine: false,
+            leading: Text(subcategoryTotals[index].quantity.toString()),
             title: Text(
                 subcategoryTotals[index].categoryName
             ),
