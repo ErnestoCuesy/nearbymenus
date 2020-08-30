@@ -45,15 +45,17 @@ class ViewOrderModel with ChangeNotifier {
   }
 
   Future<void> _submitOrder() async {
+    final double timestamp = dateFromCurrentDate() / 1.0;
+    var orderNumber = documentIdFromCurrentDate();
     try {
-      order.id = documentIdFromCurrentDate();
-      order.timestamp = dateFromCurrentDate() / 1.0;
+      order.id = orderNumber;
+      order.timestamp = timestamp;
       order.deliveryPosition = session.position;
       order.status = ORDER_PLACED;
       database.setOrderTransaction(session.currentRestaurant.managerId,
           session.currentRestaurant.id,
           order);
-      session.currentOrder = null;
+      session.currentOrder = session.emptyOrder(orderNumber, timestamp, database.userId);
       session.userDetails.orderOnHold = null;
       session.broadcastOrderCounter(0);
       _setUserDetails();
@@ -159,8 +161,6 @@ class ViewOrderModel with ChangeNotifier {
       if (order.deliveryOption != '') {
         deliveryOptionsOk = true;
       }
-    } else {
-      deliveryOptionsOk = true;
     }
     return order.paymentMethod != '' &&
            deliveryOptionsOk &&

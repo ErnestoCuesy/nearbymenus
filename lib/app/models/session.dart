@@ -72,4 +72,24 @@ class Session {
     _subjectOrderCounter.close();
     _subjectMessageCounter.close();
   }
+
+  Order emptyOrder(String orderNumber, double timestamp, String userId) {
+    return Order(
+        id: orderNumber,
+        restaurantId: currentRestaurant.id,
+        restaurantName: currentRestaurant.name,
+        managerId: currentRestaurant.managerId,
+        userId: userId,
+        timestamp: timestamp,
+        status: ORDER_ON_HOLD,
+        name: userDetails.name,
+        deliveryAddress: '${userDetails.address1} ${userDetails.address2} ${userDetails.address3} ${userDetails.address4}',
+        telephone: userDetails.telephone,
+        deliveryPosition: position,
+        paymentMethod: '',
+        deliveryOption: '',
+        orderItems: List<Map<dynamic, dynamic>>(),
+        notes: ''
+    );
+  }
 }
