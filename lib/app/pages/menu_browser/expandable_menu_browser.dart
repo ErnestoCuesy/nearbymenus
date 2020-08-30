@@ -101,22 +101,7 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
     final double timestamp = dateFromCurrentDate() / 1.0;
     var orderNumber = documentIdFromCurrentDate();
     if (session.currentOrder == null) {
-      session.currentOrder = Order(
-          id: orderNumber,
-          restaurantId: session.currentRestaurant.id,
-          restaurantName: session.currentRestaurant.name,
-          managerId: session.currentRestaurant.managerId,
-          userId: database.userId,
-          timestamp: timestamp,
-          status: ORDER_ON_HOLD,
-          name: session.userDetails.name,
-          deliveryAddress: '${session.userDetails.address1} ${session.userDetails.address2} ${session.userDetails.address3} ${session.userDetails.address4}',
-          telephone: session.userDetails.telephone,
-          deliveryPosition: session.position,
-          paymentMethod: '',
-          orderItems: List<Map<dynamic, dynamic>>(),
-          notes: ''
-      );
+      session.currentOrder = session.emptyOrder(orderNumber, timestamp, database.userId);
     }
     session.currentOrder.userId = database.userId;
     if (session.userDetails.orderOnHold != null && session.userDetails.orderOnHold.length > 0) {
