@@ -28,6 +28,8 @@ class Order {
   String deliveryOption;
   List<Map<dynamic, dynamic>> orderItems;
   String notes;
+  double tip;
+  double discount;
   bool isActive;
   bool isBlocked;
 
@@ -48,6 +50,8 @@ class Order {
     this.deliveryOption,
     this.orderItems,
     this.notes,
+    this.tip,
+    this.discount,
     this.isActive,
     this.isBlocked,
   });
@@ -81,6 +85,8 @@ class Order {
       deliveryOption: data['deliveryOption'],
       orderItems: orderItems,
       notes: data['notes'],
+      tip: data['tip'],
+      discount: data['discount'],
       isActive: data['isActive'],
       isBlocked: data['isBlocked'],
     );
@@ -93,6 +99,10 @@ class Order {
       total += item['lineTotal'];
     });
     return total;
+  }
+
+  double get netTotal {
+    return (orderTotal - (orderTotal * discount)) + tip;
   }
 
   Map<String, dynamic> toMap() {
@@ -116,6 +126,8 @@ class Order {
       'deliveryOption': deliveryOption ?? '',
       'orderItems': orderItems ?? [],
       'notes': notes,
+      'tip': tip,
+      'discount': discount,
       'isActive': activeFlag,
       'isBlocked': isBlocked ?? false,
     };
@@ -157,7 +169,7 @@ class Order {
 
   @override
   String toString() {
-    return 'id: $id, orderNumber: $orderNumber, restaurantId: $restaurantId, restaurantName: $restaurantName, managerId: $managerId, userId: $userId, timestamp: $timestamp, status: $status, name: $name, deliveryAddress: $deliveryAddress, telephone: $telephone, paymentMethod: $paymentMethod, deliveryOption: $deliveryOption, orderItems: $orderItems, notes: $notes, isBlocked: $isBlocked';
+    return 'id: $id, orderNumber: $orderNumber, restaurantId: $restaurantId, restaurantName: $restaurantName, managerId: $managerId, userId: $userId, timestamp: $timestamp, status: $status, name: $name, deliveryAddress: $deliveryAddress, telephone: $telephone, paymentMethod: $paymentMethod, deliveryOption: $deliveryOption, orderItems: $orderItems, notes: $notes, tip: $tip, disount: $discount, isBlocked: $isBlocked';
   }
 
 }

@@ -89,7 +89,9 @@ class Session {
         paymentMethod: '',
         deliveryOption: '',
         orderItems: List<Map<dynamic, dynamic>>(),
-        notes: ''
+        notes: '',
+        tip: 0.0,
+        discount: 0.0,
     );
   }
 }

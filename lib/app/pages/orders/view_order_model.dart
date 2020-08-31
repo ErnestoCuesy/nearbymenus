@@ -237,6 +237,10 @@ class ViewOrderModel with ChangeNotifier {
     return proceed;
   }
 
+  void updateTip(double tip) => order.tip = tip;
+
+  void updateDiscount(double discount) => order.discount = discount;
+
   void updateWith({
     String notes,
     String paymentMethod,

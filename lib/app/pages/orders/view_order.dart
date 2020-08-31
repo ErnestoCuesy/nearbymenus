@@ -9,6 +9,7 @@ import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/map/map_route.dart';
+import 'package:nearbymenus/app/pages/orders/order_extra_amounts.dart';
 import 'package:nearbymenus/app/pages/orders/view_order_model.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/utilities/format.dart';
@@ -122,6 +123,28 @@ class _ViewOrderState extends State<ViewOrder> {
     }
   }
 
+  void _captureExtras(BuildContext context) async {
+    ExtraFields extraFields = ExtraFields();
+    await Navigator.of(context).push(
+        MaterialPageRoute<ExtraFields>(
+            fullscreenDialog: true,
+            builder: (context) => OrderExtraAmounts(
+              orderAmount: model.order.orderTotal,
+              extraFields: ExtraFields(
+                  tip: model.order.tip,
+                  discount: model.order.discount
+              ),
+            )
+        )
+    ).then((value) {
+      extraFields = value;
+    });
+    if (extraFields != null) {
+      model.updateTip(extraFields.tip ?? 0);
+      model.updateDiscount(extraFields.discount ?? 0);
+    }
+  }
+
   void _save(BuildContext context) {
     model.save();
     scaffoldKey.currentState
@@ -143,6 +166,8 @@ class _ViewOrderState extends State<ViewOrder> {
     session.currentRestaurant.foodDeliveryFlags.forEach((key, value) {
       if (value) deliveryOptionsAvailable++;
     });
+    final discount = model.order.orderTotal * model.order.discount;
+    final orderTotal = model.order.orderTotal - discount + model.order.tip;
     return SingleChildScrollView(
       controller: orderScrollController,
       child: Padding(
@@ -254,7 +279,30 @@ class _ViewOrderState extends State<ViewOrder> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      'Total: ' + f.format(model.order.orderTotal),
+                      'Subtotal: ' + f.format(model.order.orderTotal),
+                      style: Theme.of(context).textTheme.headline5,
+                    ),
+                  ),
+                  if (model.order.discount > 0)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Discount: ' + f.format(discount),
+                      style: Theme.of(context).textTheme.headline5,
+                    ),
+                  ),
+                  if (model.order.tip > 0)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Tip: ' + f.format(model.order.tip),
+                      style: Theme.of(context).textTheme.headline5,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Total: ' + f.format(orderTotal),
                       style: Theme.of(context).textTheme.headline4,
                     ),
                   ),
@@ -288,6 +336,13 @@ class _ViewOrderState extends State<ViewOrder> {
                     ),
                   ),
                   _notesField(context, model.order.notes),
+                  if (model.order.status == ORDER_ON_HOLD)
+                    FormSubmitButton(
+                      context: context,
+                      text: FlavourConfig.isPatron() ? 'Add Tip' : 'Tips and Discounts',
+                      color: Theme.of(context).primaryColor,
+                      onPressed: () => _captureExtras(context),
+                    ),
                   if (model.order.status == ORDER_ON_HOLD)
                   Padding(
                     padding: const EdgeInsets.all(16.0),
