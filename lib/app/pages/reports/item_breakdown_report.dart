@@ -87,9 +87,12 @@ class ItemBreakdownReport extends ModalRoute<void> {
     return ListView.builder(
         itemCount: subcategoryTotals.length,
         itemBuilder: (BuildContext context, int index) {
+          final quantity = subcategoryTotals[index].quantity > 0
+              ? subcategoryTotals[index].quantity.toString()
+              : '';
           return ListTile(
             isThreeLine: false,
-            leading: Text(subcategoryTotals[index].quantity.toString()),
+            leading: Text(quantity),
             title: Text(
                 subcategoryTotals[index].categoryName
             ),

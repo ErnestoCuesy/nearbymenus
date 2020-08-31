@@ -19,6 +19,7 @@ class _OrderTotalsPageState extends State<OrderTotalsPage> {
   Map<String, double> _orderTotals = {};
   Map<String, int> _paymentMethodQuantityTotals = {};
   Map<String, double> _paymentMethodAmountTotals = {};
+  Map<String, double> _tipsAndDiscountsAmountTotals = {};
   Map<String, dynamic> _itemizedSubTotalPerStatus = {};
   Map<String, dynamic> _itemizedQuantityPerStatus = {};
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
@@ -41,11 +42,14 @@ class _OrderTotalsPageState extends State<OrderTotalsPage> {
     _itemizedSubTotalPerStatus.clear();
     _paymentMethodQuantityTotals.clear();
     _paymentMethodAmountTotals.clear();
+    _tipsAndDiscountsAmountTotals.clear();
     for (String status in ['Pending', 'Cancelled', 'Rejected', 'Active', 'Closed']) {
       _orderTotals.putIfAbsent(status, () => 0.00);
       _itemizedSubTotalPerStatus.putIfAbsent(status, () => Map<String, dynamic>());
       _itemizedQuantityPerStatus.putIfAbsent(status, () => Map<String, dynamic>());
     }
+    _tipsAndDiscountsAmountTotals.putIfAbsent('tips', () => 0);
+    _tipsAndDiscountsAmountTotals.putIfAbsent('discounts', () => 0);
     _orderList.forEach((order) {
       if (order.status == ORDER_PLACED) {
         _orderTotals.update('Pending', (value) => value + order.orderTotal);
@@ -61,21 +65,24 @@ class _OrderTotalsPageState extends State<OrderTotalsPage> {
         _updateSubTotalPerStatus(order, 'Cancelled');
       } else {
         if (order.status == ORDER_CLOSED) {
-          _orderTotals.update('Closed', (value) => value + order.orderTotal);
+          final total = order.orderTotal - (order.orderTotal * order.discount) + order.tip;
+          _orderTotals.update('Closed', (value) => value + total);
           _updateSubTotalPerStatus(order, 'Closed');
           if (_paymentMethodAmountTotals.containsKey(order.paymentMethod)) {
             _paymentMethodQuantityTotals.update(order.paymentMethod, (value) => value + 1);
-            _paymentMethodAmountTotals.update(order.paymentMethod, (value) => value + order.orderTotal);
+            _paymentMethodAmountTotals.update(order.paymentMethod, (value) => value + total);
           } else {
             _paymentMethodQuantityTotals.putIfAbsent(order.paymentMethod, () => 1);
-            _paymentMethodAmountTotals.putIfAbsent(order.paymentMethod, () => order.orderTotal);
+            _paymentMethodAmountTotals.putIfAbsent(order.paymentMethod, () => total);
           }
+          _tipsAndDiscountsAmountTotals.update('tips', (value) => value + order.tip);
+          _tipsAndDiscountsAmountTotals.update('discounts', (value) => value + (order.orderTotal * order.discount));
         }
       }
     });
   }
 
-  Widget _totalCard(BuildContext context, String totalName, bool withPaymentMethod) {
+  Widget _totalCard(BuildContext context, String totalName, bool withPaymentMethod, bool withTipsAndDiscounts) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
@@ -126,6 +133,16 @@ class _OrderTotalsPageState extends State<OrderTotalsPage> {
                       ));
                     },
                   ),
+                  if (withTipsAndDiscounts)
+                    IconButton(
+                      icon: Icon(Icons.monetization_on),
+                      onPressed: () {
+                        Navigator.of(context).push(ItemBreakdownReport(
+                          amounts: _tipsAndDiscountsAmountTotals,
+                          quantities: {'tips': 0, 'discounts': 0},
+                        ));
+                      },
+                    ),
                 ],
               ),
             ],
@@ -170,11 +187,11 @@ class _OrderTotalsPageState extends State<OrderTotalsPage> {
                           .headline5,
                     ),
                   ),
-                  _totalCard(context, 'Closed', true),
-                  _totalCard(context, 'Active', false),
-                  _totalCard(context, 'Pending', false),
-                  _totalCard(context, 'Cancelled', false),
-                  _totalCard(context, 'Rejected', false),
+                  _totalCard(context, 'Closed', true, true),
+                  _totalCard(context, 'Active', false, false),
+                  _totalCard(context, 'Pending', false, false),
+                  _totalCard(context, 'Cancelled', false, false),
+                  _totalCard(context, 'Rejected', false, false),
                 ],
               ),
             ),

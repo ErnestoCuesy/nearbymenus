@@ -71,6 +71,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
     return StreamBuilder<List<Restaurant>>(
       stream: database.managerRestaurants(database.userId),
       builder: (context, snapshot) {
+        final restaurantList = snapshot.data;
         session.userDetails.hasRestaurants = false;
         if (snapshot.hasData && snapshot.data.length > 0) {
           session.userDetails.hasRestaurants = true;
@@ -140,7 +141,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (BuildContext context) =>
-                              RestaurantAdministratorPage(),
+                              RestaurantAdministratorPage(restaurantList: restaurantList,),
                         ),
                       );
                     },

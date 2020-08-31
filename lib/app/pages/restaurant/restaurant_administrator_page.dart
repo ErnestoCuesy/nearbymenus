@@ -17,6 +17,9 @@ import 'package:nearbymenus/app/services/navigation_service.dart';
 import 'package:provider/provider.dart';
 
 class RestaurantAdministratorPage extends StatefulWidget {
+  final List<Restaurant> restaurantList;
+
+  const RestaurantAdministratorPage({Key key, this.restaurantList}) : super(key: key);
 
   @override
   _RestaurantAdministratorPageState createState() =>
@@ -33,14 +36,183 @@ class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPag
 
   List<Widget> _buildContents(BuildContext context) {
     return [
-      Text(
-        restaurant.name,
-        style: Theme.of(context).accentTextTheme.headline4
-      ),
+        Text(
+          restaurant.name,
+          style: Theme.of(context).accentTextTheme.headline4
+        ),
+        SizedBox(
+          height: 32.0,
+        ),
+        if (FlavourConfig.isManager())
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CustomRaisedButton(
+              height: buttonSize,
+              width: buttonSize,
+              color: Theme.of(context).buttonTheme.colorScheme.surface,
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (BuildContext context) => MenuPage(),
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Menu Builder',
+                    style: Theme.of(context).accentTextTheme.headline6,
+                  ),
+                  SizedBox(height: 8.0,),
+                  Icon(
+                    Icons.format_list_bulleted,
+                    size: 36.0,
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              width: 16.0,
+            ),
+            CustomRaisedButton(
+              height: buttonSize,
+              width: buttonSize,
+              color: Theme.of(context).buttonTheme.colorScheme.surface,
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (BuildContext context) => OptionPage(),
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Option Builder',
+                    style: Theme.of(context).accentTextTheme.headline6,
+                  ),
+                  SizedBox(height: 8.0,),
+                  Icon(
+                    Icons.check_box,
+                    size: 36.0,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        if (FlavourConfig.isManager())
+        SizedBox(
+          height: 16.0,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (session.userDetails.role != ROLE_VENUE)
+            CustomRaisedButton(
+              height: buttonSize,
+              width: buttonSize,
+              color: Theme.of(context).buttonTheme.colorScheme.surface,
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (BuildContext context) => ExpandableMenuBrowser(),
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Menu Browser',
+                    style: Theme.of(context).accentTextTheme.headline6,
+                  ),
+                  SizedBox(height: 8.0,),
+                  Icon(
+                    Icons.import_contacts,
+                    size: 36.0,
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              width: 16.0,
+            ),
+            if (FlavourConfig.isManager())
+            CustomRaisedButton(
+              height: buttonSize,
+              width: buttonSize,
+              color: Theme.of(context).buttonTheme.colorScheme.surface,
+              onPressed: () => _convertUser(context, _images),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Images',
+                    style: Theme.of(context).accentTextTheme.headline6,
+                  ),
+                  SizedBox(height: 8.0,),
+                  Icon(
+                    Icons.image,
+                    size: 36.0,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 16.0,
+        ),
+        if (FlavourConfig.isManager() || session.userDetails.role == ROLE_STAFF)
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CustomRaisedButton(
+              height: buttonSize,
+              width: buttonSize,
+              color: Theme.of(context).buttonTheme.colorScheme.surface,
+              onPressed: () => _convertUser(context, _activeOrders),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Active Orders',
+                    style: Theme.of(context).accentTextTheme.headline6,
+                  ),
+                  SizedBox(height: 8.0,),
+                  Icon(
+                    Icons.assignment,
+                    size: 36.0,
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              width: 16.0,
+            ),
+            CustomRaisedButton(
+              height: buttonSize,
+              width: buttonSize,
+              color: Theme.of(context).buttonTheme.colorScheme.surface,
+              onPressed: () => _convertUser(context, _inactiveOrders),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Inactive Orders',
+                    style: Theme.of(context).accentTextTheme.headline6,
+                  ),
+                  SizedBox(height: 8.0,),
+                  Icon(
+                    Icons.assignment,
+                    size: 36.0,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       SizedBox(
-        height: 32.0,
+      height: 16.0,
       ),
-      if (FlavourConfig.isManager())
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -48,194 +220,57 @@ class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPag
             height: buttonSize,
             width: buttonSize,
             color: Theme.of(context).buttonTheme.colorScheme.surface,
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (BuildContext context) => MenuPage(),
-              ),
-            ),
+            onPressed: () => _convertUser(context, _orderTotals),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Menu Builder',
+                  'Sales',
                   style: Theme.of(context).accentTextTheme.headline6,
                 ),
                 SizedBox(height: 8.0,),
                 Icon(
-                  Icons.format_list_bulleted,
+                  Icons.attach_money,
                   size: 36.0,
                 ),
               ],
             ),
           ),
-          SizedBox(
-            width: 16.0,
-          ),
-          CustomRaisedButton(
-            height: buttonSize,
-            width: buttonSize,
-            color: Theme.of(context).buttonTheme.colorScheme.surface,
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (BuildContext context) => OptionPage(),
-              ),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Option Builder',
-                  style: Theme.of(context).accentTextTheme.headline6,
-                ),
-                SizedBox(height: 8.0,),
-                Icon(
-                  Icons.check_box,
-                  size: 36.0,
-                ),
-              ],
-            ),
-          ),
-        ],
+        ]
       ),
-      if (FlavourConfig.isManager())
-      SizedBox(
-        height: 16.0,
-      ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (session.userDetails.role != ROLE_VENUE)
-          CustomRaisedButton(
-            height: buttonSize,
-            width: buttonSize,
-            color: Theme.of(context).buttonTheme.colorScheme.surface,
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (BuildContext context) => ExpandableMenuBrowser(),
-              ),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Menu Browser',
-                  style: Theme.of(context).accentTextTheme.headline6,
-                ),
-                SizedBox(height: 8.0,),
-                Icon(
-                  Icons.import_contacts,
-                  size: 36.0,
-                ),
-              ],
-            ),
-          ),
-          SizedBox(
-            width: 16.0,
-          ),
-          if (FlavourConfig.isManager())
-          CustomRaisedButton(
-            height: buttonSize,
-            width: buttonSize,
-            color: Theme.of(context).buttonTheme.colorScheme.surface,
-            onPressed: () => _convertUser(context, _images),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Images',
-                  style: Theme.of(context).accentTextTheme.headline6,
-                ),
-                SizedBox(height: 8.0,),
-                Icon(
-                  Icons.image,
-                  size: 36.0,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      SizedBox(
-        height: 16.0,
-      ),
-      if (FlavourConfig.isManager() || session.userDetails.role == ROLE_STAFF)
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CustomRaisedButton(
-            height: buttonSize,
-            width: buttonSize,
-            color: Theme.of(context).buttonTheme.colorScheme.surface,
-            onPressed: () => _convertUser(context, _activeOrders),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Active Orders',
-                  style: Theme.of(context).accentTextTheme.headline6,
-                ),
-                SizedBox(height: 8.0,),
-                Icon(
-                  Icons.assignment,
-                  size: 36.0,
-                ),
-              ],
-            ),
-          ),
-          SizedBox(
-            width: 16.0,
-          ),
-          CustomRaisedButton(
-            height: buttonSize,
-            width: buttonSize,
-            color: Theme.of(context).buttonTheme.colorScheme.surface,
-            onPressed: () => _convertUser(context, _inactiveOrders),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Inactive Orders',
-                  style: Theme.of(context).accentTextTheme.headline6,
-                ),
-                SizedBox(height: 8.0,),
-                Icon(
-                  Icons.assignment,
-                  size: 36.0,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    SizedBox(
-    height: 16.0,
-    ),
-    Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        CustomRaisedButton(
-          height: buttonSize,
-          width: buttonSize,
-          color: Theme.of(context).buttonTheme.colorScheme.surface,
-          onPressed: () => _convertUser(context, _orderTotals),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+        _copyRestaurantMenu(),
+    ];
+  }
+
+  Widget _copyRestaurantMenu() {
+    return PopupMenuButton<Restaurant>(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text(
-                'Sales',
-                style: Theme.of(context).accentTextTheme.headline6,
-              ),
-              SizedBox(height: 8.0,),
-              Icon(
-                Icons.attach_money,
-                size: 36.0,
-              ),
+              Icon(Icons.content_copy),
+              Text('Copy menu to another restaurant'),
             ],
           ),
         ),
-      ]
-    )
-    ];
+        onSelected: (Restaurant selectedRestaurant) {
+          print(selectedRestaurant.name);
+          selectedRestaurant.restaurantMenus = session.currentRestaurant.restaurantMenus;
+          selectedRestaurant.restaurantOptions = session.currentRestaurant.restaurantOptions;
+          database.setRestaurant(selectedRestaurant);
+        },
+        itemBuilder: (BuildContext context) {
+          return widget.restaurantList.map((Restaurant restaurant) {
+            if (restaurant.id != session.currentRestaurant.id) {
+              return PopupMenuItem<Restaurant>(
+                child: Text(restaurant.name),
+                value: restaurant,
+              );
+            }
+          }).toList();
+        }
+    );
   }
 
   void _images(BuildContext context) {
