@@ -95,7 +95,7 @@ class _OrderHistoryState extends State<OrderHistory> {
                 ),
               ),
               trailing: Text(
-                f.format(order.orderTotal),
+                f.format(order.orderTotal - (order.orderTotal * order.discount) + order.tip),
                 style: Theme.of(context).textTheme.headline6,
               ),
               //onTap: role != ROLE_PATRON && order.isBlocked ? null : () => _viewOrder(context, order),

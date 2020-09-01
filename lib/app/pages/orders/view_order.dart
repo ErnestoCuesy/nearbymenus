@@ -129,6 +129,7 @@ class _ViewOrderState extends State<ViewOrder> {
         MaterialPageRoute<ExtraFields>(
             fullscreenDialog: true,
             builder: (context) => OrderExtraAmounts(
+              orderStatus: model.order.status,
               orderAmount: model.order.orderTotal,
               extraFields: ExtraFields(
                   tip: model.order.tip,
@@ -336,7 +337,7 @@ class _ViewOrderState extends State<ViewOrder> {
                     ),
                   ),
                   _notesField(context, model.order.notes),
-                  if (model.order.status == ORDER_ON_HOLD)
+                  if (model.order.status < 10)
                     FormSubmitButton(
                       context: context,
                       text: FlavourConfig.isPatron() ? 'Add Tip' : 'Tips and Discounts',

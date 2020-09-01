@@ -51,21 +51,21 @@ class _OrderTotalsPageState extends State<OrderTotalsPage> {
     _tipsAndDiscountsAmountTotals.putIfAbsent('tips', () => 0);
     _tipsAndDiscountsAmountTotals.putIfAbsent('discounts', () => 0);
     _orderList.forEach((order) {
+      final total = order.orderTotal - (order.orderTotal * order.discount) + order.tip;
       if (order.status == ORDER_PLACED) {
-        _orderTotals.update('Pending', (value) => value + order.orderTotal);
+        _orderTotals.update('Pending', (value) => value + total);
         _updateSubTotalPerStatus(order, 'Pending');
       } else if (order.status > ORDER_PLACED && order.status < 10) {
-        _orderTotals.update('Active', (value) => value + order.orderTotal);
+        _orderTotals.update('Active', (value) => value + total);
         _updateSubTotalPerStatus(order, 'Active');
       } else if (order.status == ORDER_REJECTED_BUSY || order.status == ORDER_REJECTED_STOCK) {
-        _orderTotals.update('Rejected', (value) => value + order.orderTotal);
+        _orderTotals.update('Rejected', (value) => value + total);
         _updateSubTotalPerStatus(order, 'Rejected');
       } else if (order.status == ORDER_CANCELLED) {
-        _orderTotals.update('Cancelled', (value) => value + order.orderTotal);
+        _orderTotals.update('Cancelled', (value) => value + total);
         _updateSubTotalPerStatus(order, 'Cancelled');
       } else {
         if (order.status == ORDER_CLOSED) {
-          final total = order.orderTotal - (order.orderTotal * order.discount) + order.tip;
           _orderTotals.update('Closed', (value) => value + total);
           _updateSubTotalPerStatus(order, 'Closed');
           if (_paymentMethodAmountTotals.containsKey(order.paymentMethod)) {

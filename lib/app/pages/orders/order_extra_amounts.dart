@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
+import 'package:nearbymenus/app/models/order.dart';
 
 class ExtraFields {
   double tip;
@@ -10,10 +11,11 @@ class ExtraFields {
 }
 
 class OrderExtraAmounts extends StatefulWidget {
+  final int orderStatus;
   final double orderAmount;
   final ExtraFields extraFields;
 
-  const OrderExtraAmounts({Key key, this.orderAmount, this.extraFields}) : super(key: key);
+  const OrderExtraAmounts({Key key, this.orderStatus, this.orderAmount, this.extraFields}) : super(key: key);
 
   @override
   _OrderExtraAmountsState createState() => _OrderExtraAmountsState();
@@ -62,7 +64,7 @@ class _OrderExtraAmountsState extends State<OrderExtraAmounts> {
       focusNode: _tipFocusNode,
       cursorColor: Colors.black,
       decoration: InputDecoration(
-        labelText: 'Tip in ${f.currencySymbol}',
+        labelText: 'Tip amount in ${f.currencySymbol}',
         hintText: 'i.e.: 5.00, 10.99',
         errorText: '',
         enabled: true,
@@ -87,7 +89,7 @@ class _OrderExtraAmountsState extends State<OrderExtraAmounts> {
       focusNode: _discountFocusNode,
       cursorColor: Colors.black,
       decoration: InputDecoration(
-        labelText: 'Discount in %',
+        labelText: 'Discount percentage (%)',
         hintText: 'i.e.: 5, 10, 20',
         errorText: '',
         enabled: true,
@@ -113,7 +115,9 @@ class _OrderExtraAmountsState extends State<OrderExtraAmounts> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Extra amounts'),
+        title: Text(
+            FlavourConfig.isPatron() ? 'Add tip' : 'Add tip and discount',
+        ),
       ),
       body: Center(
         child: Padding(
@@ -138,6 +142,7 @@ class _OrderExtraAmountsState extends State<OrderExtraAmounts> {
                           ),
                           if (!FlavourConfig.isPatron())
                             _buildDiscountTextField(context),
+                          if (widget.orderStatus == ORDER_ON_HOLD)
                           _buildTipTextField(context),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -152,7 +157,7 @@ class _OrderExtraAmountsState extends State<OrderExtraAmounts> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: FloatingActionButton(
                     backgroundColor: Theme.of(context).backgroundColor,
                     child: Icon(Icons.save),
