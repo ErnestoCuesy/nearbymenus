@@ -238,6 +238,7 @@ class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPag
           ),
         ]
       ),
+      if (FlavourConfig.isManager())
         _copyRestaurantMenu(),
     ];
   }
