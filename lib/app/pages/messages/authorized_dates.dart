@@ -12,21 +12,42 @@ class AuthorizedDates extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var startDate = DateUtils.getFirstDayOfCurrentMonth();
-    var endDate = DateUtils.getLastDayOfCurrentMonth();
+    var currentMonthStartDate = DateUtils.getFirstDayOfCurrentMonth();
+    var currentMonthEndDate = DateUtils.getLastDayOfCurrentMonth();
+    var lastMonthStartDate = DateUtils.getFirstDayOfMonth(
+        DateTime(
+          currentMonthStartDate.year,
+          currentMonthStartDate.month - 1,
+          currentMonthStartDate.day,
+        ));
+    var lastMonthEndDate = DateUtils.getLastDayOfMonth(
+        DateTime(
+          currentMonthStartDate.year,
+          currentMonthStartDate.month - 1,
+          currentMonthStartDate.day,
+        ));
     final DateFormat monthName = DateFormat(DateFormat.MONTH);
-    final month = monthName.format(startDate);
+    final currentMonthName = monthName.format(currentMonthStartDate);
+    final lastMonthName = monthName.format(lastMonthStartDate);
     List<DateTime> selectedDates = List<DateTime>();
     authorizedIntDates.forEach((intDate) {
       selectedDates.add(DateTime.fromMillisecondsSinceEpoch(intDate));
     });
-    Calendarro monthCalendarro = Calendarro(
-        startDate: startDate,
-        endDate: endDate,
+    Calendarro currentMonth = Calendarro(
+        startDate: currentMonthStartDate,
+        endDate: currentMonthEndDate,
         displayMode: DisplayMode.MONTHS,
         selectionMode: SelectionMode.MULTI,
         selectedDates: selectedDates,
         weekdayLabelsRow: CustomWeekdayLabelsRow(),
+    );
+    Calendarro lastMonth = Calendarro(
+      startDate: lastMonthStartDate,
+      endDate: lastMonthEndDate,
+      displayMode: DisplayMode.MONTHS,
+      selectionMode: SelectionMode.MULTI,
+      selectedDates: selectedDates,
+      weekdayLabelsRow: CustomWeekdayLabelsRow(),
     );
     return new Scaffold(
       appBar: new AppBar(
@@ -35,12 +56,17 @@ class AuthorizedDates extends StatelessWidget {
       body: Column(
         children: <Widget>[
           Container(height: 32.0),
-          Text(month,
+          Text(lastMonthName,
+            style: Theme.of(context).textTheme.headline4,
+          ),
+          lastMonth,
+          Container(height: 16.0),
+          Text(currentMonthName,
             style: Theme.of(context).textTheme.headline4,
           ),
           Container(height: 32.0),
-          monthCalendarro,
-          Container(height: 32.0),
+          currentMonth,
+          Container(height: 16.0),
           FormSubmitButton(
             context: context,
             text: 'Save',

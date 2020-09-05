@@ -88,10 +88,23 @@ class _OrderTotalsState extends State<OrderTotals> {
   }
 
   Future<void> _calendarButton(BuildContext context) async {
-    var startDate = DateUtils.getFirstDayOfCurrentMonth();
-    var endDate = DateUtils.getLastDayOfCurrentMonth();
+    var currentMonthStartDate = DateUtils.getFirstDayOfCurrentMonth();
+    var currentMonthEndDate = DateUtils.getLastDayOfCurrentMonth();
+    var lastMonthStartDate = DateUtils.getFirstDayOfMonth(
+        DateTime(
+            currentMonthStartDate.year,
+            currentMonthStartDate.month - 1,
+            currentMonthStartDate.day,
+        ));
+    var lastMonthEndDate = DateUtils.getLastDayOfMonth(
+        DateTime(
+          currentMonthStartDate.year,
+          currentMonthStartDate.month - 1,
+          currentMonthStartDate.day,
+        ));
     final DateFormat monthName = DateFormat(DateFormat.MONTH);
-    final month = monthName.format(startDate);
+    final currentMonth = monthName.format(currentMonthStartDate);
+    final lastMonth = monthName.format(lastMonthStartDate);
     _selectedDate = await Navigator.of(context).push(
       MaterialPageRoute<DateTime>(builder: (_) => Scaffold(
           appBar: new AppBar(
@@ -100,13 +113,28 @@ class _OrderTotalsState extends State<OrderTotals> {
           body: Column(
             children: [
               Container(height: 32.0),
-              Text(month,
+              Text(lastMonth,
                 style: Theme.of(context).textTheme.headline4,
               ),
               Container(height: 32.0),
               Calendarro(
-                  startDate: startDate,
-                  endDate: endDate,
+                  startDate: lastMonthStartDate,
+                  endDate: lastMonthEndDate,
+                  displayMode: DisplayMode.MONTHS,
+                  selectionMode: SelectionMode.SINGLE,
+                  weekdayLabelsRow: CustomWeekdayLabelsRow(),
+                  onTap: (date) {
+                    Navigator.of(context).pop(date);
+                  }
+              ),
+              Container(height: 16.0),
+              Text(currentMonth,
+                style: Theme.of(context).textTheme.headline4,
+              ),
+              Container(height: 32.0),
+              Calendarro(
+                  startDate: currentMonthStartDate,
+                  endDate: currentMonthEndDate,
                   displayMode: DisplayMode.MONTHS,
                   selectionMode: SelectionMode.SINGLE,
                   weekdayLabelsRow: CustomWeekdayLabelsRow(),
