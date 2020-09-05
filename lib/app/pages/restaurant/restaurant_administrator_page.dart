@@ -4,6 +4,7 @@ import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/images/item_image_page.dart';
+import 'package:nearbymenus/app/pages/map/capture_map_markers.dart';
 import 'package:nearbymenus/app/pages/menu_browser/expandable_menu_browser.dart';
 import 'package:nearbymenus/app/pages/menu_builder/menu/menu_page.dart';
 import 'package:nearbymenus/app/pages/option_builder/option/option_page.dart';
@@ -220,6 +221,29 @@ class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPag
             height: buttonSize,
             width: buttonSize,
             color: Theme.of(context).buttonTheme.colorScheme.surface,
+            onPressed: () => _convertUser(context, _captureMapMarkers),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Map Markers',
+                  style: Theme.of(context).accentTextTheme.headline6,
+                ),
+                SizedBox(height: 8.0,),
+                Icon(
+                  Icons.location_on,
+                  size: 36.0,
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            width: 16.0,
+          ),
+          CustomRaisedButton(
+            height: buttonSize,
+            width: buttonSize,
+            color: Theme.of(context).buttonTheme.colorScheme.surface,
             onPressed: () => _convertUser(context, _orderTotals),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -302,6 +326,14 @@ class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPag
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) => OrderTotals(),
+      ),
+    );
+  }
+
+  void _captureMapMarkers(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) => CaptureMapMarkers(),
       ),
     );
   }

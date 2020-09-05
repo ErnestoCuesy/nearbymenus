@@ -27,11 +27,13 @@ class Restaurant {
   final bool foodDeliveries;
   final bool foodCollection;
   final bool allowCancellations;
+  final Map<dynamic, dynamic> foodDeliveryFlags;
   final Map<dynamic, dynamic> restaurantFlags;
   final Map<dynamic, dynamic> paymentFlags;
   Map<dynamic, dynamic> restaurantMenus;
-  final Map<dynamic, dynamic> foodDeliveryFlags;
   Map<dynamic, dynamic> restaurantOptions;
+  List<Position> markerCoordinates;
+  List<String> markerNames;
   bool itemImagesInitialized;
   bool adminVerified;
 
@@ -66,6 +68,8 @@ class Restaurant {
     this.restaurantOptions,
     this.itemImagesInitialized,
     this.adminVerified,
+    this.markerCoordinates,
+    this.markerNames,
   });
 
   factory Restaurant.fromMap(Map<dynamic, dynamic> value, String documentId) {
@@ -78,6 +82,11 @@ class Restaurant {
     final hoursFromMinutes = value['hoursFromMinutes'];
     final hoursToHours = value['hoursToHours'];
     final hoursToMinutes = value['hoursToMinutes'];
+    final markerCoordinates = value['markerCoordinates'] as List<dynamic> ?? <dynamic>[];
+    final markerNames = value['markerNames'] as List<dynamic> ?? <dynamic>[];
+    List<Position> markerPositionList = List<Position>.from(markerCoordinates.map((element)
+          => Position(latitude: element.latitude, longitude: element.longitude)));
+    List<String> markerNamesList = List<String>.from(markerNames.map((e) => e.toString()));
     return Restaurant(
         id: documentId,
         managerId: value['managerId'],
@@ -110,12 +119,16 @@ class Restaurant {
         foodDeliveryFlags: value['foodDeliveryFlags'] ?? {},
         itemImagesInitialized: value['itemImagesInitialized'] ?? false,
         adminVerified: value['adminVerified'] ?? false,
+        markerCoordinates: markerPositionList ?? <Position>[],
+        markerNames: markerNamesList ?? <String>[],
     );
   }
 
   Map<String, dynamic> toMap() {
     final GeoPoint geoPoint =
         GeoPoint(coordinates.latitude, coordinates.longitude);
+    final List<GeoPoint> geoPointList = List<GeoPoint>.from(markerCoordinates.map((e)
+          => GeoPoint(e.latitude, e.longitude)));
     return <String, dynamic>{
       'id': id,
       'managerId': managerId,
@@ -141,6 +154,8 @@ class Restaurant {
       'itemImagesInitialized': itemImagesInitialized ?? false,
       'allowCancellations': allowCancellations,
       'adminVerified': adminVerified ?? false,
+      'markerCoordinates': geoPointList,
+      'markerNames': markerNames,
     };
   }
 

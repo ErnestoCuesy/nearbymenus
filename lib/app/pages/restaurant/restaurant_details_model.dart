@@ -38,6 +38,8 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
   bool adminVerified;
   Map<dynamic, dynamic> restaurantMenus;
   Map<dynamic, dynamic> restaurantOptions;
+  List<Position> markerCoordinates;
+  List<String> markerDescription;
   bool isLoading;
   bool submitted;
   bool dataHasChanged = false;
@@ -71,6 +73,8 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     this.adminVerified = false,
     this.restaurantMenus,
     this.restaurantOptions,
+    this.markerCoordinates,
+    this.markerDescription,
     this.isLoading = false,
     this.submitted = false,
   });
@@ -123,6 +127,8 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
             'Collect': foodCollection,
           },
           restaurantOptions: restaurantOptions,
+          markerCoordinates: markerCoordinates,
+          markerNames: markerDescription,
         ),
       );
       if (!adminVerified) {

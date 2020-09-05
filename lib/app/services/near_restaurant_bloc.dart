@@ -16,19 +16,18 @@ class NearRestaurantBloc {
     source.forEach((rest) {
       resList.clear();
       rest.forEach((res) async {
-        await Geolocator().distanceBetween(
+        double distance = GeolocatorPlatform.distanceBetween(
           userCoordinates.latitude,
           userCoordinates.longitude,
           res.coordinates.latitude,
           res.coordinates.longitude,
-        ).then((distance) {
-          if (FlavourConfig.isAdmin()) {
-            resList.add(res);
-          } else if (res.active && distance < res.deliveryRadius) {
-            resList.add(res);
-          }
-        });
-        _stream.add(resList);
+        );
+        if (FlavourConfig.isAdmin()) {
+          resList.add(res);
+        } else if (res.active && distance < res.deliveryRadius) {
+          resList.add(res);
+        }
+      _stream.add(resList);
       });
     });
   }

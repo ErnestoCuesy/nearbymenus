@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/utilities/map_utils.dart';
+import 'package:provider/provider.dart';
 
 class MapRoute extends StatefulWidget {
   final Position currentLocation;
@@ -14,6 +16,7 @@ class MapRoute extends StatefulWidget {
 }
 
 class _MapRouteState extends State<MapRoute> {
+  Session session;
   MapUtils mapUtils;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
@@ -25,11 +28,14 @@ class _MapRouteState extends State<MapRoute> {
 
   @override
   Widget build(BuildContext context) {
+    session = Provider.of<Session>(context);
     mapUtils = MapUtils(
       mediaSize: MediaQuery.of(context).size,
       currentLocation: widget.currentLocation,
       destination: widget.destination,
       callBack: _callBack,
+      markerCoordinates: session.currentRestaurant.markerCoordinates,
+      markerNames: session.currentRestaurant.markerNames,
     );
     return Scaffold(
       appBar: AppBar(

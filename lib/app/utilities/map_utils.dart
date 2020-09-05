@@ -11,10 +11,19 @@ class MapUtils {
   final Position destination;
   final Size mediaSize;
   final Function callBack;
+  final List<Position> markerCoordinates;
+  final List<String> markerNames;
 
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
-  MapUtils({this.currentLocation, this.destination, this.mediaSize, this.callBack});
+  MapUtils({
+    this.currentLocation,
+    this.destination,
+    this.mediaSize,
+    this.callBack,
+    this.markerCoordinates,
+    this.markerNames,
+  });
 
   // Return appropriate destination chequered flag based on platform
   Future<BitmapDescriptor> get deliveryIcon async {
@@ -26,6 +35,18 @@ class MapUtils {
       return BitmapDescriptor.fromAssetImage(
           ImageConfiguration(),
           'assets/chequered-flag.png');
+    }
+  }
+
+  Future<BitmapDescriptor> get homeIcon async {
+    if (Platform.isIOS) {
+      return BitmapDescriptor.fromAssetImage(
+          ImageConfiguration(),
+          'assets/bigHome.png');
+    } else {
+      return BitmapDescriptor.fromAssetImage(
+          ImageConfiguration(),
+          'assets/bigHome.png');
     }
   }
 
@@ -45,11 +66,12 @@ class MapUtils {
     final startMarker = Marker(
       markerId: startMarkerId,
       position: LatLng(currentLocation.latitude, currentLocation.longitude),
-      infoWindow: InfoWindow(title: 'You are here')
+      infoWindow: InfoWindow(title: 'You are here'),
+      icon: await homeIcon
     );
 
     // Determine distance to destination
-    double distance = await Geolocator().distanceBetween(
+    double distance = GeolocatorPlatform.distanceBetween(
         bounds.southwest.latitude,
         bounds.southwest.longitude,
         bounds.northeast.latitude,
@@ -66,11 +88,25 @@ class MapUtils {
       infoWindow: InfoWindow(title: 'Delivery point', snippet: finishSnippetInfo),
       icon: await deliveryIcon
     );
+    final List<MarkerId> referenceMarkersId = List<MarkerId>.generate(5, (index) => MarkerId(index.toString()));
+    final List<Marker> referenceMarkerPositions = List<Marker>.from(markerCoordinates.asMap().entries.map((entry) => Marker(
+        markerId: referenceMarkersId[entry.key],
+        position: LatLng(
+          entry.value.latitude,
+          entry.value.longitude,
+        ),
+        infoWindow: InfoWindow(title: markerNames[entry.key]),
+    )));
 
     // Clear and add markers to map
     markers.clear();
     markers[startMarkerId] = startMarker;
     markers[finishMarkerId] = finishMarker;
+    referenceMarkerPositions.forEach((marker) {
+      if (marker.position != LatLng(0, 0)) {
+        markers.putIfAbsent(marker.markerId, () => marker);
+      }
+    });
 
     // Determine correct level of zoom
     double zoom =

@@ -50,6 +50,8 @@ class RestaurantDetailsForm extends StatefulWidget {
         adminVerified: restaurant.adminVerified ?? false,
         restaurantMenus: restaurant.restaurantMenus ?? {},
         restaurantOptions: restaurant.restaurantOptions ?? {},
+        markerCoordinates: restaurant.markerCoordinates ?? [],
+        markerDescription: restaurant.markerNames ?? [],
       ),
       child: Consumer<RestaurantDetailsModel>(
         builder: (context, model, _) => RestaurantDetailsForm(

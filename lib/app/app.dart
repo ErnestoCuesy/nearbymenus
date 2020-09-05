@@ -1,8 +1,12 @@
+import 'package:rxdart/subjects.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:provider/provider.dart';
+import 'package:rate_my_app/rate_my_app.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/received_notification.dart';
 import 'package:nearbymenus/app/models/session.dart';
@@ -16,11 +20,6 @@ import 'package:nearbymenus/app/services/navigation_service.dart';
 import 'package:nearbymenus/app/services/notification_streams.dart';
 import 'package:nearbymenus/app/utilities/app_theme.dart';
 import 'package:nearbymenus/app/utilities/logo_image_asset.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
-import 'package:rate_my_app/rate_my_app.dart';
-import 'package:responsive_framework/responsive_framework.dart';
-import 'package:rxdart/subjects.dart';
 
 class MyApp extends StatefulWidget {
   @override
@@ -28,13 +27,10 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Geolocator _geolocator;
-  Position _currentLocation;
-  PermissionStatus _permissionStatus;
+  Position _defaultLocation = Position(longitude: 0, latitude: 0);
   final MethodChannel platform = MethodChannel('crossingthestreams.io/resourceResolver');
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  bool _locationPermissionGranted = true;
-  bool _geolocatorTimedOut = false;
+  bool _continueFlag = false;
   GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
 // Streams are created so that app can respond to notification-related events since the plugin is initialised in the `main` function
@@ -53,7 +49,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _determineLocationPermissions();
+    //_determineLocationPermissions();
     _initNotifications();
     _requestIOSPermissions();
     _initRating();
@@ -133,66 +129,16 @@ class _MyAppState extends State<MyApp> {
     super.dispose();
   }
 
-  _determineLocationPermissions(){
-    PermissionHandler().checkPermissionStatus(PermissionGroup.location)
-        .then((status) => _updateLocationPermissions(status));
-  }
-
-  _updateLocationPermissions(PermissionStatus status){
-    if (_permissionStatus != status) {
+  void _askPermission() {
+    requestPermission().then((status) {
       setState(() {
-        _permissionStatus = status;
-        if (_permissionStatus == PermissionStatus.granted){
-          //_determineCurrentLocation();
-        } else {
-          PermissionHandler().requestPermissions([PermissionGroup.location])
-              .then((permission){
-            if (permission[PermissionGroup.location] == PermissionStatus.granted){
-              setState(() {
-                _locationPermissionGranted = true;
-              });
-              //_determineCurrentLocation();
-            } else {
-              setState(() {
-                _locationPermissionGranted = false;
-              });
-            }
-          });
-        }
       });
-    }
-  }
-
-  _determineCurrentLocation() async {
-    _geolocator = Geolocator();
-    _geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.best
-    ).timeout(
-        Duration(
-            seconds: 20
-        ),
-        onTimeout: () {
-          print('Geolocator timed out');
-          setState(() {
-            _geolocatorTimedOut = true;
-          });
-          return;
-        }).then((position) async {
-      if (position != null) {
-        setState(() {
-          _currentLocation = position;
-        });
-        print(
-            'Current location: ${_currentLocation
-                .latitude} : ${_currentLocation
-                .longitude}');
-      }
     });
   }
 
-  void _callBack() {
+  void _continueWithoutLocation() {
     setState(() {
-      _geolocatorTimedOut = false;
+      _continueFlag = true;
     });
   }
 
@@ -200,50 +146,67 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     // Below line disabled since the bottom android nav bar behaves funny
     // SystemChrome.setEnabledSystemUIOverlays([]);
-    if (_currentLocation != null) {
-      return MultiProvider(
-          providers: [
-            Provider.value(value: flutterLocalNotificationsPlugin),
-            Provider<NotificationStreams>(create: (context) => NotificationStreams(
-                didReceiveLocalNotificationSubject: didReceiveLocalNotificationSubject,
-                selectNotificationSubject: selectNotificationSubject),
-            ),
-            Provider<LogoImageAsset>(create: (context) => LogoImageAsset()),
-            Provider<AuthBase>(create: (context) => Auth()),
-            Provider<Database>(create: (context) => FirestoreDatabase()),
-            Provider<Session>(create: (context) => Session(position: _currentLocation)),
-            Provider<NavigationService>(create: (context) => NavigationService(navigatorKey: _navigatorKey),)
-          ],
-          child: MaterialApp(
-            navigatorKey: _navigatorKey,
-            title: 'Nearby Menus',
-            theme: AppTheme.createTheme(context),
-            home: LandingPage(),
-            builder: (context, widget) => ResponsiveWrapper.builder(
-              widget,
-              maxWidth: 1200,
-              minWidth: 450,
-              defaultScale: true,
-              breakpoints: [
-                ResponsiveBreakpoint.resize(450, name: MOBILE),
-                ResponsiveBreakpoint.autoScale(800, name: TABLET),
-                ResponsiveBreakpoint.autoScale(1000, name: TABLET),
-              ],
-            ),
-          )
-      );
-    } else {
-      _determineCurrentLocation();
-      if (!_locationPermissionGranted || _geolocatorTimedOut) {
-        setState(() {
-          _currentLocation = Position(latitude: 0, longitude: 0);
-        });
-        return LocationServicesError(
-          callBack: () => _callBack(),
-          message: 'Please make sure location services are enabled and location permissions granted.',);
-      } else {
-        return SplashScreen();
-      }
-    }
+    return FutureBuilder<LocationPermission>(
+      future: checkPermission(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return SplashScreen();
+        } else {
+          if (snapshot.data == LocationPermission.deniedForever && !_continueFlag) {
+            return LocationServicesError(
+              askPermission: () => _askPermission(),
+              continueWithoutLocation: () => _continueWithoutLocation(),
+              message: 'Access to location not granted or location services are off. Please rectify and re-run LVE Navigator.',
+            );
+          }
+          return FutureBuilder<Position>(
+              future: getCurrentPosition(desiredAccuracy: LocationAccuracy.best),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                    return MultiProvider(
+                        providers: [
+                          Provider.value(value: flutterLocalNotificationsPlugin),
+                          Provider<NotificationStreams>(create: (context) => NotificationStreams(
+                              didReceiveLocalNotificationSubject: didReceiveLocalNotificationSubject,
+                              selectNotificationSubject: selectNotificationSubject),
+                          ),
+                          Provider<LogoImageAsset>(create: (context) => LogoImageAsset()),
+                          Provider<AuthBase>(create: (context) => Auth()),
+                          Provider<Database>(create: (context) => FirestoreDatabase()),
+                          Provider<Session>(create: (context) => Session(position: snapshot.data ?? _defaultLocation)),
+                          Provider<NavigationService>(create: (context) => NavigationService(navigatorKey: _navigatorKey),)
+                        ],
+                        child: MaterialApp(
+                          navigatorKey: _navigatorKey,
+                          title: 'Nearby Menus',
+                          theme: AppTheme.createTheme(context),
+                          home: LandingPage(),
+                          builder: (context, widget) => ResponsiveWrapper.builder(
+                            widget,
+                            maxWidth: 1200,
+                            minWidth: 450,
+                            defaultScale: true,
+                            breakpoints: [
+                              ResponsiveBreakpoint.resize(450, name: MOBILE),
+                              ResponsiveBreakpoint.autoScale(800, name: TABLET),
+                              ResponsiveBreakpoint.autoScale(1000, name: TABLET),
+                            ],
+                          ),
+                        )
+                    );
+                } else
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return SplashScreen();
+                } else {
+                  return LocationServicesError(
+                    askPermission: () => _askPermission(),
+                    message: 'Please make sure location services are enabled before proceeding.',
+                  );
+                }
+              }
+          );
+        }
+      },
+    );
   }
 }

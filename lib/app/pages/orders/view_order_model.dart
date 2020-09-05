@@ -22,7 +22,7 @@ class ViewOrderModel with ChangeNotifier {
       });
 
   Future<int> get orderDistance async {
-    double distance = await Geolocator().distanceBetween(
+    double distance = GeolocatorPlatform.distanceBetween(
       session.position.latitude,
       session.position.longitude,
       order.deliveryPosition.latitude,

@@ -4,10 +4,11 @@ import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 
 class LocationServicesError extends StatelessWidget {
-  final Function callBack;
+  final Function askPermission;
+  final Function continueWithoutLocation;
   final String message;
 
-  const LocationServicesError({Key key, this.callBack, this.message}) : super(key: key);
+  const LocationServicesError({Key key, this.askPermission, this.continueWithoutLocation, this.message}) : super(key: key);
 
   Color _buttonColor() {
     Color buttonColor = Colors.green;
@@ -40,9 +41,16 @@ class LocationServicesError extends StatelessWidget {
             ),
             FormSubmitButton(
               context: context,
+              color: Colors.grey,
+              text: 'Retry',
+              onPressed: askPermission,
+            ),
+            SizedBox(height: 16.0,),
+            FormSubmitButton(
+              context: context,
               color: _buttonColor(),
               text: 'Continue',
-              onPressed: callBack,
+              onPressed: continueWithoutLocation,
             ),
           ],
         ),
