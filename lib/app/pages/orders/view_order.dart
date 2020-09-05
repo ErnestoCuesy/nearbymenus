@@ -33,6 +33,7 @@ class ViewOrder extends StatefulWidget {
           database: database,
           session: session,
           order: order,
+          automaticallyCloseOrder: false
       ),
       child: Consumer<ViewOrderModel>(
         builder: (context, model, _) => ViewOrder(
@@ -347,23 +348,38 @@ class _ViewOrderState extends State<ViewOrder> {
                   if (model.order.status == ORDER_ON_HOLD)
                   Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    child: Column(
                       children: [
-                        FormSubmitButton(
-                          context: context,
-                          text: 'Cancel',
-                          color: Theme.of(context).primaryColor,
-                          onPressed: () => _cancelOrder(context),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            FormSubmitButton(
+                              context: context,
+                              text: 'Cancel',
+                              color: Theme.of(context).primaryColor,
+                              onPressed: () => _cancelOrder(context),
+                            ),
+                            Builder(
+                              builder: (context) => FormSubmitButton(
+                                context: context,
+                                text: 'Submit',
+                                color: model.canSave
+                                    ? Theme.of(context).primaryColor
+                                    : Theme.of(context).disabledColor,
+                                onPressed: model.canSave ? () => _save(context) : null,
+                              ),
+                            ),
+                          ],
                         ),
-                        Builder(
-                          builder: (context) => FormSubmitButton(
-                            context: context,
-                            text: 'Submit',
-                            color: model.canSave
-                                ? Theme.of(context).primaryColor
-                                : Theme.of(context).disabledColor,
-                            onPressed: model.canSave ? () => _save(context) : null,
+                        if (!FlavourConfig.isPatron())
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: CheckboxListTile(
+                            title: Text(
+                            'Automatically close order',
+                            ),
+                            value: model.automaticallyCloseOrder,
+                            onChanged: (flag) => model.updateAutomaticallyCloseOrder(flag),
                           ),
                         ),
                       ],

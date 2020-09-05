@@ -10,6 +10,7 @@ class ViewOrderModel with ChangeNotifier {
   final Database database;
   final Session session;
   Order order;
+  bool automaticallyCloseOrder;
   bool isLoading;
   bool submitted;
 
@@ -17,6 +18,7 @@ class ViewOrderModel with ChangeNotifier {
       {@required this.database,
         @required this.session,
         @required this.order,
+        this.automaticallyCloseOrder,
         this.isLoading = false,
         this.submitted = false,
       });
@@ -51,7 +53,7 @@ class ViewOrderModel with ChangeNotifier {
       order.id = orderNumber;
       order.timestamp = timestamp;
       order.deliveryPosition = session.position;
-      order.status = ORDER_PLACED;
+      order.status = automaticallyCloseOrder ? ORDER_CLOSED : ORDER_PLACED;
       database.setOrderTransaction(session.currentRestaurant.managerId,
           session.currentRestaurant.id,
           order);
@@ -241,16 +243,20 @@ class ViewOrderModel with ChangeNotifier {
 
   void updateDiscount(double discount) => order.discount = discount;
 
+  void updateAutomaticallyCloseOrder(bool flag) => updateWith(automaticallyCloseOrder: flag);
+
   void updateWith({
     String notes,
     String paymentMethod,
     String deliveryOption,
+    bool automaticallyCloseOrder,
     bool isLoading,
     bool submitted,
   }) {
     this.order.notes = notes ?? this.order.notes;
     this.order.paymentMethod = paymentMethod ?? this.order.paymentMethod;
     this.order.deliveryOption = deliveryOption ?? this.order.deliveryOption;
+    this.automaticallyCloseOrder = automaticallyCloseOrder ?? this.automaticallyCloseOrder;
     this.isLoading = isLoading ?? this.isLoading;
     this.submitted = this.submitted;
     notifyListeners();
