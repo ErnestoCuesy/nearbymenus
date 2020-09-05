@@ -159,7 +159,7 @@ class _OrderExtraAmountsState extends State<OrderExtraAmounts> {
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: FloatingActionButton(
-                    backgroundColor: Theme.of(context).backgroundColor,
+                    backgroundColor: FlavourConfig.isManager() ? Colors.black : Theme.of(context).backgroundColor,
                     child: Icon(Icons.save),
                     onPressed: () => Navigator.of(context).pop(extraFields),
                   ),
