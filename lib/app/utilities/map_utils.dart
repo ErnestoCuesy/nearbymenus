@@ -42,7 +42,7 @@ class MapUtils {
     if (Platform.isIOS) {
       return BitmapDescriptor.fromAssetImage(
           ImageConfiguration(),
-          'assets/bigHome.png');
+          'assets/bigHomeiOS.png');
     } else {
       return BitmapDescriptor.fromAssetImage(
           ImageConfiguration(),

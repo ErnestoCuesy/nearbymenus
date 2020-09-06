@@ -217,6 +217,7 @@ class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPag
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          if (FlavourConfig.isManager())
           CustomRaisedButton(
             height: buttonSize,
             width: buttonSize,
@@ -237,6 +238,7 @@ class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPag
               ],
             ),
           ),
+          if (FlavourConfig.isManager())
           SizedBox(
             width: 16.0,
           ),
