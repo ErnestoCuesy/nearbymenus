@@ -5,7 +5,7 @@ import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/images/item_image_page.dart';
 import 'package:nearbymenus/app/pages/map/capture_map_markers.dart';
-import 'package:nearbymenus/app/pages/menu_browser/expandable_menu_browser.dart';
+import 'package:nearbymenus/app/pages/menu_browser/menu_browser.dart';
 import 'package:nearbymenus/app/pages/menu_builder/menu/menu_page.dart';
 import 'package:nearbymenus/app/pages/option_builder/option/option_page.dart';
 import 'package:nearbymenus/app/pages/orders/active_orders.dart';
@@ -115,7 +115,7 @@ class _RestaurantAdministratorPageState extends State<RestaurantAdministratorPag
               color: Theme.of(context).buttonTheme.colorScheme.surface,
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (BuildContext context) => ExpandableMenuBrowser(),
+                  builder: (BuildContext context) => MenuBrowser(),
                 ),
               ),
               child: Column(

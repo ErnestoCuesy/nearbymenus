@@ -8,7 +8,7 @@ import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/models/user_message.dart';
 import 'package:nearbymenus/app/pages/images/item_image_page.dart';
-import 'package:nearbymenus/app/pages/menu_browser/expandable_menu_browser.dart';
+import 'package:nearbymenus/app/pages/menu_browser/menu_browser.dart';
 import 'package:nearbymenus/app/pages/orders/active_orders.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:provider/provider.dart';
@@ -34,7 +34,7 @@ class _RestaurantOptionsPageState extends State<RestaurantOptionsPage> {
       MaterialPageRoute<void>(
         fullscreenDialog: false,
         builder: (context) => session.currentRestaurant.restaurantMenus.isNotEmpty
-            ? ExpandableMenuBrowser()
+            ? MenuBrowser()
             : Scaffold(
               appBar: AppBar(title: Text(''),),
               body: EmptyContent(

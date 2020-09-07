@@ -7,7 +7,7 @@ import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
-import 'package:nearbymenus/app/pages/menu_browser/expandable_list_view.dart';
+import 'package:nearbymenus/app/pages/menu_browser/menu_list_view.dart';
 import 'package:nearbymenus/app/pages/orders/view_order.dart';
 import 'package:nearbymenus/app/pages/sign_in/conversion_process.dart';
 import 'package:nearbymenus/app/services/auth.dart';
@@ -15,13 +15,13 @@ import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/services/navigation_service.dart';
 import 'package:provider/provider.dart';
 
-class ExpandableMenuBrowser extends StatefulWidget {
+class MenuBrowser extends StatefulWidget {
 
   @override
-  _ExpandableMenuBrowserState createState() => _ExpandableMenuBrowserState();
+  _MenuBrowserState createState() => _MenuBrowserState();
 }
 
-class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
+class _MenuBrowserState extends State<MenuBrowser> {
   Auth auth;
   Session session;
   Database database;
@@ -46,7 +46,11 @@ class _ExpandableMenuBrowserState extends State<ExpandableMenuBrowser> {
         itemCount: sortedKeys.length,
         itemBuilder: (BuildContext context, int index) {
           final menu = menus[sortedKeys[index]];
-          return ExpandableListView(
+          // return ExpandableListView(
+          //   menu: menu,
+          //   options: options,
+          // );
+          return MenuListView(
             menu: menu,
             options: options,
           );
