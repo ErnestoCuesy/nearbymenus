@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:nearbymenus/app/config/flavour_config.dart';
 
 class SubcategoryTotal {
   final String categoryName;
@@ -71,7 +72,7 @@ class ItemBreakdownReport extends ModalRoute<void> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: FloatingActionButton(
-                backgroundColor: Theme.of(context).backgroundColor,
+                backgroundColor: FlavourConfig.isManager() ? Colors.black : Theme.of(context).backgroundColor,
                 child: Icon(Icons.clear),
                 onPressed: () => Navigator.of(context).pop(),
               ),
