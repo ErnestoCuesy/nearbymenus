@@ -5,14 +5,14 @@ import 'package:flutter/services.dart';
 class UserAuth {
   UserAuth({
     @required this.uid,
-    @required this.photoUrl,
+    @required this.photoURL,
     @required this.displayName,
     @required this.email,
     @required this.isAnonymous,
     @required this.isEmailVerified,
   });
   final String uid;
-  final String photoUrl;
+  final String photoURL;
   final String displayName;
   final String email;
   final bool isAnonymous;
@@ -20,7 +20,7 @@ class UserAuth {
 }
 
 abstract class AuthBase {
-  Stream<UserAuth> get onAuthStateChanged;
+  Stream<UserAuth> get authStateChanges;
   Future<UserAuth> currentUser();
   Future<UserAuth> signInAnonymously();
   Future<UserAuth> signInWithEmailAndPassword(String email, String password);
@@ -28,7 +28,7 @@ abstract class AuthBase {
   Future<void> resetPassword(String email);
   Future<void> signOut();
   Future<void> convertUserWithEmail(String email, String password, String name);
-  Future<void> updateUserName(String name, FirebaseUser currentUser);
+  Future<void> updateUserName(String name, User currentUser);
   Future<bool> userIsAnonymous();
   Future<bool> userEmailVerified();
   Future<void> sendEmailVerification();
@@ -40,28 +40,28 @@ abstract class AuthBase {
 class Auth implements AuthBase {
   final _fireBaseAuth = FirebaseAuth.instance;
 
-  UserAuth _userFromFirebase(FirebaseUser user) {
-    print('FirebaseUser => ${user.displayName}');
+  UserAuth _userFromFirebase(User user) {
+    print('User => ${user.displayName}');
     return user == null
         ? null
         : UserAuth(
             uid: user.uid,
             displayName: user.displayName,
             email: user.email,
-            photoUrl: user.photoUrl,
+            photoURL: user.photoURL,
             isAnonymous: user.isAnonymous,
-            isEmailVerified: user.isEmailVerified
+            isEmailVerified: user.emailVerified
           );
   }
 
   @override
-  Stream<UserAuth> get onAuthStateChanged {
-    return _fireBaseAuth.onAuthStateChanged.map(_userFromFirebase);
+  Stream<UserAuth> get authStateChanges {
+    return _fireBaseAuth.authStateChanges().map((event) => _userFromFirebase(event));
   }
 
   @override
   Future<UserAuth> currentUser() async {
-    final user = await _fireBaseAuth.currentUser();
+    final user = _fireBaseAuth.currentUser;
     return _userFromFirebase(user);
   }
 
@@ -76,7 +76,7 @@ class Auth implements AuthBase {
       String email, String password) async {
     final authResult = await _fireBaseAuth.signInWithEmailAndPassword(
         email: email, password: password);
-    if (!authResult.user.isEmailVerified) {
+    if (!authResult.user.emailVerified) {
       throw PlatformException(
           code: 'ERROR_EMAIL_NOT_VERIFIED',
           message:
@@ -114,45 +114,37 @@ class Auth implements AuthBase {
   }
   @override
   Future<void> convertUserWithEmail(String email, String password, String name) async {
-    final currentUser = await _fireBaseAuth.currentUser();
-    final credential = EmailAuthProvider.getCredential(email: email, password: password);
+    final currentUser = _fireBaseAuth.currentUser;
+    final credential = EmailAuthProvider.credential(email: email, password: password);
     await currentUser.linkWithCredential(credential);
     await updateUserName(name, currentUser);
   }
 
   @override
-  Future<void> updateUserName(String name, FirebaseUser currentUser) async {
-    var userUpdateInfo = UserUpdateInfo();
-    userUpdateInfo.displayName = name;
-    await currentUser.updateProfile(userUpdateInfo);
+  Future<void> updateUserName(String name, User currentUser) async {
+    await currentUser.updateProfile(displayName: name);
     await currentUser.reload();
   }
 
   @override
   Future<bool> userIsAnonymous() async {
-    return await _fireBaseAuth.currentUser().then((value) => value.isAnonymous);
+    return _fireBaseAuth.currentUser.isAnonymous;
   }
 
   @override
   Future<bool> userEmailVerified() async {
-    try {
-      return await _fireBaseAuth.currentUser().then((value) => value.isEmailVerified);
-    } catch (e) {
-      print(e);
-    }
+    return _fireBaseAuth.currentUser.emailVerified;
   }
 
   @override
   Future<void> sendEmailVerification() async {
-    final currentUser = await _fireBaseAuth.currentUser();
-    await currentUser.sendEmailVerification();
+    _fireBaseAuth.currentUser.sendEmailVerification();
   }
 
   @override
   Future<void> reloadUser() async {
-    final currentUser = await _fireBaseAuth.currentUser();
     try {
-      await currentUser.reload();
+      _fireBaseAuth.currentUser.reload();
     } catch (e) {
       print(e);
     }
@@ -160,14 +152,13 @@ class Auth implements AuthBase {
 
   @override
   Future<String> userEmail() async {
-    return await _fireBaseAuth.currentUser().then((value) => value.email);
+    return _fireBaseAuth.currentUser.email;
   }
 
   @override
   Future<void> deleteUser() async {
     try {
-      final user = await _fireBaseAuth.currentUser();
-      user.delete();
+      _fireBaseAuth.currentUser.delete();
     } catch (e) {
       print(e);
     }
