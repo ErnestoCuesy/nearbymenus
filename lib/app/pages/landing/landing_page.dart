@@ -33,7 +33,7 @@ class LandingPage extends StatelessWidget {
     final session = Provider.of<Session>(context, listen: true);
     print('Landing page user coord: ${session.position.toString()}');
     return StreamBuilder<UserAuth>(
-      stream: auth.onAuthStateChanged,
+      stream: auth.authStateChanges,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.active) {
           UserAuth user = snapshot.data;

@@ -1,8 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'app/config/flavour_config.dart';
 import 'app/app.dart';
 
-void main() {
+void main() async {
   var flavour = Flavour.ADMIN;
   FlavourConfig(
     flavour: flavour,
@@ -11,6 +12,7 @@ void main() {
   );
 
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
 
   runApp(
     MaterialApp(
