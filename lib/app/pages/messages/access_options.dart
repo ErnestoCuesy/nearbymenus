@@ -27,8 +27,10 @@ class _AccessOptionsState extends State<AccessOptions> {
   Restaurant get restaurant => session.currentRestaurant;
   UserMessage get message => widget.message;
   double buttonSize = 180.0;
-  bool get hasPermAuth => authorizations.authorizedRoles.containsValue(ROLE_STAFF);
-  bool get hasVenueAuth => authorizations.authorizedRoles.containsValue(ROLE_VENUE);
+  bool get hasPermAuth => authorizations.authorizedRoles.containsKey(message.fromUid) &&
+                          authorizations.authorizedRoles[message.fromUid] == ROLE_STAFF;
+  bool get hasVenueAuth => authorizations.authorizedRoles.containsKey(message.fromUid) &&
+                           authorizations.authorizedRoles[message.fromUid] == ROLE_VENUE;
 
   void _changeVenueAuthorization() async {
     List<dynamic> authorizedIntDates = authorizations.authorizedDates[message.fromUid] ?? [];
@@ -46,7 +48,7 @@ class _AccessOptionsState extends State<AccessOptions> {
       authorizedDates.forEach((date) {
         authorizedIntDates.add(date.millisecondsSinceEpoch);
       });
-      if (authorizations.authorizedRoles.containsValue(ROLE_STAFF)) {
+      if (hasPermAuth) {
         authorizations.authorizedRoles
             .update(message.fromUid, (value) => ROLE_VENUE);
       } else {
@@ -80,7 +82,7 @@ class _AccessOptionsState extends State<AccessOptions> {
       message.authFlag = flag;
     });
     if (flag) {
-      if (authorizations.authorizedRoles.containsValue(ROLE_VENUE)) {
+      if (hasVenueAuth) {
         authorizations.authorizedRoles
             .update(message.fromUid, (value) => ROLE_STAFF);
       } else {
