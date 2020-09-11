@@ -5,14 +5,14 @@ import 'package:flutter/services.dart';
 class UserAuth {
   UserAuth({
     @required this.uid,
-    @required this.photoURL,
+    @required this.photoUrl,
     @required this.displayName,
     @required this.email,
     @required this.isAnonymous,
     @required this.isEmailVerified,
   });
   final String uid;
-  final String photoURL;
+  final String photoUrl;
   final String displayName;
   final String email;
   final bool isAnonymous;
@@ -20,7 +20,7 @@ class UserAuth {
 }
 
 abstract class AuthBase {
-  Stream<UserAuth> get authStateChanges;
+  Stream<UserAuth> get onAuthStateChanged;
   Future<UserAuth> currentUser();
   Future<UserAuth> signInAnonymously();
   Future<UserAuth> signInWithEmailAndPassword(String email, String password);
@@ -41,22 +41,22 @@ class Auth implements AuthBase {
   final _fireBaseAuth = FirebaseAuth.instance;
 
   UserAuth _userFromFirebase(User user) {
-    print('User => ${user.displayName}');
+    print('FirebaseUser => ${user.displayName}');
     return user == null
         ? null
         : UserAuth(
             uid: user.uid,
             displayName: user.displayName,
             email: user.email,
-            photoURL: user.photoURL,
+            photoUrl: user.photoURL,
             isAnonymous: user.isAnonymous,
             isEmailVerified: user.emailVerified
           );
   }
 
   @override
-  Stream<UserAuth> get authStateChanges {
-    return _fireBaseAuth.authStateChanges().map((event) => _userFromFirebase(event));
+  Stream<UserAuth> get onAuthStateChanged {
+    return _fireBaseAuth.authStateChanges().map(_userFromFirebase);
   }
 
   @override
