@@ -1,4 +1,3 @@
-import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -7,7 +6,7 @@ import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
-import 'package:nearbymenus/app/pages/menu_browser/menu_list_view.dart';
+import 'package:nearbymenus/app/pages/menu_browser/menu_item_view.dart';
 import 'package:nearbymenus/app/pages/orders/view_order.dart';
 import 'package:nearbymenus/app/pages/sign_in/conversion_process.dart';
 import 'package:nearbymenus/app/services/auth.dart';
@@ -29,7 +28,10 @@ class _MenuBrowserState extends State<MenuBrowser> {
   Restaurant restaurant;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
-  ScrollController _scrollController = ScrollController();
+  Map<String, dynamic> menu;
+  bool _menuSelected = false;
+  List<bool> _selectedMenu;
+  Orientation _previousOrientation;
 
   bool get orderOnHold =>
       session.currentOrder != null &&
@@ -39,23 +41,89 @@ class _MenuBrowserState extends State<MenuBrowser> {
 
   Widget _buildContents(BuildContext context, Map<dynamic, dynamic> menus,
     Map<dynamic, dynamic> options, dynamic sortedKeys) {
-    return DraggableScrollbar.semicircle(
-      controller: _scrollController,
-      child: ListView.builder(
-        controller: _scrollController,
-        itemCount: sortedKeys.length,
-        itemBuilder: (BuildContext context, int index) {
-          final menu = menus[sortedKeys[index]];
-          // return ExpandableListView(
-          //   menu: menu,
-          //   options: options,
-          // );
-          return MenuListView(
-            menu: menu,
-            options: options,
-          );
-        },
-      ),
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        bool isLargeScreen = MediaQuery.of(context).size.width > 600;
+        return Row(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: sortedKeys.length,
+                itemBuilder: (BuildContext context, int index) {
+                  menu = menus[sortedKeys[index]];
+                  return Container(
+                    margin: EdgeInsets.symmetric(vertical: 1.0),
+                    child: Card(
+                      color: (_selectedMenu[index] && isLargeScreen) ? Colors.grey : Theme.of(context).canvasColor,
+                      margin: EdgeInsets.all(12.0),
+                      child: ListTile(
+                        isThreeLine: false,
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              menu['name'],
+                              style: Theme.of(context).textTheme.headline4,
+                            ),
+                          ],
+                        ),
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                          child: Text(
+                            menu['notes'],
+                          ),
+                        ),
+                        trailing: IconButton(
+                            icon: Container(
+                              height: 50.0,
+                              width: 50.0,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).primaryColor,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  Icons.keyboard_arrow_right,
+                                  color: Colors.white,
+                                  size: 30.0,
+                                ),
+                              ),
+                            ),
+                            onPressed: () {
+                              if (!isLargeScreen) {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute<void>(
+                                    fullscreenDialog: false,
+                                    builder: (context) =>
+                                        MenuItemView(
+                                          menu: menus[sortedKeys[index]],
+                                          isLargeScreen: false,
+                                        ),
+                                  ),
+                                );
+                              } else {
+                                setState(() {
+                                  menu = menus[sortedKeys[index]];
+                                  _menuSelected = true;
+                                  _selectedMenu = List.filled(_selectedMenu.length, false);
+                                  _selectedMenu[index] = true;
+                                });
+                              }
+                            }
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            if (isLargeScreen)
+            Expanded(
+              child: _menuSelected ? MenuItemView(menu: menu, isLargeScreen: true,) : Container(),
+            )
+          ],
+        );
+      },
     );
   }
 
@@ -134,6 +202,15 @@ class _MenuBrowserState extends State<MenuBrowser> {
       }
     });
     var sortedKeys = sortedMenus.keys.toList()..sort();
+    if (!_menuSelected) {
+      _selectedMenu = List<bool>.generate(
+          session.currentRestaurant.restaurantMenus.length, (index) => false);
+    }
+    if (MediaQuery.of(context).orientation != _previousOrientation) {
+      _menuSelected = false;
+      _selectedMenu = List.filled(_selectedMenu.length, false);
+      _previousOrientation = MediaQuery.of(context).orientation;
+    }
     return Stack(
       children: <Widget>[
         Scaffold(
@@ -156,7 +233,6 @@ class _MenuBrowserState extends State<MenuBrowser> {
           ),
           body: _buildContents(context, sortedMenus, options, sortedKeys),
         ),
-        //if (_numberOfItems > 0)
         StreamBuilder<int>(
           stream: session.orderCounterObservable,
           builder: (context, snapshot) {

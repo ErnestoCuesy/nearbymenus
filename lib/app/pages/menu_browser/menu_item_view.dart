@@ -5,18 +5,28 @@ import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.d
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/orders/add_to_order.dart';
+import 'package:provider/provider.dart';
 
-class MenuItemView extends StatelessWidget {
-  final Session session;
-  final Map<dynamic, dynamic> sortedMenuItems;
-  final Map<dynamic, dynamic> options;
-  final List<dynamic> sortedKeys;
-  final String menuName;
+class MenuItemView extends StatefulWidget {
+  final Map<dynamic, dynamic> menu;
+  final bool isLargeScreen;
 
-  MenuItemView({Key key, this.session, this.sortedMenuItems, this.options, this.sortedKeys, this.menuName}) : super(key: key);
+  MenuItemView({Key key, this.menu, this.isLargeScreen}) : super(key: key);
 
+  @override
+  _MenuItemViewState createState() => _MenuItemViewState();
+}
+
+class _MenuItemViewState extends State<MenuItemView> {
+  Session session;
+  Map<dynamic, dynamic> sortedMenuItems  = Map<dynamic, dynamic>();
+  Map<dynamic, dynamic> options;
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
-  int get itemCount => sortedMenuItems.length;
+  var sortedKeys;
+  int itemCount;
+  String menuName;
+
+  Map<dynamic, dynamic> get menu => widget.menu;
 
   Future<void> _exceptionDialog(BuildContext context, String title, String code, String message) async {
     await PlatformExceptionAlertDialog(
@@ -77,60 +87,84 @@ class MenuItemView extends StatelessWidget {
     return '[' + result.substring(0, 4) + '] ';
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          menuName
-        ),
-      ),
-      body: ListView.builder(
-        itemCount: itemCount,
-        itemBuilder: (BuildContext context, int index) {
-          final menuItem = sortedMenuItems[sortedKeys[index]];
-          String adjustedName = menuItem['name'];
-          if (adjustedName.length > 25) {
-            adjustedName = adjustedName.substring(0, 25) + '...(more)';
-          }
-          String adjustedDescription = menuItem['description'];
-          if (adjustedDescription.length > 70) {
-            adjustedDescription =
-                adjustedDescription.substring(0, 70) + '...(more)';
-          }
-          return Container(
-            height: 90.0,
-            decoration: BoxDecoration(
-              border: Border.all(
-                width: 0.5,
-                color: Theme.of(context).primaryColor,
-              ),
+  Widget _buildContents(BuildContext context) {
+    return ListView.builder(
+      itemCount: itemCount,
+      itemBuilder: (BuildContext context, int index) {
+        final menuItem = sortedMenuItems[sortedKeys[index]];
+        String adjustedName = menuItem['name'];
+        if (adjustedName.length > 25) {
+          adjustedName = adjustedName.substring(0, 25) + '...(more)';
+        }
+        String adjustedDescription = menuItem['description'];
+        if (adjustedDescription.length > 70) {
+          adjustedDescription =
+              adjustedDescription.substring(0, 70) + '...(more)';
+        }
+        return Container(
+          height: 90.0,
+          decoration: BoxDecoration(
+            border: Border.all(
+              width: 0.5,
+              color: Theme.of(context).primaryColor,
             ),
-            child: ListTile(
-              title: Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: Text(
-                  '$adjustedName',
-                  style: Theme.of(context).textTheme.headline6,
-                ),
-              ),
-              subtitle: Padding(
-                padding: const EdgeInsets.only(
-                    left: 8.0, top: 8.0, bottom: 8.0),
-                child: Text(
-                  '$adjustedDescription',
-                ),
-              ),
-              trailing: Text(
-                f.format(menuItem['price']),
+          ),
+          child: ListTile(
+            title: Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Text(
+                '$adjustedName',
                 style: Theme.of(context).textTheme.headline6,
               ),
-              onTap: () =>
-                  _addMenuItemToOrder(context, _menuCode(menuName), menuItem),
             ),
-          );
-        },
-      ),
+            subtitle: Padding(
+              padding: const EdgeInsets.only(
+                  left: 8.0, top: 8.0, bottom: 8.0),
+              child: Text(
+                '$adjustedDescription',
+              ),
+            ),
+            trailing: Text(
+              f.format(menuItem['price']),
+              style: Theme.of(context).textTheme.headline6,
+            ),
+            onTap: () =>
+                _addMenuItemToOrder(context, _menuCode(menuName), menuItem),
+          ),
+        );
+      },
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    session = Provider.of<Session>(context);
+    menuName = menu['name'];
+    options = session.currentRestaurant.restaurantOptions;
+    sortedMenuItems.clear();
+    itemCount = menu.entries.where((element) {
+      if (element.key.toString().length > 20 &&
+          (element.value['hidden'] == null ||
+              element.value['hidden'] == false)) {
+        sortedMenuItems.putIfAbsent(
+            menu[element.key]['sequence'], () => element.value);
+        return true;
+      } else {
+        return false;
+      }
+    }).toList().length;
+    sortedKeys = sortedMenuItems.keys.toList()..sort();
+    if (widget.isLargeScreen) {
+      return Material(child: _buildContents(context));
+    } else {
+      return Scaffold(
+          appBar: AppBar(
+            title: Text(
+                menuName
+            ),
+          ),
+          body: _buildContents(context)
+      );
+    }
   }
 }
