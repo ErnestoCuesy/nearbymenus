@@ -73,43 +73,41 @@ class _MenuBrowserState extends State<MenuBrowser> {
                             menu['notes'],
                           ),
                         ),
-                        trailing: IconButton(
-                            icon: Container(
-                              height: 50.0,
-                              width: 50.0,
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor,
-                                shape: BoxShape.circle,
+                        onTap: () {
+                          if (!isLargeScreen) {
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                fullscreenDialog: false,
+                                builder: (context) =>
+                                    MenuItemView(
+                                      menu: menus[sortedKeys[index]],
+                                      isLargeScreen: false,
+                                    ),
                               ),
-                              child: Center(
-                                child: Icon(
-                                  Icons.keyboard_arrow_right,
-                                  color: Colors.white,
-                                  size: 30.0,
-                                ),
-                              ),
+                            );
+                          } else {
+                            setState(() {
+                              menu = menus[sortedKeys[index]];
+                              _menuSelected = true;
+                              _selectedMenu = List.filled(_selectedMenu.length, false);
+                              _selectedMenu[index] = true;
+                            });
+                          }
+                        },
+                        trailing: Container(
+                          height: 35.0,
+                          width: 35.0,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Icon(
+                              Icons.keyboard_arrow_right,
+                              color: Colors.white,
+                              size: 30.0,
                             ),
-                            onPressed: () {
-                              if (!isLargeScreen) {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute<void>(
-                                    fullscreenDialog: false,
-                                    builder: (context) =>
-                                        MenuItemView(
-                                          menu: menus[sortedKeys[index]],
-                                          isLargeScreen: false,
-                                        ),
-                                  ),
-                                );
-                              } else {
-                                setState(() {
-                                  menu = menus[sortedKeys[index]];
-                                  _menuSelected = true;
-                                  _selectedMenu = List.filled(_selectedMenu.length, false);
-                                  _selectedMenu[index] = true;
-                                });
-                              }
-                            }
+                          ),
                         ),
                       ),
                     ),
