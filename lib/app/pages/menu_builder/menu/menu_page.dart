@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,6 +8,7 @@ import 'package:nearbymenus/app/common_widgets/platform_trailing_icon.dart';
 import 'package:nearbymenus/app/models/menu.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
+import 'package:nearbymenus/app/pages/menu_builder/menu/reorder_menu.dart';
 import 'package:nearbymenus/app/pages/menu_builder/menu_item/menu_item_page.dart';
 import 'package:nearbymenus/app/pages/menu_builder/menu/menu_details_page.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -27,8 +26,10 @@ class _MenuPageState extends State<MenuPage> {
   Database database;
   MenuObservableStream menuStream;
   Restaurant get restaurant => session.currentRestaurant;
+  List<Menu> _menuList;
+  int _sequence;
 
-  void _createMenuDetailsPage(BuildContext context, Menu menu) {
+  void _createMenuDetailsPage(BuildContext context, Menu menu, int sequence) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         fullscreenDialog: false,
@@ -36,6 +37,7 @@ class _MenuPageState extends State<MenuPage> {
           restaurant: restaurant,
           menu: menu,
           menuStream: menuStream,
+          sequence: sequence,
         ),
       ),
     );
@@ -84,6 +86,10 @@ class _MenuPageState extends State<MenuPage> {
     return StreamBuilder<List<Menu>>(
       stream: menuStream.stream,
       builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.active) {
+          _menuList = snapshot.data;
+          _sequence = _menuList.length;
+        }
         return ListItemsBuilder<Menu>(
             title: 'No menus found',
             message: 'Tap the + button to add a new menu',
@@ -124,12 +130,23 @@ class _MenuPageState extends State<MenuPage> {
                       ),
                       icon: PlatformTrailingIcon(),
                     ),
-                    onTap: () => _createMenuDetailsPage(context, menu),
+                    onTap: () => _createMenuDetailsPage(context, menu, menu.sequence),
                   ),
                 ),
               );
             });
       },
+    );
+  }
+
+  void _reorderMenu(BuildContext context) {
+    Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (BuildContext context) => ReorderMenu(
+            menuStream: menuStream,
+            menuList: _menuList,
+          ),
+        )
     );
   }
 
@@ -139,44 +156,31 @@ class _MenuPageState extends State<MenuPage> {
     database = Provider.of<Database>(context);
     menuStream = MenuObservableStream(observable: session.currentRestaurant.restaurantMenus);
     menuStream.init();
-    if (Platform.isAndroid) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            '${restaurant.name}',
-            style: TextStyle(color: Theme.of(context).appBarTheme.color),
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          '${restaurant.name}',
+          style: TextStyle(color: Theme.of(context).appBarTheme.color),
         ),
-        body: _buildContents(context),
-        floatingActionButton: FloatingActionButton(
-          tooltip: 'Add new menu',
-          child: Icon(
-            Icons.add,
-          ),
-          onPressed: () => _createMenuDetailsPage(context, Menu()),
-        ),
-      );
-    } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            '${restaurant.name}',
-            style: TextStyle(color: Theme.of(context).appBarTheme.color),
-          ),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(
-                Icons.add,
-                color: Theme.of(context).appBarTheme.color,
-              ),
-              iconSize: 32.0,
-              padding: const EdgeInsets.only(right: 16.0),
-              onPressed: () => _createMenuDetailsPage(context, Menu()),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.add,
+              color: Theme.of(context).appBarTheme.color,
             ),
-          ],
-        ),
-        body: _buildContents(context),
-      );
-    }
+            iconSize: 32.0,
+            onPressed: () => _createMenuDetailsPage(context, Menu(), _sequence),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, right: 32.0),
+            child: IconButton(
+              icon: Icon(Icons.import_export),
+              onPressed: () => _reorderMenu(context),
+            ),
+          ),
+        ],
+      ),
+      body: _buildContents(context),
+    );
   }
 }

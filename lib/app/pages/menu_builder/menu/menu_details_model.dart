@@ -80,17 +80,11 @@ class MenuDetailsModel with RestaurantMenuValidators, ChangeNotifier {
 
   String get primaryButtonText => 'Save';
 
-  bool get canSave => menuNameValidator.isValid(name) &&
-                      sequenceValidator.isValid(sequence, menuSequences);
+  bool get canSave => menuNameValidator.isValid(name);
 
   String get menuNameErrorText {
     bool showErrorText = !menuNameValidator.isValid(name);
     return showErrorText ? invalidMenuNameText : null;
-  }
-
-  String get sequenceErrorText {
-    bool showErrorText = !sequenceValidator.isValid(sequence, menuSequences);
-    return showErrorText ? invalidSequenceText : null;
   }
 
   void updateMenuName(String name) => updateWith(name: name);

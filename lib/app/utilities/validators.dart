@@ -49,17 +49,6 @@ class NumericFieldValidator implements NumberValidator{
   }
 }
 
-class SequenceFieldValidator implements RangeValidator{
-  @override
-  bool isValid(int value, List<int> range) {
-    if (value == null ||
-        value.isNaN ||
-        value < 1 ||
-        range.contains(value)) return false;
-    return true;
-  }
-}
-
 class GreaterThanZeroValidator implements NumberValidator{
   @override
   bool isValid(int value) {
@@ -110,7 +99,6 @@ class RestaurantDetailsValidators {
 class RestaurantMenuValidators {
   final StringValidator menuNameValidator = NonEmptyStringValidator();
   final String invalidMenuNameText = 'Menu name can\'t be empty';
-  final SequenceFieldValidator sequenceValidator = SequenceFieldValidator();
   final String invalidSequenceText = 'Sequence is not a valid number or is duplicate';
 }
 
@@ -118,7 +106,6 @@ class MenuItemValidators {
   final StringValidator menuItemNameValidator = NonEmptyStringValidator();
   final StringValidator menuItemDescriptionValidator = NonEmptyStringValidator();
   final DoubleNumberValidator menuItemPriceValidator = DoubleNumericFieldValidator();
-  final SequenceFieldValidator sequenceValidator = SequenceFieldValidator();
   final String invalidMenuItemNameText = 'Menu item name can\'t be empty';
   final String invalidMenuItemDescriptionText = 'Description can\'t be empty';
   final String invalidMenuItemPriceText = 'Price must be a number';

@@ -59,12 +59,10 @@ class _MenuItemDetailsFormState extends State<MenuItemDetailsForm> {
   final TextEditingController _menuItemNameController = TextEditingController();
   final TextEditingController _menuItemDescriptionController =
       TextEditingController();
-  final TextEditingController _sequenceController = TextEditingController();
   final TextEditingController _menuItemPriceController =
       TextEditingController();
   final FocusNode _menuItemNameFocusNode = FocusNode();
   final FocusNode _menuItemDescriptionFocusNode = FocusNode();
-  final FocusNode _sequenceFocusNode = FocusNode();
   final FocusNode _menuItemPriceFocusNode = FocusNode();
 
   MenuItemDetailsModel get model => widget.model;
@@ -76,7 +74,6 @@ class _MenuItemDetailsFormState extends State<MenuItemDetailsForm> {
       _menuItemNameController.text = model.name ?? null;
       _menuItemDescriptionController.text = model.description ?? null;
       _menuItemPriceController.text = model.price.toString() ?? null;
-      _sequenceController.text = model.sequence.toString() ?? null;
     }
   }
 
@@ -84,12 +81,10 @@ class _MenuItemDetailsFormState extends State<MenuItemDetailsForm> {
   void dispose() {
     _menuItemNameController.dispose();
     _menuItemDescriptionController.dispose();
-    _sequenceController.dispose();
     _menuItemPriceController.dispose();
     _menuItemNameFocusNode.dispose();
     _menuItemDescriptionFocusNode.dispose();
     _menuItemPriceFocusNode.dispose();
-    _sequenceFocusNode.dispose();
     super.dispose();
   }
 
@@ -122,13 +117,8 @@ class _MenuItemDetailsFormState extends State<MenuItemDetailsForm> {
 
   void _menuItemPriceEditingComplete() {
     final newFocus = model.menuItemPriceValidator.isValid(model.price)
-        ? _sequenceFocusNode
+        ? _menuItemPriceFocusNode
         : _menuItemPriceFocusNode;
-    FocusScope.of(context).requestFocus(newFocus);
-  }
-
-  void _sequenceEditingComplete() {
-    final newFocus = _sequenceFocusNode;
     FocusScope.of(context).requestFocus(newFocus);
   }
 
@@ -143,10 +133,6 @@ class _MenuItemDetailsFormState extends State<MenuItemDetailsForm> {
         height: 8.0,
       ),
       _buildMenuItemPriceTextField(),
-      SizedBox(
-        height: 8.0,
-      ),
-      _sequenceTextField(),
       SizedBox(
         height: 8.0,
       ),
@@ -252,28 +238,6 @@ class _MenuItemDetailsFormState extends State<MenuItemDetailsForm> {
       textInputAction: TextInputAction.done,
       onChanged: (value) => model.updateMenuItemPrice(value),
       onEditingComplete: () => _menuItemPriceEditingComplete(),
-    );
-  }
-
-  TextField _sequenceTextField() {
-    return TextField(
-      style: Theme.of(context).inputDecorationTheme.labelStyle,
-      controller: _sequenceController,
-      focusNode: _sequenceFocusNode,
-      cursorColor: Colors.black,
-      decoration: InputDecoration(
-        labelText: 'Sequence of appearance',
-        hintText: 'i.e.: 0, 10, 20, 30, 40',
-        errorText: model.sequenceErrorText,
-        enabled: model.isLoading == false,
-      ),
-      autocorrect: false,
-      enableSuggestions: false,
-      enableInteractiveSelection: false,
-      keyboardType: TextInputType.number,
-      textInputAction: TextInputAction.done,
-      onChanged: (value) => model.updateSequence(int.tryParse(value)),
-      onEditingComplete: () => _sequenceEditingComplete(),
     );
   }
 

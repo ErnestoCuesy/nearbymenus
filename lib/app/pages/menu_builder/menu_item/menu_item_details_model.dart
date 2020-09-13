@@ -95,7 +95,6 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
   String get primaryButtonText => 'Save';
 
   bool get canSave => menuItemNameValidator.isValid(name) &&
-      sequenceValidator.isValid(sequence, menuSequences) &&
       menuItemPriceValidator.isValid(price);
 
   String get menuItemNameErrorText {
@@ -111,11 +110,6 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
   String get menuItemPriceErrorText {
     bool showErrorText = !menuItemPriceValidator.isValid(price);
     return showErrorText ? invalidMenuItemPriceText : null;
-  }
-
-  String get sequenceErrorText {
-    bool showErrorText = !sequenceValidator.isValid(sequence, menuSequences);
-    return showErrorText ? invalidSequenceText : null;
   }
 
   void copyMenuItem(String newMenuId) async {

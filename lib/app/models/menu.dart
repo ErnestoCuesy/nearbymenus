@@ -3,7 +3,7 @@ class Menu {
   final String restaurantId;
   final String name;
   final String notes;
-  final int sequence;
+  int sequence;
   final bool hidden;
 
   Menu({

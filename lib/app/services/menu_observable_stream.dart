@@ -17,6 +17,7 @@ class MenuObservableStream {
       data.forEach((key, value) {
         menuList.add(Menu.fromMap(value, null));
       });
+      menuList.sort((a, b) => a.sequence.compareTo(b.sequence));
       sink.add(menuList);
     },
     handleDone: (sink) => sink.close(),
