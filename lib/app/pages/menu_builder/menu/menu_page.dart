@@ -174,7 +174,10 @@ class _MenuPageState extends State<MenuPage> {
           Padding(
             padding: const EdgeInsets.only(left: 16.0, right: 32.0),
             child: IconButton(
-              icon: Icon(Icons.import_export),
+              icon: Icon(
+                  Icons.import_export,
+              ),
+              iconSize: 32.0,
               onPressed: () => _reorderMenu(context),
             ),
           ),

@@ -4,7 +4,7 @@ class MenuItem {
   final String menuId;
   final String name;
   final String description;
-  final int sequence;
+  int sequence;
   final bool hidden;
   final double price;
   final List<String> options;

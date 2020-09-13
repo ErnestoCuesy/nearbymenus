@@ -19,6 +19,7 @@ class MenuItemObservableStream {
           menuItemList.add(MenuItem.fromMap(value, null));
         }
       });
+      menuItemList.sort((a, b) => a.sequence.compareTo(b.sequence));
       sink.add(menuItemList);
     },
     handleDone: (sink) => sink.close(),

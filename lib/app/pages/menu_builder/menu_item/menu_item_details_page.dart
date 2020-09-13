@@ -10,6 +10,7 @@ class MenuItemDetailsPage extends StatelessWidget {
   final Menu menu;
   final MenuItem item;
   final MenuItemObservableStream menuItemStream;
+  final int sequence;
 
   const MenuItemDetailsPage({
     Key key,
@@ -17,6 +18,7 @@ class MenuItemDetailsPage extends StatelessWidget {
     this.menu,
     this.item,
     this.menuItemStream,
+    this.sequence,
   }) : super(key: key);
 
   @override
@@ -36,6 +38,7 @@ class MenuItemDetailsPage extends StatelessWidget {
               restaurant: restaurant,
               item: item,
               menuItemStream: menuItemStream,
+              sequence: sequence
             ),
           ),
         ),

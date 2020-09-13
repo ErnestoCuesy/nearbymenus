@@ -24,6 +24,7 @@ class MenuItemDetailsForm extends StatefulWidget {
     Menu menu,
     MenuItem item,
     MenuItemObservableStream menuItemStream,
+    int sequence,
   }) {
     final database = Provider.of<Database>(context);
     final session = Provider.of<Session>(context);
@@ -37,7 +38,7 @@ class MenuItemDetailsForm extends StatefulWidget {
         id: item.id ?? '',
         name: item.name ?? '',
         description: item.description ?? '',
-        sequence: item.sequence ?? 0,
+        sequence: item.sequence ?? sequence,
         hidden: item.hidden ?? false,
         price: item.price ?? 0.0,
         optionIdList: item.options ?? [],

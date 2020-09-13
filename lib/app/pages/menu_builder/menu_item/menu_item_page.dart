@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +10,7 @@ import 'package:nearbymenus/app/models/menu.dart';
 import 'package:nearbymenus/app/models/restaurant.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/menu_builder/menu_item/menu_item_details_page.dart';
+import 'package:nearbymenus/app/pages/menu_builder/menu_item/reorder_menu_item.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/services/menu_item_observable_stream.dart';
 import 'package:provider/provider.dart';
@@ -34,8 +33,10 @@ class _MenuItemPageState extends State<MenuItemPage> {
   Restaurant get restaurant => session.currentRestaurant;
   Menu get menu => Menu.fromMap(restaurant.restaurantMenus[menuId], null);
   final f = NumberFormat.simpleCurrency(locale: "en_ZA");
+  List<MenuItem> _menuItemList;
+  int _sequence;
 
-  void _createMenuItemDetailsPage(BuildContext context, MenuItem item) {
+  void _createMenuItemDetailsPage(BuildContext context, MenuItem item, int sequence) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         fullscreenDialog: false,
@@ -44,6 +45,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
           menu: menu,
           item: item,
           menuItemStream: menuItemStream,
+          sequence: sequence,
         ),
       ),
     );
@@ -85,6 +87,10 @@ class _MenuItemPageState extends State<MenuItemPage> {
     return StreamBuilder<List<MenuItem>>(
       stream: menuItemStream.stream,
       builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.active) {
+          _menuItemList = snapshot.data;
+          _sequence = _menuItemList.length;
+        }
         return ListItemsBuilder<MenuItem>(
             title: 'No menu items found',
             message: 'Tap the + button to add a new menu item',
@@ -131,7 +137,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
                       f.format(item.price),
                       style: Theme.of(context).textTheme.headline6,
                     ),
-                    onTap: () => _createMenuItemDetailsPage(context, item),
+                    onTap: () => _createMenuItemDetailsPage(context, item, item.sequence),
                   ),
                 ),
               );
@@ -158,52 +164,50 @@ class _MenuItemPageState extends State<MenuItemPage> {
     return optionList;
   }
 
+  void _reorderMenuItem(BuildContext context) {
+    Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (BuildContext context) => ReorderMenuItem(
+            menuItemStream: menuItemStream,
+            menuItemList: _menuItemList,
+          ),
+        )
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
     database = Provider.of<Database>(context);
     menuItemStream = MenuItemObservableStream(observable: restaurant.restaurantMenus[menuId]);
     menuItemStream.init();
-    if (Platform.isAndroid) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            '${widget.menu.name}', style: TextStyle(color: Theme
-              .of(context)
-              .appBarTheme
-              .color),
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          '${widget.menu.name}', style: TextStyle(color: Theme
+            .of(context)
+            .appBarTheme
+            .color),
         ),
-        body: _buildContents(context),
-        floatingActionButton: FloatingActionButton(
-          tooltip: 'Add new menu item',
-          child: Icon(
-            Icons.add,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.add, color: Theme.of(context).appBarTheme.color,),
+            iconSize: 32.0,
+            onPressed: () => _createMenuItemDetailsPage(context, MenuItem(menuId: widget.menu.id), _sequence),
           ),
-          onPressed: () => _createMenuItemDetailsPage(context, MenuItem(menuId: widget.menu.id)),
-        ),
-      );
-    } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            '${widget.menu.name}', style: TextStyle(color: Theme
-              .of(context)
-              .appBarTheme
-              .color),
-          ),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.add, color: Theme.of(context).appBarTheme.color,),
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, right: 32.0),
+            child: IconButton(
+              icon: Icon(
+                  Icons.import_export,
+              ),
               iconSize: 32.0,
-              padding: const EdgeInsets.only(right: 16.0),
-              onPressed: () => _createMenuItemDetailsPage(context, MenuItem(menuId: widget.menu.id)),
+              onPressed: () => _reorderMenuItem(context),
             ),
-          ],
-        ),
-        body: _buildContents(context),
-      );
-    }
+          ),
+        ],
+      ),
+      body: _buildContents(context),
+    );
   }
-
 }

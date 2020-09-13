@@ -99,7 +99,6 @@ class RestaurantDetailsValidators {
 class RestaurantMenuValidators {
   final StringValidator menuNameValidator = NonEmptyStringValidator();
   final String invalidMenuNameText = 'Menu name can\'t be empty';
-  final String invalidSequenceText = 'Sequence is not a valid number or is duplicate';
 }
 
 class MenuItemValidators {
@@ -109,7 +108,6 @@ class MenuItemValidators {
   final String invalidMenuItemNameText = 'Menu item name can\'t be empty';
   final String invalidMenuItemDescriptionText = 'Description can\'t be empty';
   final String invalidMenuItemPriceText = 'Price must be a number';
-  final String invalidSequenceText = 'Sequence is not a valid number or it\'s duplicate';
 }
 
 class OptionItemValidators {
