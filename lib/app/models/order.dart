@@ -85,8 +85,8 @@ class Order {
       deliveryOption: data['deliveryOption'],
       orderItems: orderItems,
       notes: data['notes'],
-      tip: data['tip'],
-      discount: data['discount'],
+      tip: data['tip'] ?? 0,
+      discount: data['discount'] ?? 0,
       isActive: data['isActive'],
       isBlocked: data['isBlocked'],
     );
