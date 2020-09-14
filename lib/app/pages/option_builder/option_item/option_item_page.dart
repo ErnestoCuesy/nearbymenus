@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -115,46 +113,24 @@ class _OptionItemPageState extends State<OptionItemPage> {
     database = Provider.of<Database>(context);
     optionItemStream = OptionItemObservableStream(observable: restaurant.restaurantOptions[optionId]);
     optionItemStream.init();
-    if (Platform.isAndroid) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            '${widget.option.name}', style: TextStyle(color: Theme
-              .of(context)
-              .appBarTheme
-              .color),
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          '${widget.option.name}', style: TextStyle(color: Theme
+            .of(context)
+            .appBarTheme
+            .color),
         ),
-        body: _buildContents(context),
-        floatingActionButton: FloatingActionButton(
-          tooltip: 'Add new option item',
-          child: Icon(
-            Icons.add,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.add, color: Theme.of(context).appBarTheme.color,),
+            iconSize: 32.0,
+            padding: const EdgeInsets.only(right: 32.0),
+            onPressed: () => _createOptionItemDetailsPage(context, OptionItem(optionId: widget.option.id)),
           ),
-          onPressed: () => _createOptionItemDetailsPage(context, OptionItem(optionId: widget.option.id)),
-        ),
-      );
-    } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            '${widget.option.name}', style: TextStyle(color: Theme
-              .of(context)
-              .appBarTheme
-              .color),
-          ),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.add, color: Theme.of(context).appBarTheme.color,),
-              iconSize: 32.0,
-              padding: const EdgeInsets.only(right: 16.0),
-              onPressed: () => _createOptionItemDetailsPage(context, OptionItem(optionId: widget.option.id)),
-            ),
-          ],
-        ),
-        body: _buildContents(context),
-      );
-    }
+        ],
+      ),
+      body: _buildContents(context),
+    );
   }
-
 }

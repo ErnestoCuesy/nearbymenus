@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -150,44 +148,25 @@ class _OptionPageState extends State<OptionPage> {
     database = Provider.of<Database>(context);
     optionStream = OptionObservableStream(observable: session.currentRestaurant.restaurantOptions);
     optionStream.init();
-    if (Platform.isAndroid) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            '${restaurant.name}',
-            style: TextStyle(color: Theme.of(context).appBarTheme.color),
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          '${restaurant.name}',
+          style: TextStyle(color: Theme.of(context).appBarTheme.color),
         ),
-        body: _buildContents(context),
-        floatingActionButton: FloatingActionButton(
-          tooltip: 'Add new option',
-          child: Icon(
-            Icons.add,
-          ),
-          onPressed: () => _createOptionDetailsPage(context, Option()),
-        ),
-      );
-    } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            '${restaurant.name}',
-            style: TextStyle(color: Theme.of(context).appBarTheme.color),
-          ),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(
-                Icons.add,
-                color: Theme.of(context).appBarTheme.color,
-              ),
-              iconSize: 32.0,
-              padding: const EdgeInsets.only(right: 16.0),
-              onPressed: () => _createOptionDetailsPage(context, Option()),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.add,
+              color: Theme.of(context).appBarTheme.color,
             ),
-          ],
-        ),
-        body: _buildContents(context),
-      );
-    }
+            iconSize: 32.0,
+            padding: const EdgeInsets.only(right: 32.0),
+            onPressed: () => _createOptionDetailsPage(context, Option()),
+          ),
+        ],
+      ),
+      body: _buildContents(context),
+    );
   }
 }

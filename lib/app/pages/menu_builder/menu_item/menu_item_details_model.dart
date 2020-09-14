@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nearbymenus/app/models/menu_item.dart';
@@ -113,19 +114,29 @@ class MenuItemDetailsModel with MenuItemValidators, ChangeNotifier {
   }
 
   void copyMenuItem(String newMenuId) async {
+    final Map<String, dynamic> items = restaurant.restaurantMenus[newMenuId];
+    List<int> sequences = [];
+    items.forEach((key, value) {
+      if (key.length > 20) {
+        sequences.add(value['sequence']);
+      }
+    });
+    int targetMenuSequence = 1;
+    if (sequences.length > 0) {
+      targetMenuSequence = sequences.reduce(max) + 1;
+    }
     final item = MenuItem(
       id: id,
       menuId: newMenuId,
       restaurantId: restaurant.id,
       name: name,
       description: description,
-      sequence: 99,
+      sequence: targetMenuSequence,
       hidden: hidden,
       price: price,
       options: optionIdList,
     );
     try {
-      final Map<dynamic, dynamic> items = restaurant.restaurantMenus[newMenuId];
       if (items.containsKey(id)) {
         restaurant.restaurantMenus[newMenuId].update(id, (_) => item.toMap());
       } else {

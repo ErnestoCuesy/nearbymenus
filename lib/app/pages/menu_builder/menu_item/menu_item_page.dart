@@ -54,6 +54,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
   Future<void> _deleteItem(BuildContext context, MenuItem item) async {
     try {
       restaurant.restaurantMenus[menuId].remove(item.id);
+      menuItemStream.broadcastEvent(restaurant.restaurantMenus[menuId]);
       Restaurant.setRestaurant(database, restaurant);
     } on PlatformException catch (e) {
       PlatformExceptionAlertDialog(
@@ -175,6 +176,17 @@ class _MenuItemPageState extends State<MenuItemPage> {
     );
   }
 
+  bool _menuIsReorderable() {
+    int counter = 0;
+    Map<String, dynamic> menuFields = restaurant.restaurantMenus[menuId];
+    menuFields.forEach((key, value) {
+      if (key.length > 20) {
+        counter++;
+      }
+    });
+    return counter > 1;
+  }
+
   @override
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
@@ -193,17 +205,17 @@ class _MenuItemPageState extends State<MenuItemPage> {
           IconButton(
             icon: Icon(Icons.add, color: Theme.of(context).appBarTheme.color,),
             iconSize: 32.0,
-            onPressed: () => _createMenuItemDetailsPage(context, MenuItem(menuId: widget.menu.id), _sequence),
+            onPressed: () => _createMenuItemDetailsPage(context, MenuItem(menuId: menuId), _sequence),
           ),
           Padding(
             padding: const EdgeInsets.only(left: 16.0, right: 32.0),
-            child: IconButton(
+            child: _menuIsReorderable() ? IconButton(
               icon: Icon(
                   Icons.import_export,
               ),
               iconSize: 32.0,
               onPressed: () => _reorderMenuItem(context),
-            ),
+            ) : Container(),
           ),
         ],
       ),

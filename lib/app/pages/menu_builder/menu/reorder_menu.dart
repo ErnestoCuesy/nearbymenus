@@ -76,6 +76,7 @@ class _ReorderMenuState extends State<ReorderMenu> {
             padding: const EdgeInsets.only(right: 16.0),
             child: IconButton(
               icon: Icon(Icons.check),
+              iconSize: 32.0,
               onPressed: () => _save(context),
             ),
           ),

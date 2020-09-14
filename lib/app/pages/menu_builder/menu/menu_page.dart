@@ -150,6 +150,17 @@ class _MenuPageState extends State<MenuPage> {
     );
   }
 
+  bool _menuIsReorderable() {
+    int counter = 0;
+    Map<String, dynamic> menuFields = restaurant.restaurantMenus;
+    menuFields.forEach((key, value) {
+      if (key.length > 20) {
+        counter++;
+      }
+    });
+    return counter > 1;
+  }
+
   @override
   Widget build(BuildContext context) {
     session = Provider.of<Session>(context);
@@ -173,13 +184,13 @@ class _MenuPageState extends State<MenuPage> {
           ),
           Padding(
             padding: const EdgeInsets.only(left: 16.0, right: 32.0),
-            child: IconButton(
+            child: _menuIsReorderable() ? IconButton(
               icon: Icon(
                   Icons.import_export,
               ),
               iconSize: 32.0,
               onPressed: () => _reorderMenu(context),
-            ),
+            ) : Container(),
           ),
         ],
       ),
