@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:nearbymenus/app/models/map_marker.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/map/capture_marker_name.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -17,6 +18,7 @@ class _CaptureMapMarkersState extends State<CaptureMapMarkers> {
   Database database;
   StreamSubscription<Position> _positionStreamSubscription;
   Position _lastPosition = Position(latitude: 0, longitude: 0);
+  String EMPTY_NAME = '>> Tap to capture position name';
 
   @override
   void initState() {
@@ -30,7 +32,7 @@ class _CaptureMapMarkersState extends State<CaptureMapMarkers> {
     database = Provider.of<Database>(context);
     if (session.currentRestaurant.markerCoordinates.length == 0) {
       session.currentRestaurant.markerCoordinates = List<Position>.generate(5, (index) => Position(latitude: 0, longitude: 0));
-      session.currentRestaurant.markerNames = List<String>.generate(5, (index) => '>> Tap to capture position name');
+      session.currentRestaurant.markerNames = List<String>.generate(5, (index) => EMPTY_NAME);
       database.setRestaurant(session.currentRestaurant);
     }
     return Scaffold(
@@ -121,25 +123,34 @@ class _CaptureMapMarkersState extends State<CaptureMapMarkers> {
   }
 
   void _capturePositionName(BuildContext context, int index) async {
-    String name = '';
+    MapMarker mapMarker;
     await Navigator.of(context).push(
-        MaterialPageRoute<String>(
+        MaterialPageRoute<MapMarker>(
             fullscreenDialog: true,
             builder: (context) => CaptureMarkerName(
               name: session.currentRestaurant.markerNames[index],
             )
         )
     ).then((value) {
-      name = value;
+      mapMarker = value;
     });
-    if (name != null) {
-      setState(() {
-        session.currentRestaurant.markerNames[index] = name;
-        session.currentRestaurant.markerCoordinates[index] = Position(
-            latitude: _lastPosition.latitude,
-            longitude: _lastPosition.longitude);
-        database.setRestaurant(session.currentRestaurant);
-      });
+    if (mapMarker != null) {
+      if (mapMarker.isActive) {
+        setState(() {
+          session.currentRestaurant.markerNames[index] = mapMarker.name;
+          session.currentRestaurant.markerCoordinates[index] = Position(
+              latitude: _lastPosition.latitude,
+              longitude: _lastPosition.longitude);
+        });
+      } else {
+        setState(() {
+          session.currentRestaurant.markerNames[index] = EMPTY_NAME;
+          session.currentRestaurant.markerCoordinates[index] = Position(
+              latitude: 0,
+              longitude: 0);
+        });
+      }
+      database.setRestaurant(session.currentRestaurant);
     }
   }
 
