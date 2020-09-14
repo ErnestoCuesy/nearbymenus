@@ -72,7 +72,6 @@ class CheckPurchases extends StatelessWidget {
           if (snapshot.hasData) {
             subscription = snapshot.data;
             session.subscription = subscription;
-            print('Subscription data: ${subscription.purchaserInfo.allPurchaseDates}');
           }
           return FutureBuilder<List<Bundle>>(
               future: database.bundlesSnapshot(session.userDetails.email == '' || session.userDetails == null

@@ -31,7 +31,6 @@ class LandingPage extends StatelessWidget {
     final auth = Provider.of<AuthBase>(context, listen: true);
     final database = Provider.of<Database>(context, listen: true);
     final session = Provider.of<Session>(context, listen: true);
-    print('Landing page user coord: ${session.position.toString()}');
     return StreamBuilder<UserAuth>(
       stream: auth.onAuthStateChanged,
       builder: (context, snapshot) {
@@ -50,7 +49,7 @@ class LandingPage extends StatelessWidget {
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 final userDetails = snapshot.data;
-                if (!user.isAnonymous && user.isEmailVerified) {
+                if (!user.isAnonymous) {
                   if (userDetails.email == null || userDetails.email == '' ||
                       userDetails.role == null || userDetails.role == '') {
                     database.setUserDetails(session.userDetails);

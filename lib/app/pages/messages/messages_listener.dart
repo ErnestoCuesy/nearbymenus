@@ -76,7 +76,6 @@ class _MessagesListenerState extends State<MessagesListener> {
         if (snapshot.hasData) {
           final notificationsList = snapshot.data;
           notificationsList.forEach((message) {
-            print('Message for ${message.toRole}');
             if (message.toRole == role && !message.delivered) {
               _notifyUser(message);
               if (message.toRole == ROLE_PATRON ||

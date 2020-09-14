@@ -39,6 +39,7 @@ class UserDetailsForm extends StatefulWidget {
           userAddress3: userDetails.address3,
           userAddress4: userDetails.address4,
           userTelephone: userDetails.telephone,
+          agreementDate: userDetails.agreementDate,
       ),
       child: Consumer<UserDetailsModel>(
         builder: (context, model, _) => UserDetailsForm(model: model,),

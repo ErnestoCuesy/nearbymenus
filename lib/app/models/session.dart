@@ -63,7 +63,6 @@ class Session {
   }
 
   void broadcastMessageCounter(int value) {
-    print('Counter to broadcast $value');
     _subjectMessageCounter.add(value);
   }
 

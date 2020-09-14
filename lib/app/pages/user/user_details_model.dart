@@ -17,6 +17,7 @@ class UserDetailsModel with UserDetailsValidators, ChangeNotifier {
   String userAddress3;
   String userAddress4;
   String userTelephone;
+  String agreementDate;
   bool isLoading;
   bool submitted;
 
@@ -31,6 +32,7 @@ class UserDetailsModel with UserDetailsValidators, ChangeNotifier {
     this.userAddress3,
     this.userAddress4,
     this.userTelephone,
+    this.agreementDate,
     this.isLoading = false,
     this.submitted = false,
   });
@@ -46,6 +48,7 @@ class UserDetailsModel with UserDetailsValidators, ChangeNotifier {
       address3: userAddress3,
       address4: userAddress4,
       telephone: userTelephone,
+      agreementDate: agreementDate,
     );
     try {
       await database.setUserDetails(userDetails);
