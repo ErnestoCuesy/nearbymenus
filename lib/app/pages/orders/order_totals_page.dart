@@ -48,8 +48,8 @@ class _OrderTotalsPageState extends State<OrderTotalsPage> {
       _itemizedSubTotalPerStatus.putIfAbsent(status, () => Map<String, dynamic>());
       _itemizedQuantityPerStatus.putIfAbsent(status, () => Map<String, dynamic>());
     }
-    _tipsAndDiscountsAmountTotals.putIfAbsent('tips', () => 0);
-    _tipsAndDiscountsAmountTotals.putIfAbsent('discounts', () => 0);
+    _tipsAndDiscountsAmountTotals.putIfAbsent('Tips', () => 0);
+    _tipsAndDiscountsAmountTotals.putIfAbsent('Discounts', () => 0);
     _orderList.forEach((order) {
       final total = order.orderTotal - (order.orderTotal * order.discount) + order.tip;
       if (order.status == ORDER_PLACED) {
@@ -75,8 +75,8 @@ class _OrderTotalsPageState extends State<OrderTotalsPage> {
             _paymentMethodQuantityTotals.putIfAbsent(order.paymentMethod, () => 1);
             _paymentMethodAmountTotals.putIfAbsent(order.paymentMethod, () => total);
           }
-          _tipsAndDiscountsAmountTotals.update('tips', (value) => value + order.tip);
-          _tipsAndDiscountsAmountTotals.update('discounts', (value) => value + (order.orderTotal * order.discount));
+          _tipsAndDiscountsAmountTotals.update('Tips', (value) => value + order.tip);
+          _tipsAndDiscountsAmountTotals.update('Discounts', (value) => value + (order.orderTotal * order.discount));
         }
       }
     });
@@ -139,7 +139,7 @@ class _OrderTotalsPageState extends State<OrderTotalsPage> {
                       onPressed: () {
                         Navigator.of(context).push(ItemBreakdownReport(
                           amounts: _tipsAndDiscountsAmountTotals,
-                          quantities: {'tips': 0, 'discounts': 0},
+                          quantities: {'Tips': 0, 'Discounts': 0},
                         ));
                       },
                     ),
