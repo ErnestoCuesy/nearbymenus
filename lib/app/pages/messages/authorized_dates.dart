@@ -53,27 +53,30 @@ class AuthorizedDates extends StatelessWidget {
       appBar: new AppBar(
         title: new Text('Select authorized dates'),
       ),
-      body: Column(
-        children: <Widget>[
-          Container(height: 32.0),
-          Text(lastMonthName,
-            style: Theme.of(context).textTheme.headline4,
-          ),
-          lastMonth,
-          Container(height: 16.0),
-          Text(currentMonthName,
-            style: Theme.of(context).textTheme.headline4,
-          ),
-          Container(height: 32.0),
-          currentMonth,
-          Container(height: 16.0),
-          FormSubmitButton(
-            context: context,
-            text: 'Save',
-            color: Theme.of(context).primaryColor,
-            onPressed: () => Navigator.of(context).pop(selectedDates),
-          ),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Container(height: 32.0),
+            Text(lastMonthName,
+              style: Theme.of(context).textTheme.headline4,
+            ),
+            lastMonth,
+            Container(height: 16.0),
+            Text(currentMonthName,
+              style: Theme.of(context).textTheme.headline4,
+            ),
+            Container(height: 32.0),
+            currentMonth,
+            Container(height: 16.0),
+            FormSubmitButton(
+              context: context,
+              text: 'Save',
+              color: Theme.of(context).primaryColor,
+              onPressed: () => Navigator.of(context).pop(selectedDates),
+            ),
+            Container(height: 16.0),
+          ],
+        ),
       ),
     );
   }
