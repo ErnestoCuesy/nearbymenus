@@ -73,16 +73,29 @@ class Auth implements AuthBase {
 
   @override
   Future<UserAuth> signInWithEmailAndPassword(
-      String email, String password) async {
-    final authResult = await _fireBaseAuth.signInWithEmailAndPassword(
-        email: email, password: password);
-    if (!authResult.user.emailVerified) {
-      throw PlatformException(
-          code: 'ERROR_EMAIL_NOT_VERIFIED',
-          message:
-              'Please verify your email address by clicking on the link emailed to you.');
-    } else {
-      return _userFromFirebase(authResult.user);
+    String email, String password) async {
+    User userInfo;
+    try {
+      final credential = await _fireBaseAuth.signInWithEmailAndPassword(
+              email: email, password: password);
+      userInfo = credential.user;
+      if (!userInfo.emailVerified) {
+            throw PlatformException(
+                code: 'EMAIL_NOT_VERIFIED',
+                message:
+                    'Please verify your email address by clicking on the link emailed to you.');
+      } else {
+        return _userFromFirebase(userInfo);
+      }
+    } catch (e) {
+      print(e);
+      if (e.code == 'user-not-found') {
+        throw PlatformException(
+            code: 'ERROR_USER_NOT_FOUND',
+            message: e.message,
+            );
+      }
+      rethrow;
     }
   }
 
@@ -101,11 +114,22 @@ class Auth implements AuthBase {
 
   @override
   Future<void> resetPassword(String email) async {
-    await _fireBaseAuth.sendPasswordResetEmail(email: email);
-    throw PlatformException(
-        code: 'PASSWORD_RESET',
-        message:
+    try {
+      await _fireBaseAuth.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      print(e);
+      if (e.code == 'user-not-found') {
+        throw PlatformException(
+          code: 'ERROR_USER_NOT_FOUND',
+          message: e.message,
+        );
+      } else {
+        throw PlatformException(
+            code: 'PASSWORD_RESET',
+            message:
             'A password reset link has been emailed to you. Please click on it to enter your new password and try to sign in again.');
+      }
+    }
   }
 
   @override

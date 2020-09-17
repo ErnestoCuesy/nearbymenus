@@ -77,7 +77,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
         ).show(context).then((value) async => await model.auth.signOut());
       }
       Navigator.of(context).pop(true);
-    } on PlatformException catch (e) {
+    } catch (e) {
       PlatformExceptionAlertDialog(
         title: 'Sign In',
         exception: e,

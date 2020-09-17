@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/models/user_details.dart';
 import 'package:nearbymenus/app/services/database.dart';
@@ -59,7 +60,7 @@ class EmailSignInModel with UserCredentialsValidators, ChangeNotifier {
         }
         break;
       }
-    } catch (e) {
+    } on PlatformException catch (e) {
       if (e.code == 'PASSWORD_RESET' || e.code == 'EMAIL_NOT_VERIFIED') {
         updateWith(formType: EmailSignInFormType.signIn);
       }
