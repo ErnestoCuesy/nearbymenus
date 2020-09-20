@@ -68,12 +68,32 @@ class _OrderTotalsPageState extends State<OrderTotalsPage> {
         if (order.status == ORDER_CLOSED) {
           _orderTotals.update('Closed', (value) => value + total);
           _updateSubTotalPerStatus(order, 'Closed');
-          if (_paymentMethodAmountTotals.containsKey(order.paymentMethod)) {
-            _paymentMethodQuantityTotals.update(order.paymentMethod, (value) => value + 1);
-            _paymentMethodAmountTotals.update(order.paymentMethod, (value) => value + total);
-          } else {
-            _paymentMethodQuantityTotals.putIfAbsent(order.paymentMethod, () => 1);
-            _paymentMethodAmountTotals.putIfAbsent(order.paymentMethod, () => total);
+          if (order.paymentMethod != '') { // Old transaction with one payment method
+            if (_paymentMethodAmountTotals.containsKey(order.paymentMethod)) {
+              _paymentMethodQuantityTotals.update(
+                  order.paymentMethod, (value) => value + 1);
+              _paymentMethodAmountTotals.update(
+                  order.paymentMethod, (value) => value + total);
+            } else {
+              _paymentMethodQuantityTotals.putIfAbsent(
+                  order.paymentMethod, () => 1);
+              _paymentMethodAmountTotals.putIfAbsent(
+                  order.paymentMethod, () => total);
+            }
+          } else { // New transaction with multiple payment methods
+            order.paymentMethods.forEach((key, splitAmount) {
+              if (_paymentMethodAmountTotals.containsKey(key)) {
+                _paymentMethodQuantityTotals.update(
+                    key, (value) => value + 1);
+                _paymentMethodAmountTotals.update(
+                    key, (value) => value + splitAmount);
+              } else {
+                _paymentMethodQuantityTotals.putIfAbsent(
+                    key, () => 1);
+                _paymentMethodAmountTotals.putIfAbsent(
+                    key, () => splitAmount);
+              }
+            });
           }
           _tipsAndDiscountsAmountTotals.update('Tips', (value) => value + order.tip);
           _tipsAndDiscountsAmountTotals.update('Discounts', (value) => value + (order.orderTotal * order.discount));

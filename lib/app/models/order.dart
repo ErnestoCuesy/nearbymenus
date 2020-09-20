@@ -25,6 +25,7 @@ class Order {
   String telephone;
   Position deliveryPosition;
   String paymentMethod;
+  Map<String, double> paymentMethods;
   String deliveryOption;
   List<Map<dynamic, dynamic>> orderItems;
   String notes;
@@ -47,6 +48,7 @@ class Order {
     this.telephone,
     this.deliveryPosition,
     this.paymentMethod,
+    this.paymentMethods,
     this.deliveryOption,
     this.orderItems,
     this.notes,
@@ -67,6 +69,12 @@ class Order {
     } else {
       orderItems = List<Map<dynamic, dynamic>>();
     }
+    Map<String, double> paymentMethods;
+    if (data['paymentMethods'] != null) {
+      paymentMethods = Map.from(data['paymentMethods']);
+    } else {
+      paymentMethods = Map<String, double>();
+    }
     return Order(
       id: data['id'],
       orderNumber: data['orderNumber'],
@@ -82,6 +90,7 @@ class Order {
       deliveryPosition: Position(
           latitude: geoPoint.latitude, longitude: geoPoint.longitude),
       paymentMethod: data['paymentMethod'],
+      paymentMethods: paymentMethods,
       deliveryOption: data['deliveryOption'],
       orderItems: orderItems,
       notes: data['notes'],
@@ -123,6 +132,7 @@ class Order {
       'telephone': telephone,
       'deliveryPosition': geoPoint,
       'paymentMethod': paymentMethod ?? '',
+      'paymentMethods': paymentMethods ?? {},
       'deliveryOption': deliveryOption ?? '',
       'orderItems': orderItems ?? [],
       'notes': notes,

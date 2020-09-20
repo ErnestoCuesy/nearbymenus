@@ -86,6 +86,7 @@ class Session {
         telephone: userDetails.telephone,
         deliveryPosition: position,
         paymentMethod: '',
+        paymentMethods: Map<String, double>(),
         deliveryOption: '',
         orderItems: List<Map<dynamic, dynamic>>(),
         notes: '',

@@ -10,6 +10,7 @@ class ViewOrderModel with ChangeNotifier {
   final Database database;
   final Session session;
   Order order;
+  Map<String, double> stagedPaymentMethods = {};
   bool automaticallyCloseOrder;
   bool isLoading;
   bool submitted;
@@ -164,9 +165,15 @@ class ViewOrderModel with ChangeNotifier {
         deliveryOptionsOk = true;
       }
     }
-    return order.paymentMethod != '' &&
+    double orderFinalAmount = order.orderTotal - (order.orderTotal * order.discount) + order.tip;
+    double paymentMethodsSum = 0;
+    if (order.paymentMethods.length > 0) {
+      paymentMethodsSum =
+          order.paymentMethods.values.reduce((sum, element) => sum + element);
+    }
+    return paymentMethodsSum == orderFinalAmount &&
            deliveryOptionsOk &&
-           order.orderTotal > 0;
+           orderFinalAmount > 0;
   }
 
   void updatePaymentMethod(String key, bool flag) {
@@ -177,6 +184,26 @@ class ViewOrderModel with ChangeNotifier {
       updateWith(paymentMethod: key);
     } else {
       updateWith(paymentMethod: '');
+    }
+  }
+
+  void updatePaymentMethods(String key, bool flag) {
+    if (order.status != ORDER_ON_HOLD && FlavourConfig.isPatron()) {
+      return;
+    }
+    if (flag) {
+      stagedPaymentMethods.putIfAbsent(key, () => 0.0);
+    } else {
+      stagedPaymentMethods.remove(key);
+    }
+    updateWith(paymentMethods: stagedPaymentMethods);
+  }
+
+  void updatePaymentMethodAmount(String key, double newValue) {
+    if (stagedPaymentMethods.containsKey(key)) {
+      stagedPaymentMethods.update(key, (value) => newValue);
+    } else {
+      stagedPaymentMethods.putIfAbsent(key, () => newValue);
     }
   }
 
@@ -192,6 +219,8 @@ class ViewOrderModel with ChangeNotifier {
   }
 
   bool paymentOptionCheck(String key) => order.paymentMethod == key;
+
+  bool paymentOptionsCheck(String key) => order.paymentMethods.containsKey(key);
 
   bool foodDeliveryOptionCheck(String key) => order.deliveryOption == key;
 
@@ -248,6 +277,7 @@ class ViewOrderModel with ChangeNotifier {
   void updateWith({
     String notes,
     String paymentMethod,
+    Map<String, double> paymentMethods,
     String deliveryOption,
     bool automaticallyCloseOrder,
     bool isLoading,
@@ -255,6 +285,7 @@ class ViewOrderModel with ChangeNotifier {
   }) {
     this.order.notes = notes ?? this.order.notes;
     this.order.paymentMethod = paymentMethod ?? this.order.paymentMethod;
+    this.order.paymentMethods = paymentMethods ?? this.order.paymentMethods;
     this.order.deliveryOption = deliveryOption ?? this.order.deliveryOption;
     this.automaticallyCloseOrder = automaticallyCloseOrder ?? this.automaticallyCloseOrder;
     this.isLoading = isLoading ?? this.isLoading;

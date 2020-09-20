@@ -5,11 +5,12 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
+import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/session.dart';
 import 'package:nearbymenus/app/pages/map/map_route.dart';
-import 'package:nearbymenus/app/pages/orders/order_extra_amounts.dart';
+import 'package:nearbymenus/app/pages/orders/order_settlement.dart';
 import 'package:nearbymenus/app/pages/orders/view_order_model.dart';
 import 'package:nearbymenus/app/services/database.dart';
 import 'package:nearbymenus/app/utilities/format.dart';
@@ -124,26 +125,44 @@ class _ViewOrderState extends State<ViewOrder> {
     }
   }
 
-  void _captureExtras(BuildContext context) async {
-    ExtraFields extraFields = ExtraFields();
-    await Navigator.of(context).push(
-        MaterialPageRoute<ExtraFields>(
-            fullscreenDialog: true,
-            builder: (context) => OrderExtraAmounts(
-              orderStatus: model.order.status,
-              orderAmount: model.order.orderTotal,
-              extraFields: ExtraFields(
-                  tip: model.order.tip,
-                  discount: model.order.discount
-              ),
-            )
-        )
-    ).then((value) {
-      extraFields = value;
-    });
-    if (extraFields != null) {
-      model.updateTip(extraFields.tip ?? 0);
-      model.updateDiscount(extraFields.discount ?? 0);
+  void _orderSettlement(BuildContext context) async {
+    if (model.order.paymentMethods.length > 0) {
+      ExtraFields extraFields = ExtraFields();
+      await Navigator.of(context).push(
+          MaterialPageRoute<ExtraFields>(
+              fullscreenDialog: true,
+              builder: (context) =>
+                  OrderSettlement(
+                    orderStatus: model.order.status,
+                    orderAmount: model.order.orderTotal,
+                    extraFields: ExtraFields(
+                      tip: model.order.tip,
+                      discount: model.order.discount,
+                      splitAmounts: model.order.paymentMethods,
+                    ),
+                  )
+          )
+      ).then((value) {
+        extraFields = value;
+      });
+      if (extraFields != null) {
+        model.updateTip(extraFields.tip ?? 0);
+        model.updateDiscount(extraFields.discount ?? 0);
+        extraFields.splitAmounts.forEach((key, newValue) {
+          model.updatePaymentMethodAmount(key, newValue);
+        });
+      }
+    } else {
+      await PlatformExceptionAlertDialog(
+        title: 'No payment methods selected',
+        exception: PlatformException(
+          code: 'PAYMENT_METHOD_MISSING',
+          message:
+          'Please select at least one payment method.',
+          details:
+          'Please select at least one payment method.',
+        ),
+      ).show(context);
     }
   }
 
@@ -338,12 +357,16 @@ class _ViewOrderState extends State<ViewOrder> {
                     ),
                   ),
                   _notesField(context, model.order.notes),
-                  if (model.order.status < 10)
-                    FormSubmitButton(
-                      context: context,
-                      text: FlavourConfig.isPatron() ? 'Add Tip' : 'Tips and Discounts',
-                      color: Theme.of(context).primaryColor,
-                      onPressed: () => _captureExtras(context),
+                  if (model.order.status == ORDER_ON_HOLD ||
+                      (!FlavourConfig.isPatron() && model.order.status != ORDER_CLOSED))
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: FormSubmitButton(
+                        context: context,
+                        text: 'Order Settlement',
+                        color: Theme.of(context).primaryColor,
+                        onPressed: () => _orderSettlement(context),
+                      ),
                     ),
                   if (model.order.status == ORDER_ON_HOLD)
                   Padding(
@@ -579,13 +602,32 @@ class _ViewOrderState extends State<ViewOrder> {
     Map<dynamic, dynamic> restaurantPaymentOptions = session.currentRestaurant.paymentFlags;
     restaurantPaymentOptions.forEach((key, value) {
       if (value) {
-        paymentOptionsList.add(CheckboxListTile(
-          title: Text(
-            key,
-          ),
-          value: model.paymentOptionCheck(key),
-          onChanged: (flag) => model.updatePaymentMethod(key, flag),
-        ));
+        paymentOptionsList.add(
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: CheckboxListTile(
+                    title: Text(
+                      key,
+                    ),
+                    value: model.order.paymentMethod == ''
+                        ? model.paymentOptionsCheck(key)
+                        : model.paymentOptionCheck(key),
+                    onChanged: (flag) => model.updatePaymentMethods(key, flag),
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                      model.order.paymentMethods[key] != null && model.order.paymentMethods[key] > 0
+                          ? f.format(model.order.paymentMethods[key])
+                          : '',
+                  ),
+                ),
+              ],
+            ),
+        );
       }
     });
     return paymentOptionsList;
