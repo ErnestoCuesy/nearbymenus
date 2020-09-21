@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:nearbymenus/app/common_widgets/form_submit_button.dart';
 import 'package:nearbymenus/app/common_widgets/platform_alert_dialog.dart';
-import 'package:nearbymenus/app/common_widgets/platform_exception_alert_dialog.dart';
 import 'package:nearbymenus/app/config/flavour_config.dart';
 import 'package:nearbymenus/app/models/order.dart';
 import 'package:nearbymenus/app/models/session.dart';
@@ -126,43 +125,32 @@ class _ViewOrderState extends State<ViewOrder> {
   }
 
   void _orderSettlement(BuildContext context) async {
-    if (model.order.paymentMethods.length > 0) {
-      ExtraFields extraFields = ExtraFields();
-      await Navigator.of(context).push(
-          MaterialPageRoute<ExtraFields>(
-              fullscreenDialog: true,
-              builder: (context) =>
-                  OrderSettlement(
-                    orderStatus: model.order.status,
-                    orderAmount: model.order.orderTotal,
-                    extraFields: ExtraFields(
-                      tip: model.order.tip,
-                      discount: model.order.discount,
-                      splitAmounts: model.order.paymentMethods,
-                    ),
-                  )
-          )
-      ).then((value) {
-        extraFields = value;
+    ExtraFields extraFields = ExtraFields();
+    await Navigator.of(context).push(
+        MaterialPageRoute<ExtraFields>(
+            fullscreenDialog: true,
+            builder: (context) =>
+                OrderSettlement(
+                  orderStatus: model.order.status,
+                  orderAmount: model.order.orderTotal,
+                  extraFields: ExtraFields(
+                    tip: model.order.tip,
+                    discount: model.order.discount,
+                    cashReceived: model.order.cashReceived,
+                    splitAmounts: model.order.paymentMethods,
+                  ),
+                )
+        )
+    ).then((value) {
+      extraFields = value;
+    });
+    if (extraFields != null) {
+      model.updateTip(extraFields.tip ?? 0);
+      model.updateDiscount(extraFields.discount ?? 0);
+      model.updateCashReceived(extraFields.cashReceived ?? 0);
+      extraFields.splitAmounts.forEach((key, newValue) {
+        model.updatePaymentMethodAmount(key, newValue);
       });
-      if (extraFields != null) {
-        model.updateTip(extraFields.tip ?? 0);
-        model.updateDiscount(extraFields.discount ?? 0);
-        extraFields.splitAmounts.forEach((key, newValue) {
-          model.updatePaymentMethodAmount(key, newValue);
-        });
-      }
-    } else {
-      await PlatformExceptionAlertDialog(
-        title: 'No payment methods selected',
-        exception: PlatformException(
-          code: 'PAYMENT_METHOD_MISSING',
-          message:
-          'Please select at least one payment method.',
-          details:
-          'Please select at least one payment method.',
-        ),
-      ).show(context);
     }
   }
 
@@ -364,8 +352,10 @@ class _ViewOrderState extends State<ViewOrder> {
                       child: FormSubmitButton(
                         context: context,
                         text: 'Order Settlement',
-                        color: Theme.of(context).primaryColor,
-                        onPressed: () => _orderSettlement(context),
+                        color: model.canSettleOrder
+                            ? Theme.of(context).primaryColor
+                            : Theme.of(context).disabledColor,
+                        onPressed: model.canSettleOrder ? () => _orderSettlement(context) : null,
                       ),
                     ),
                   if (model.order.status == ORDER_ON_HOLD)

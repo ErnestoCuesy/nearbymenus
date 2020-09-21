@@ -92,6 +92,7 @@ class Session {
         notes: '',
         tip: 0.0,
         discount: 0.0,
+        cashReceived: 0.0,
     );
   }
 }

@@ -31,6 +31,7 @@ class Order {
   String notes;
   double tip;
   double discount;
+  double cashReceived;
   bool isActive;
   bool isBlocked;
 
@@ -54,6 +55,7 @@ class Order {
     this.notes,
     this.tip,
     this.discount,
+    this.cashReceived,
     this.isActive,
     this.isBlocked,
   });
@@ -96,6 +98,7 @@ class Order {
       notes: data['notes'],
       tip: data['tip'] ?? 0,
       discount: data['discount'] ?? 0,
+      cashReceived: data['cashReceived'] ?? 0,
       isActive: data['isActive'],
       isBlocked: data['isBlocked'],
     );
@@ -138,6 +141,7 @@ class Order {
       'notes': notes,
       'tip': tip,
       'discount': discount,
+      'cashReceived': cashReceived,
       'isActive': activeFlag,
       'isBlocked': isBlocked ?? false,
     };

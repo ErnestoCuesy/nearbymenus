@@ -154,6 +154,8 @@ class ViewOrderModel with ChangeNotifier {
 
   bool get canSave => _checkOrder();
 
+  bool get canSettleOrder => order.paymentMethods.length > 0;
+
   bool _checkOrder() {
     int deliveryOptionsAvailable = 0;
     session.currentRestaurant.foodDeliveryFlags.forEach((key, value) {
@@ -268,14 +270,19 @@ class ViewOrderModel with ChangeNotifier {
     return proceed;
   }
 
-  void updateTip(double tip) => order.tip = tip;
+  void updateTip(double tip) => updateWith(tip: tip);
 
-  void updateDiscount(double discount) => order.discount = discount;
+  void updateDiscount(double discount) => updateWith(discount: discount);
+
+  void updateCashReceived(double cashReceived) => updateWith(cashReceived: cashReceived);
 
   void updateAutomaticallyCloseOrder(bool flag) => updateWith(automaticallyCloseOrder: flag);
 
   void updateWith({
     String notes,
+    double tip,
+    double discount,
+    double cashReceived,
     String paymentMethod,
     Map<String, double> paymentMethods,
     String deliveryOption,
@@ -284,6 +291,9 @@ class ViewOrderModel with ChangeNotifier {
     bool submitted,
   }) {
     this.order.notes = notes ?? this.order.notes;
+    this.order.tip = tip ?? this.order.tip;
+    this.order.discount = discount ?? this.order.discount;
+    this.order.cashReceived = cashReceived ?? this.order.cashReceived;
     this.order.paymentMethod = paymentMethod ?? this.order.paymentMethod;
     this.order.paymentMethods = paymentMethods ?? this.order.paymentMethods;
     this.order.deliveryOption = deliveryOption ?? this.order.deliveryOption;

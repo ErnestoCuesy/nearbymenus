@@ -7,9 +7,10 @@ import 'package:nearbymenus/app/config/flavour_config.dart';
 class ExtraFields {
   double tip;
   double discount;
+  double cashReceived;
   Map<String, double> splitAmounts;
 
-  ExtraFields({this.tip = 0.0, this.discount = 0.0, this.splitAmounts});
+  ExtraFields({this.tip = 0.0, this.discount = 0.0, this.cashReceived, this.splitAmounts});
 }
 
 class OrderSettlement extends StatefulWidget {
@@ -77,6 +78,9 @@ class _OrderSettlementState extends State<OrderSettlement> {
   void _recalculate() {
     setState(() {
       totalAmount = double.parse((orderAmount - (orderAmount * extraFields.discount) + extraFields.tip).toStringAsFixed(2));
+      final key = _editingControllerMap.keys.elementAt(0);
+      extraFields.splitAmounts[key] = totalAmount;
+      _editingControllerMap.values.elementAt(0).text = ff.format(totalAmount);
     });
   }
 
@@ -153,9 +157,12 @@ class _OrderSettlementState extends State<OrderSettlement> {
       textInputAction: TextInputAction.next,
       onChanged: (value) {
         setState(() {
-          String cashPortionText = _editingControllerMap['Cash'].text.replaceAll(',', '.');
-          final cashPortion = double.tryParse(cashPortionText);
-          final cashOnHand = double.tryParse(value);
+          //String cashPortionText = _editingControllerMap['Cash'].text.replaceAll(',', '.');
+          //final cashPortion = double.tryParse(cashPortionText);
+          final cashPortion = extraFields.splitAmounts['Cash'];
+          var amount = value.replaceAll(RegExp(r','), '.');
+          final cashOnHand = double.tryParse(amount);
+          extraFields.cashReceived = cashOnHand;
           final change = cashOnHand - cashPortion;
           _cashChangeController.text = ff.format(change);
         });
@@ -170,7 +177,7 @@ class _OrderSettlementState extends State<OrderSettlement> {
       controller: _cashChangeController,
       cursorColor: Colors.black,
       decoration: InputDecoration(
-        labelText: 'Cash change',
+        labelText: 'Change',
         errorText: '',
         enabled: false,
       ),
