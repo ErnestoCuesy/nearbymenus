@@ -38,8 +38,8 @@ class _OrderSettlementState extends State<OrderSettlement> {
   double totalAmount;
   double splitAmount;
   final f = NumberFormat.simpleCurrency(locale: "en_ZA", decimalDigits: 2);
-  final ff = NumberFormat("0.00", 'en_ZA');
-  final fff = NumberFormat('0', 'en_ZA');
+  final ff = NumberFormat('0.00', 'en_ZA');
+  final fff = NumberFormat('0.00', 'en_ZA');
 
   @override
   void initState() {
@@ -76,7 +76,7 @@ class _OrderSettlementState extends State<OrderSettlement> {
 
   void _recalculate() {
     setState(() {
-      totalAmount = orderAmount - (orderAmount * extraFields.discount) + extraFields.tip;
+      totalAmount = double.parse((orderAmount - (orderAmount * extraFields.discount) + extraFields.tip).toStringAsFixed(2));
     });
   }
 
@@ -98,7 +98,8 @@ class _OrderSettlementState extends State<OrderSettlement> {
       keyboardType: TextInputType.numberWithOptions(decimal: true),
       textInputAction: TextInputAction.next,
       onChanged: (value) {
-        extraFields.tip = double.tryParse(value ?? 0);
+        var amount = value.replaceAll(RegExp(r','), '.');
+        extraFields.tip = double.tryParse(amount ?? 0);
         _recalculate();
       },
       onEditingComplete: () => FocusScope.of(context).requestFocus(_discountFocusNode),
@@ -120,14 +121,13 @@ class _OrderSettlementState extends State<OrderSettlement> {
       autocorrect: false,
       enableSuggestions: false,
       enableInteractiveSelection: false,
-      keyboardType: TextInputType.numberWithOptions(decimal: false),
+      keyboardType: TextInputType.numberWithOptions(decimal: true),
       textInputAction: TextInputAction.next,
       onChanged: (value) {
-        if (value.length > 0) {
-          extraFields.discount = double.tryParse(value ?? 0) / 100;
-        } else {
-          extraFields.discount = 0.0;
-        }
+        var amount = value.replaceAll(RegExp(r','), '.');
+        var percent = double.tryParse(amount) / 100;
+        var percentString = percent.toStringAsFixed(2);
+        extraFields.discount = double.parse(percentString);
         _recalculate();
       },
       onEditingComplete: () => FocusScope.of(context).requestFocus(_tipFocusNode),
@@ -222,7 +222,8 @@ class _OrderSettlementState extends State<OrderSettlement> {
         keyboardType: TextInputType.numberWithOptions(decimal: true),
         textInputAction: TextInputAction.next,
         onChanged: (value) {
-          extraFields.splitAmounts[key] = double.tryParse(value ?? 0);
+          var amount = value.replaceAll(RegExp(r','), '.');
+          extraFields.splitAmounts[key] = double.tryParse(amount ?? 0.00);
         },
         onEditingComplete: () {},
       ));
