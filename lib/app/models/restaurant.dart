@@ -27,6 +27,8 @@ class Restaurant {
   final bool foodDeliveries;
   final bool foodCollection;
   final bool allowCancellations;
+  final String vatNumber;
+  final String registrationNumber;
   final Map<dynamic, dynamic> foodDeliveryFlags;
   final Map<dynamic, dynamic> restaurantFlags;
   final Map<dynamic, dynamic> paymentFlags;
@@ -61,6 +63,8 @@ class Restaurant {
     this.foodDeliveries,
     this.foodCollection,
     this.allowCancellations,
+    this.vatNumber,
+    this.registrationNumber,
     this.restaurantFlags,
     this.paymentFlags,
     this.restaurantMenus,
@@ -112,6 +116,8 @@ class Restaurant {
         foodDeliveries: value['foodDeliveryFlags']['Deliver'] ?? false,
         foodCollection: value['foodDeliveryFlags']['Collect'] ?? false,
         allowCancellations: value['allowCancellations'] ?? false,
+        vatNumber: value['vatNumber'] ?? '',
+        registrationNumber: value['registrationNumber'] ?? '',
         restaurantFlags: value['restaurantFlags'] ?? {},
         paymentFlags: value['paymentFlags'] ?? {},
         restaurantMenus: value['restaurantMenus'] ?? {},
@@ -153,6 +159,8 @@ class Restaurant {
       'foodDeliveryFlags': foodDeliveryFlags ?? {},
       'itemImagesInitialized': itemImagesInitialized ?? false,
       'allowCancellations': allowCancellations,
+      'vatNumber': vatNumber,
+      'registrationNumber': registrationNumber,
       'adminVerified': adminVerified ?? false,
       'markerCoordinates': geoPointList,
       'markerNames': markerNames,

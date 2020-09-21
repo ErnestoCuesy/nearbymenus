@@ -35,6 +35,8 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
   bool foodDeliveries;
   bool foodCollection;
   bool allowCancellations;
+  String vatNumber;
+  String registrationNumber;
   bool adminVerified;
   Map<dynamic, dynamic> restaurantMenus;
   Map<dynamic, dynamic> restaurantOptions;
@@ -70,6 +72,8 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     this.foodDeliveries = false,
     this.foodCollection = false,
     this.allowCancellations = false,
+    this.vatNumber,
+    this.registrationNumber,
     this.adminVerified = false,
     this.restaurantMenus,
     this.restaurantOptions,
@@ -110,6 +114,8 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
           foodDeliveries: foodDeliveries,
           foodCollection: foodCollection,
           allowCancellations: allowCancellations,
+          vatNumber: vatNumber,
+          registrationNumber: registrationNumber,
           adminVerified: adminVerified,
           restaurantFlags: {
             'open': open,
@@ -261,6 +267,10 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
 
   void updateAllowCancellations(bool allowCancellations) => updateWith(allowCancellations: allowCancellations);
 
+  void updateVatNumber(String vatNumber) => updateWith(vatNumber: vatNumber);
+
+  void updateRegistrationNumber(String registrationNumber) => updateWith(registrationNumber: registrationNumber);
+
   void updateWith({
     String name,
     String address1,
@@ -283,6 +293,8 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     bool foodDeliveries,
     bool foodCollection,
     bool allowCancellations,
+    String vatNumber,
+    String registrationNumber,
     bool isLoading,
     bool submitted,
   }) {
@@ -308,6 +320,8 @@ class RestaurantDetailsModel with RestaurantDetailsValidators, ChangeNotifier {
     this.foodDeliveries = foodDeliveries ?? this.foodDeliveries;
     this.foodCollection = foodCollection ?? this.foodCollection;
     this.allowCancellations = allowCancellations ?? this.allowCancellations;
+    this.vatNumber = vatNumber ?? this.vatNumber;
+    this.registrationNumber = registrationNumber ?? this.registrationNumber;
     this.isLoading = isLoading ?? this.isLoading;
     this.submitted = this.submitted;
     dataHasChanged = true;

@@ -47,6 +47,8 @@ class RestaurantDetailsForm extends StatefulWidget {
         foodDeliveries: restaurant.foodDeliveries ?? false,
         foodCollection: restaurant.foodCollection ?? false,
         allowCancellations: restaurant.allowCancellations ?? false,
+        vatNumber: restaurant.vatNumber ?? '',
+        registrationNumber: restaurant.registrationNumber ?? '',
         adminVerified: restaurant.adminVerified ?? false,
         restaurantMenus: restaurant.restaurantMenus ?? {},
         restaurantOptions: restaurant.restaurantOptions ?? {},
@@ -74,6 +76,8 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
   final TextEditingController _restaurantAddress4Controller = TextEditingController();
   final TextEditingController _deliveryRadiusController = TextEditingController();
   final TextEditingController _notesController = TextEditingController();
+  final TextEditingController _vatNumberController = TextEditingController();
+  final TextEditingController _registrationNumberController = TextEditingController();
   final TextEditingController _telephoneNumberController = TextEditingController();
   final FocusNode _restaurantNameFocusNode = FocusNode();
   final FocusNode _typeOfFoodFocusNode = FocusNode();
@@ -83,6 +87,8 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
   final FocusNode _restaurantAddress4FocusNode = FocusNode();
   final FocusNode _deliveryRadiusFocusNode = FocusNode();
   final FocusNode _notesFocusNode = FocusNode();
+  final FocusNode _vatNumberFocusNode = FocusNode();
+  final FocusNode _registrationNumberFocusNode = FocusNode();
   final FocusNode _telephoneNumberFocusNode = FocusNode();
   final FocusNode _hoursFromFocusNode = FocusNode();
   final FocusNode _hoursToFocusNode = FocusNode();
@@ -106,6 +112,8 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       _restaurantAddress4Controller.text = model.address4 ?? null;
       _deliveryRadiusController.text = model.deliveryRadius.toString() ?? 0;
       _notesController.text = model.notes ?? null;
+      _vatNumberController.text = model.vatNumber ?? null;
+      _registrationNumberController.text = model.registrationNumber ?? null;
       _telephoneNumberController.text = model.telephoneNumber ?? null;
       _openFrom = model.workingHoursFrom ?? null;
       _openTo = model.workingHoursTo ?? null;
@@ -122,6 +130,8 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
     _restaurantAddress4Controller.dispose();
     _deliveryRadiusController.dispose();
     _notesController.dispose();
+    _vatNumberController.dispose();
+    _registrationNumberController.dispose();
     _telephoneNumberController.dispose();
     _restaurantNameFocusNode.dispose();
     _restaurantAddress1FocusNode.dispose();
@@ -131,6 +141,8 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
     _typeOfFoodFocusNode.dispose();
     _deliveryRadiusFocusNode.dispose();
     _notesFocusNode.dispose();
+    _vatNumberFocusNode.dispose();
+    _registrationNumberFocusNode.dispose();
     _telephoneNumberFocusNode.dispose();
     _hoursFromFocusNode.dispose();
     _hoursToFocusNode.dispose();
@@ -221,6 +233,14 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
   }
 
   void _notesEditingComplete() {
+    FocusScope.of(context).requestFocus(_registrationNumberFocusNode);
+  }
+
+  void _registrationNumberEditingComplete() {
+    FocusScope.of(context).requestFocus(_vatNumberFocusNode);
+  }
+
+  void _vatNumberEditingComplete() {
     FocusScope.of(context).requestFocus(_hoursFromFocusNode);
   }
 
@@ -259,6 +279,14 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
         height: 8.0,
       ),
       _buildNotesTextField(),
+      SizedBox(
+        height: 8.0,
+      ),
+      _buildRegistrationNumberTextField(),
+      SizedBox(
+        height: 8.0,
+      ),
+      _buildVatNumberTextField(),
       SizedBox(
         height: 16.0,
       ),
@@ -542,6 +570,48 @@ class _RestaurantDetailsFormState extends State<RestaurantDetailsForm> {
       textInputAction: TextInputAction.next,
       onChanged: (value) => model.updateNotes(value),
       onEditingComplete: () => _notesEditingComplete(),
+    );
+  }
+
+  TextField _buildRegistrationNumberTextField() {
+    return TextField(
+      style: Theme.of(context).inputDecorationTheme.labelStyle,
+      controller: _registrationNumberController,
+      focusNode: _registrationNumberFocusNode,
+      cursorColor: Colors.black,
+      decoration: InputDecoration(
+        labelText: 'Registration Number',
+        hintText: '',
+        enabled: model.isLoading == false,
+      ),
+      autocorrect: false,
+      enableSuggestions: false,
+      enableInteractiveSelection: false,
+      keyboardType: TextInputType.text,
+      textInputAction: TextInputAction.next,
+      onChanged: (value) => model.updateRegistrationNumber(value),
+      onEditingComplete: () => _registrationNumberEditingComplete(),
+    );
+  }
+
+  TextField _buildVatNumberTextField() {
+    return TextField(
+      style: Theme.of(context).inputDecorationTheme.labelStyle,
+      controller: _vatNumberController,
+      focusNode: _vatNumberFocusNode,
+      cursorColor: Colors.black,
+      decoration: InputDecoration(
+        labelText: 'VAT Number',
+        hintText: '',
+        enabled: model.isLoading == false,
+      ),
+      autocorrect: false,
+      enableSuggestions: false,
+      enableInteractiveSelection: false,
+      keyboardType: TextInputType.number,
+      textInputAction: TextInputAction.next,
+      onChanged: (value) => model.updateVatNumber(value),
+      onEditingComplete: () => _vatNumberEditingComplete(),
     );
   }
 
