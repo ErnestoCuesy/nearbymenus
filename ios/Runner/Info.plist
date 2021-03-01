@@ -11,7 +11,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>NM Manager</string>
+	<string>NM Staff</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -22,6 +22,10 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+        <string>itms</string>
+    </array>
 	<key>NSAppleMusicUsageDescription</key>
 	<string>Your phone's Apple Music may be accessed while you use this app.</string>
 	<key>NSCalendarsUsageDescription</key>
@@ -36,8 +40,8 @@
 	<string>Your current location will be used to find restaurants advertising on Nearby Menus.</string>
 	<key>NSMotionUsageDescription</key>
 	<string>Your phone's motion may be accessed while you use this app.</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>Your phone's photo library may be accessed to pick restaurant images.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Your phone's photo library may be accessed to pick restaurant images.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Your phone's speech recognition may be accessed while you use this app.</string>
 	<key>UILaunchStoryboardName</key>
@@ -59,5 +63,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>io.flutter.embedded_views_preview</key>
+	<true/>
 </dict>
 </plist>
