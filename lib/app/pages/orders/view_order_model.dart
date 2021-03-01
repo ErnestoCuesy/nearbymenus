@@ -15,17 +15,17 @@ class ViewOrderModel with ChangeNotifier {
   bool isLoading;
   bool submitted;
 
-  ViewOrderModel(
-      {@required this.database,
-        @required this.session,
-        @required this.order,
-        this.automaticallyCloseOrder,
-        this.isLoading = false,
-        this.submitted = false,
-      });
+  ViewOrderModel({
+    @required this.database,
+    @required this.session,
+    @required this.order,
+    this.automaticallyCloseOrder,
+    this.isLoading = false,
+    this.submitted = false,
+  });
 
   Future<int> get orderDistance async {
-    double distance = GeolocatorPlatform.distanceBetween(
+    double distance = Geolocator.distanceBetween(
       session.position.latitude,
       session.position.longitude,
       order.deliveryPosition.latitude,
@@ -42,8 +42,7 @@ class ViewOrderModel with ChangeNotifier {
           session.currentRestaurant.managerId,
           FlavourConfig.isManager() ? ROLE_MANAGER : ROLE_PATRON,
           ROLE_STAFF,
-          'New order to ${session.currentRestaurant.name}'
-      );
+          'New order to ${session.currentRestaurant.name}');
     }
   }
 
@@ -56,9 +55,9 @@ class ViewOrderModel with ChangeNotifier {
       order.deliveryPosition = session.position;
       order.status = automaticallyCloseOrder ? ORDER_CLOSED : ORDER_PLACED;
       database.setOrderTransaction(session.currentRestaurant.managerId,
-          session.currentRestaurant.id,
-          order);
-      session.currentOrder = session.emptyOrder(orderNumber, timestamp, database.userId);
+          session.currentRestaurant.id, order);
+      session.currentOrder =
+          session.emptyOrder(orderNumber, timestamp, database.userId);
       session.userDetails.orderOnHold = null;
       session.broadcastOrderCounter(0);
       _setUserDetails();
@@ -68,7 +67,8 @@ class ViewOrderModel with ChangeNotifier {
     }
   }
 
-  Future<void> _sendMessage(String toUid, String fromRole, String toRole, String type) async {
+  Future<void> _sendMessage(
+      String toUid, String fromRole, String toRole, String type) async {
     final double timestamp = dateFromCurrentDate() / 1.0;
     database.setMessageDetails(UserMessage(
       id: documentIdFromCurrentDate(),
@@ -84,7 +84,6 @@ class ViewOrderModel with ChangeNotifier {
       authFlag: false,
       attendedFlag: false,
     ));
-
   }
 
   void processOrder(int newOrderStatus) {
@@ -92,7 +91,8 @@ class ViewOrderModel with ChangeNotifier {
       order.status = newOrderStatus;
       database.setOrder(order);
       if (newOrderStatus == ORDER_CANCELLED) {
-        database.setBundleCounterTransaction(session.currentRestaurant.managerId, 1);
+        database.setBundleCounterTransaction(
+            session.currentRestaurant.managerId, 1);
       }
     } catch (e) {
       print(e);
@@ -116,14 +116,8 @@ class ViewOrderModel with ChangeNotifier {
         message = 'We\'re out of stock on one or more items.';
         break;
     }
-    if (newOrderStatus != ORDER_CLOSED &&
-        newOrderStatus != ORDER_CANCELLED) {
-      _sendMessage(
-          order.userId,
-          ROLE_STAFF,
-          ROLE_PATRON,
-          message
-      );
+    if (newOrderStatus != ORDER_CLOSED && newOrderStatus != ORDER_CANCELLED) {
+      _sendMessage(order.userId, ROLE_STAFF, ROLE_PATRON, message);
     }
   }
 
@@ -142,14 +136,14 @@ class ViewOrderModel with ChangeNotifier {
   void updateNotes(String notes) => updateWith(notes: notes);
 
   void deleteOrderItem(int index) {
-      order.orderItems.removeAt(index);
-      session.currentOrder = order;
-      session.userDetails.orderOnHold = order.toMap();
-      session.broadcastOrderCounter(order.orderItems.length);
-      _setUserDetails();
-      notifyListeners();
+    order.orderItems.removeAt(index);
+    session.currentOrder = order;
+    session.userDetails.orderOnHold = order.toMap();
+    session.broadcastOrderCounter(order.orderItems.length);
+    _setUserDetails();
+    notifyListeners();
   }
-  
+
   String get primaryButtonText => 'Save';
 
   bool get canSave => _checkOrder();
@@ -167,15 +161,16 @@ class ViewOrderModel with ChangeNotifier {
         deliveryOptionsOk = true;
       }
     }
-    double orderFinalAmount = order.orderTotal - (order.orderTotal * order.discount) + order.tip;
+    double orderFinalAmount =
+        order.orderTotal - (order.orderTotal * order.discount) + order.tip;
     double paymentMethodsSum = 0;
     if (order.paymentMethods.length > 0) {
       paymentMethodsSum =
           order.paymentMethods.values.reduce((sum, element) => sum + element);
     }
     return paymentMethodsSum == orderFinalAmount &&
-           deliveryOptionsOk &&
-           orderFinalAmount > 0;
+        deliveryOptionsOk &&
+        orderFinalAmount > 0;
   }
 
   void updatePaymentMethod(String key, bool flag) {
@@ -259,8 +254,7 @@ class ViewOrderModel with ChangeNotifier {
         }
         break;
       case ORDER_CLOSED:
-        if (order.status == ORDER_READY ||
-            order.status == ORDER_DELIVERING) {
+        if (order.status == ORDER_READY || order.status == ORDER_DELIVERING) {
           proceed = true;
         } else {
           proceed = false;
@@ -274,9 +268,11 @@ class ViewOrderModel with ChangeNotifier {
 
   void updateDiscount(double discount) => updateWith(discount: discount);
 
-  void updateCashReceived(double cashReceived) => updateWith(cashReceived: cashReceived);
+  void updateCashReceived(double cashReceived) =>
+      updateWith(cashReceived: cashReceived);
 
-  void updateAutomaticallyCloseOrder(bool flag) => updateWith(automaticallyCloseOrder: flag);
+  void updateAutomaticallyCloseOrder(bool flag) =>
+      updateWith(automaticallyCloseOrder: flag);
 
   void updateWith({
     String notes,
@@ -297,7 +293,8 @@ class ViewOrderModel with ChangeNotifier {
     this.order.paymentMethod = paymentMethod ?? this.order.paymentMethod;
     this.order.paymentMethods = paymentMethods ?? this.order.paymentMethods;
     this.order.deliveryOption = deliveryOption ?? this.order.deliveryOption;
-    this.automaticallyCloseOrder = automaticallyCloseOrder ?? this.automaticallyCloseOrder;
+    this.automaticallyCloseOrder =
+        automaticallyCloseOrder ?? this.automaticallyCloseOrder;
     this.isLoading = isLoading ?? this.isLoading;
     this.submitted = this.submitted;
     notifyListeners();

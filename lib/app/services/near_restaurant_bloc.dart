@@ -16,7 +16,7 @@ class NearRestaurantBloc {
     source.forEach((rest) {
       resList.clear();
       rest.forEach((res) async {
-        double distance = GeolocatorPlatform.distanceBetween(
+        double distance = Geolocator.distanceBetween(
           userCoordinates.latitude,
           userCoordinates.longitude,
           res.coordinates.latitude,
@@ -27,11 +27,10 @@ class NearRestaurantBloc {
         } else if (res.active && distance < res.deliveryRadius) {
           resList.add(res);
         }
-      _stream.add(resList);
+        _stream.add(resList);
       });
     });
   }
 
   Stream<List<Restaurant>> get stream => _stream.stream;
-
 }

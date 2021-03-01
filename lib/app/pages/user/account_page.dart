@@ -18,7 +18,6 @@ import 'package:nearbymenus/app/utilities/logo_image_asset.dart';
 import 'package:provider/provider.dart';
 
 class AccountPage extends StatefulWidget {
-
   @override
   _AccountPageState createState() => _AccountPageState();
 }
@@ -28,8 +27,8 @@ class _AccountPageState extends State<AccountPage> {
   Session session;
   Database database;
   NavigationService navigationService;
-  Restaurant restaurant = Restaurant(
-      name: '', address1: '', acceptingStaffRequests: false);
+  Restaurant restaurant =
+      Restaurant(name: '', address1: '', acceptingStaffRequests: false);
   int _ordersLeft = 0;
   String _lastBundlePurchase = '';
 
@@ -38,7 +37,9 @@ class _AccountPageState extends State<AccountPage> {
       session.userDetails.orderOnHold = null;
       session.currentOrder = null;
       session.userProcessComplete = false;
-      database.setUserDetails(session.userDetails).then((value) => auth.signOut());
+      database
+          .setUserDetails(session.userDetails)
+          .then((value) => auth.signOut());
     } catch (e) {
       print(e.toString());
     }
@@ -97,21 +98,21 @@ class _AccountPageState extends State<AccountPage> {
 
   void _lockedOrders(BuildContext context) {
     Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (BuildContext context) => LockedOrders(),
-        ),
+      MaterialPageRoute(
+        builder: (BuildContext context) => LockedOrders(),
+      ),
     );
   }
 
-  void _convertUser(BuildContext context, Function(BuildContext) nextAction) async {
+  void _convertUser(
+      BuildContext context, Function(BuildContext) nextAction) async {
     if (!session.userProcessComplete) {
       final ConversionProcess conversionProcess = ConversionProcess(
           navigationService: navigationService,
           session: session,
           auth: auth,
           database: database,
-          captureUserDetails: false
-      );
+          captureUserDetails: false);
       if (!await conversionProcess.userCanProceed()) {
         return;
       }
@@ -146,15 +147,14 @@ class _AccountPageState extends State<AccountPage> {
       _userDetailsSection(
         context: context,
         sectionTitle: 'Your details',
-        cardTitle:
-            nameEmail,
+        cardTitle: nameEmail,
         cardSubtitle: session.userDetails.address1 == ''
             ? 'Address unknown'
             : '${session.userDetails.address1}\n'
-            '${session.userDetails.address2}\n'
-            '${session.userDetails.address3}\n'
-            '${session.userDetails.address4}\n'
-            '${session.userDetails.telephone}',
+                '${session.userDetails.address2}\n'
+                '${session.userDetails.address3}\n'
+                '${session.userDetails.address4}\n'
+                '${session.userDetails.telephone}',
         onPressed: () => _convertUser(context, _changeDetails),
       ),
       // SUBSCRIPTION
@@ -163,8 +163,7 @@ class _AccountPageState extends State<AccountPage> {
           context: context,
           sectionTitle: 'Bundle details',
           cardTitle: 'Orders left: $_ordersLeft',
-          cardSubtitle:
-              'Last purchase was on: $_lastBundlePurchase',
+          cardSubtitle: 'Last purchase was on: $_lastBundlePurchase',
           onPressed: () => _convertUser(context, _upSell),
         ),
       if (FlavourConfig.isManager())
@@ -174,15 +173,15 @@ class _AccountPageState extends State<AccountPage> {
           cardTitle: 'Tap to see and unlock orders across all your restaurants',
           cardSubtitle: '',
           onPressed: () => _convertUser(context, _lockedOrders),
-          ),
-      // ABOUT
-        _userDetailsSection(
-          context: context,
-          sectionTitle: 'About',
-          cardTitle: 'Tap here for information about this app and other actions',
-          cardSubtitle: '',
-          onPressed: () => _aboutPage(context),
         ),
+      // ABOUT
+      _userDetailsSection(
+        context: context,
+        sectionTitle: 'About',
+        cardTitle: 'Tap here for information about this app and other actions',
+        cardSubtitle: '',
+        onPressed: () => _aboutPage(context),
+      ),
     ];
   }
 
@@ -262,16 +261,18 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   Future<String> _reloadUser() async {
+    String emailString = '';
     try {
       await auth.reloadUser();
       if (await auth.userEmailVerified()) {
-            return await auth.userEmail();
-          } else {
-            return 'Email not verified yet';
-          }
+        emailString = await auth.userEmail();
+      } else {
+        emailString = 'Email not verified yet';
+      }
     } catch (e) {
       print(e);
     }
+    return emailString;
   }
 
   @override
@@ -293,48 +294,48 @@ class _AccountPageState extends State<AccountPage> {
         ),
         actions: <Widget>[
           if (!session.isAnonymousUser)
-          FlatButton(
-            child: Text(
-              'Logout',
-              style: Theme.of(context).primaryTextTheme.button,
+            FlatButton(
+              child: Text(
+                'Logout',
+                style: Theme.of(context).primaryTextTheme.button,
+              ),
+              onPressed: () => _confirmSignOut(context),
             ),
-            onPressed: () => _confirmSignOut(context),
-          ),
         ],
       ),
       body: StreamBuilder<UserDetails>(
-        stream: database.userDetailsStream(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.active || !snapshot.hasData) {
-            return Center(child: PlatformProgressIndicator());
-          } else {
-            session.userDetails = snapshot.data;
-            if (FlavourConfig.isManager()) {
-              _lastBundlePurchase = '\nYou haven\'t bought any bundles';
-              return FutureBuilder<List<Bundle>>(
-                  future: database.bundlesSnapshot(session.userDetails.email),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState != ConnectionState.waiting &&
-                        snapshot.hasData) {
-                      if (snapshot.data.length > 0) {
-                        final bundles = snapshot.data;
-                        bundles.removeWhere((element) => element.id == null);
-                        bundles.sort((a, b) => b.id.compareTo(a.id));
-                        if (bundles.length > 0) {
-                          _lastBundlePurchase = '\n' + bundles[0].id;
-                        }
-                      }
-                      return _buildContents(context);
-                    } else {
-                      return Center(child: PlatformProgressIndicator());
-                    }
-                  });
+          stream: database.userDetailsStream(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.active ||
+                !snapshot.hasData) {
+              return Center(child: PlatformProgressIndicator());
             } else {
-              return _buildContents(context);
+              session.userDetails = snapshot.data;
+              if (FlavourConfig.isManager()) {
+                _lastBundlePurchase = '\nYou haven\'t bought any bundles';
+                return FutureBuilder<List<Bundle>>(
+                    future: database.bundlesSnapshot(session.userDetails.email),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState != ConnectionState.waiting &&
+                          snapshot.hasData) {
+                        if (snapshot.data.length > 0) {
+                          final bundles = snapshot.data;
+                          bundles.removeWhere((element) => element.id == null);
+                          bundles.sort((a, b) => b.id.compareTo(a.id));
+                          if (bundles.length > 0) {
+                            _lastBundlePurchase = '\n' + bundles[0].id;
+                          }
+                        }
+                        return _buildContents(context);
+                      } else {
+                        return Center(child: PlatformProgressIndicator());
+                      }
+                    });
+              } else {
+                return _buildContents(context);
+              }
             }
-          }
-        }
-      ),
+          }),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     );
   }

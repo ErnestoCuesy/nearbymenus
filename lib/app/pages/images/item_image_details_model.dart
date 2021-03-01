@@ -22,25 +22,26 @@ class ItemImageDetailsModel with ItemImageValidators, ChangeNotifier {
   bool isLoading;
   bool submitted;
 
-  final FirebaseStorage _storage = FirebaseStorage(storageBucket: 'gs://nearby-menus-be6e3.appspot.com');
+  final FirebaseStorage _storage = FirebaseStorage.instanceFor(
+      bucket: 'gs://nearby-menus-be6e3.appspot.com');
 
   Map<dynamic, dynamic> itemImages;
   ImagePicker _imagePicker = ImagePicker();
 
   String fileName;
-  StorageReference storageReference;
-  StorageUploadTask uploadTask;
+  Reference storageReference;
+  UploadTask uploadTask;
 
-  ItemImageDetailsModel(
-      {@required this.database,
-        @required this.restaurant,
-        this.id,
-        this.description,
-        this.url,
-        this.image,
-        this.isLoading = false,
-        this.submitted = false,
-      });
+  ItemImageDetailsModel({
+    @required this.database,
+    @required this.restaurant,
+    this.id,
+    this.description,
+    this.url,
+    this.image,
+    this.isLoading = false,
+    this.submitted = false,
+  });
 
   Future<void> save() async {
     updateWith(isLoading: true, submitted: true);
@@ -63,13 +64,16 @@ class ItemImageDetailsModel with ItemImageValidators, ChangeNotifier {
   }
 
   Future getImage() async {
-    PickedFile pickedImage = await _imagePicker.getImage(source: ImageSource.gallery);
+    PickedFile pickedImage =
+        await _imagePicker.getImage(source: ImageSource.gallery);
     if (pickedImage != null) {
       var tempPath = pickedImage.path.split('image_picker');
       var dirPath = tempPath[0];
       var tempName = tempPath[1].split('.');
       var newPath = dirPath + tempName[0] + 'comp.' + tempName[1];
-      var result = await FlutterImageCompress.compressAndGetFile(pickedImage.path, newPath, quality: 50);
+      var result = await FlutterImageCompress.compressAndGetFile(
+          pickedImage.path, newPath,
+          quality: 50);
       imageFile = File(result.path);
       image = Image.file(result);
       updateWith(image: image, imageChanged: true);
@@ -82,8 +86,12 @@ class ItemImageDetailsModel with ItemImageValidators, ChangeNotifier {
     uploadTask = storageReference.putFile(imageFile);
     updateWith(isLoading: true);
     try {
-      final StorageTaskSnapshot downloadUrl = await uploadTask.onComplete;
-      url = await downloadUrl.ref.getDownloadURL();
+      await uploadTask.then((TaskSnapshot snapshot) async {
+        url = await snapshot.ref.getDownloadURL();
+        print('Update complete!');
+      }).catchError((Object e) {
+        print(e);
+      });
       print('Image file uploaded, url is $url');
     } catch (e) {
       print(e);
@@ -94,14 +102,16 @@ class ItemImageDetailsModel with ItemImageValidators, ChangeNotifier {
 
   String get primaryButtonText => 'Save';
 
-  bool get canSave => itemImageDescriptionValidator.isValid(description) && !isLoading;
+  bool get canSave =>
+      itemImageDescriptionValidator.isValid(description) && !isLoading;
 
   String get itemImageDescriptionErrorText {
     bool showErrorText = !itemImageDescriptionValidator.isValid(description);
     return showErrorText ? invalidItemImageDescriptionText : null;
   }
 
-  void updateItemImageDescription(String description) => updateWith(description: description);
+  void updateItemImageDescription(String description) =>
+      updateWith(description: description);
 
   void updateWith({
     String description,

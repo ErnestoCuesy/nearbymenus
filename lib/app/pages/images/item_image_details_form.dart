@@ -14,7 +14,8 @@ class ItemImageDetailsForm extends StatefulWidget {
   final ItemImageDetailsModel model;
   final ItemImage itemImage;
 
-  const ItemImageDetailsForm({Key key, this.model, this.itemImage}) : super(key: key);
+  const ItemImageDetailsForm({Key key, this.model, this.itemImage})
+      : super(key: key);
 
   static Widget create({
     BuildContext context,
@@ -48,7 +49,7 @@ class ItemImageDetailsForm extends StatefulWidget {
 
 class _ItemImageDetailsFormState extends State<ItemImageDetailsForm> {
   final TextEditingController _itemImageDescriptionController =
-  TextEditingController();
+      TextEditingController();
   final FocusNode _itemImageDescriptionFocusNode = FocusNode();
   double buttonSize = 200.0;
 
@@ -87,9 +88,9 @@ class _ItemImageDetailsFormState extends State<ItemImageDetailsForm> {
 
   void _itemImageDescriptionEditingComplete() {
     final newFocus =
-    model.itemImageDescriptionValidator.isValid(model.description)
-        ? _itemImageDescriptionFocusNode
-        : _itemImageDescriptionFocusNode;
+        model.itemImageDescriptionValidator.isValid(model.description)
+            ? _itemImageDescriptionFocusNode
+            : _itemImageDescriptionFocusNode;
     FocusScope.of(context).requestFocus(newFocus);
   }
 
@@ -115,13 +116,18 @@ class _ItemImageDetailsFormState extends State<ItemImageDetailsForm> {
                   textAlign: TextAlign.center,
                   style: Theme.of(context).accentTextTheme.headline6,
                 ),
-                SizedBox(height: 8.0,),
+                SizedBox(
+                  height: 8.0,
+                ),
                 if (model.imageChanged && model.imageFile != null)
-                Expanded(child: Image.file(model.imageFile)),
+                  Expanded(child: Image.file(model.imageFile)),
                 if (!model.imageChanged && model.image != null)
-                Expanded(child: model.image),
+                  Expanded(child: model.image),
                 if (model.image == null && model.imageFile == null)
-                Icon(Icons.image,size: 36.0,),
+                  Icon(
+                    Icons.image,
+                    size: 36.0,
+                  ),
               ],
             ),
           ),
@@ -142,35 +148,36 @@ class _ItemImageDetailsFormState extends State<ItemImageDetailsForm> {
         height: 8.0,
       ),
       if (model.uploadTask != null)
-      StreamBuilder<StorageTaskEvent>(
-        stream: model.uploadTask.events,
-        builder: (context, snapshot) {
-          var event = snapshot?.data?.snapshot;
-          double progressPercent = event != null
-                  ? event.bytesTransferred / event.totalByteCount
-                  : 0;
-          return Column(
-            children: <Widget>[
-              if (model.uploadTask.isComplete)
-                Text('Complete'),
-              if (model.uploadTask.isPaused)
-                FlatButton(
-                  child: Icon(Icons.play_arrow),
-                  onPressed: model.uploadTask.resume,
-                ),
-              if (model.uploadTask.isInProgress)
-                FlatButton(
-                  child: Icon(Icons.pause),
-                  onPressed: model.uploadTask.pause,
-                ),
-              LinearProgressIndicator(value: progressPercent,),
-              Text(
-                '${(progressPercent * 100).toStringAsFixed(2)} % '
-              )
-            ],
-          );
-        }
-      ),
+        StreamBuilder<TaskSnapshot>(
+            stream: model.uploadTask.snapshotEvents,
+            builder: (context, snapshot) {
+              var event = snapshot?.data;
+              double progressPercent =
+                  event != null ? event.bytesTransferred / event.totalBytes : 0;
+              TaskState snapshotState;
+              model.uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
+                snapshotState = snapshot.state;
+              });
+              return Column(
+                children: <Widget>[
+                  if (snapshotState == TaskState.success) Text('Complete'),
+                  if (snapshotState == TaskState.paused)
+                    FlatButton(
+                      child: Icon(Icons.play_arrow),
+                      onPressed: model.uploadTask.resume,
+                    ),
+                  if (snapshotState == TaskState.running)
+                    FlatButton(
+                      child: Icon(Icons.pause),
+                      onPressed: model.uploadTask.pause,
+                    ),
+                  LinearProgressIndicator(
+                    value: progressPercent,
+                  ),
+                  Text('${(progressPercent * 100).toStringAsFixed(2)} % ')
+                ],
+              );
+            }),
     ];
   }
 

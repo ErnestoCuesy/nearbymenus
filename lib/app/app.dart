@@ -28,17 +28,20 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   Position _defaultLocation = Position(longitude: 0, latitude: 0);
-  final MethodChannel platform = MethodChannel('crossingthestreams.io/resourceResolver');
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  final MethodChannel platform =
+      MethodChannel('crossingthestreams.io/resourceResolver');
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
   bool _continueFlag = false;
   GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
 // Streams are created so that app can respond to notification-related events since the plugin is initialised in the `main` function
-  final BehaviorSubject<ReceivedNotification> didReceiveLocalNotificationSubject =
-  BehaviorSubject<ReceivedNotification>();
+  final BehaviorSubject<ReceivedNotification>
+      didReceiveLocalNotificationSubject =
+      BehaviorSubject<ReceivedNotification>();
 
   final BehaviorSubject<String> selectNotificationSubject =
-  BehaviorSubject<String>();
+      BehaviorSubject<String>();
 
   NotificationAppLaunchDetails notificationAppLaunchDetails;
 
@@ -76,17 +79,18 @@ class _MyAppState extends State<MyApp> {
       appStoreIdentifier: appStoreIdentifier,
     );
     rateMyApp.init().then((_) => RateApp.displayDialog(
-        context: context,
-        rateMyApp: rateMyApp,
-        forceDialog: false,
-    ));
+          context: context,
+          rateMyApp: rateMyApp,
+          forceDialog: false,
+        ));
   }
 
   void _initNotifications() async {
     notificationAppLaunchDetails =
         await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
 
-    var initializationSettingsAndroid = AndroidInitializationSettings('launchericon');
+    var initializationSettingsAndroid =
+        AndroidInitializationSettings('launchericon');
     // Note: permissions aren't requested here just to demonstrate that can be done later using the `requestPermissions()` method
     // of the `IOSFlutterLocalNotificationsPlugin` class
     var initializationSettingsIOS = IOSInitializationSettings(
@@ -104,22 +108,22 @@ class _MyAppState extends State<MyApp> {
 
     await flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onSelectNotification: (String payload) async {
-          if (payload != null) {
-            debugPrint('notification payload: ' + payload);
-          }
-          selectNotificationSubject.add(payload);
-        });
+      if (payload != null) {
+        debugPrint('notification payload: ' + payload);
+      }
+      selectNotificationSubject.add(payload);
+    });
   }
 
   void _requestIOSPermissions() {
     flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-        IOSFlutterLocalNotificationsPlugin>()
+            IOSFlutterLocalNotificationsPlugin>()
         ?.requestPermissions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+          alert: true,
+          badge: true,
+          sound: true,
+        );
   }
 
   @override
@@ -130,9 +134,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _askPermission() {
-    requestPermission().then((status) {
-      setState(() {
-      });
+    Geolocator.requestPermission().then((status) {
+      setState(() {});
     });
   }
 
@@ -147,64 +150,76 @@ class _MyAppState extends State<MyApp> {
     // Below line disabled since the bottom android nav bar behaves funny
     // SystemChrome.setEnabledSystemUIOverlays([]);
     return FutureBuilder<LocationPermission>(
-      future: checkPermission(),
+      future: Geolocator.checkPermission(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return SplashScreen();
         } else {
-          if (snapshot.data == LocationPermission.deniedForever && !_continueFlag) {
+          if (snapshot.data == LocationPermission.deniedForever &&
+              !_continueFlag) {
             return LocationServicesError(
               askPermission: () => _askPermission(),
               continueWithoutLocation: () => _continueWithoutLocation(),
-              message: 'Access to location not granted or location services are off. Please rectify and re-run LVE Navigator.',
+              message:
+                  'Access to location not granted or location services are off. Please rectify and re-run LVE Navigator.',
             );
           }
           return FutureBuilder<Position>(
-              future: getCurrentPosition(desiredAccuracy: LocationAccuracy.best),
+              future: Geolocator.getCurrentPosition(
+                  desiredAccuracy: LocationAccuracy.best),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
-                    return MultiProvider(
-                        providers: [
-                          Provider.value(value: flutterLocalNotificationsPlugin),
-                          Provider<NotificationStreams>(create: (context) => NotificationStreams(
-                              didReceiveLocalNotificationSubject: didReceiveLocalNotificationSubject,
-                              selectNotificationSubject: selectNotificationSubject),
-                          ),
-                          Provider<LogoImageAsset>(create: (context) => LogoImageAsset()),
-                          Provider<AuthBase>(create: (context) => Auth()),
-                          Provider<Database>(create: (context) => FirestoreDatabase()),
-                          Provider<Session>(create: (context) => Session(position: snapshot.data ?? _defaultLocation)),
-                          Provider<NavigationService>(create: (context) => NavigationService(navigatorKey: _navigatorKey),)
-                        ],
-                        child: MaterialApp(
-                          navigatorKey: _navigatorKey,
-                          title: 'Nearby Menus',
-                          theme: AppTheme.createTheme(context),
-                          home: LandingPage(),
-                          builder: (context, widget) => ResponsiveWrapper.builder(
-                            widget,
-                            maxWidth: 1200,
-                            minWidth: 450,
-                            defaultScale: true,
-                            breakpoints: [
-                              ResponsiveBreakpoint.resize(450, name: MOBILE),
-                              ResponsiveBreakpoint.autoScale(800, name: TABLET),
-                              ResponsiveBreakpoint.autoScale(1000, name: TABLET),
-                            ],
-                          ),
+                  return MultiProvider(
+                      providers: [
+                        Provider.value(value: flutterLocalNotificationsPlugin),
+                        Provider<NotificationStreams>(
+                          create: (context) => NotificationStreams(
+                              didReceiveLocalNotificationSubject:
+                                  didReceiveLocalNotificationSubject,
+                              selectNotificationSubject:
+                                  selectNotificationSubject),
+                        ),
+                        Provider<LogoImageAsset>(
+                            create: (context) => LogoImageAsset()),
+                        Provider<AuthBase>(create: (context) => Auth()),
+                        Provider<Database>(
+                            create: (context) => FirestoreDatabase()),
+                        Provider<Session>(
+                            create: (context) => Session(
+                                position: snapshot.data ?? _defaultLocation)),
+                        Provider<NavigationService>(
+                          create: (context) =>
+                              NavigationService(navigatorKey: _navigatorKey),
                         )
-                    );
-                } else
-                if (snapshot.connectionState == ConnectionState.waiting) {
+                      ],
+                      child: MaterialApp(
+                        navigatorKey: _navigatorKey,
+                        title: 'Nearby Menus',
+                        theme: AppTheme.createTheme(context),
+                        home: LandingPage(),
+                        builder: (context, widget) => ResponsiveWrapper.builder(
+                          widget,
+                          maxWidth: 1200,
+                          minWidth: 450,
+                          defaultScale: true,
+                          breakpoints: [
+                            ResponsiveBreakpoint.resize(450, name: MOBILE),
+                            ResponsiveBreakpoint.autoScale(800, name: TABLET),
+                            ResponsiveBreakpoint.autoScale(1000, name: TABLET),
+                          ],
+                        ),
+                      ));
+                } else if (snapshot.connectionState ==
+                    ConnectionState.waiting) {
                   return SplashScreen();
                 } else {
                   return LocationServicesError(
                     askPermission: () => _askPermission(),
-                    message: 'Please make sure location services are enabled before proceeding.',
+                    message:
+                        'Please make sure location services are enabled before proceeding.',
                   );
                 }
-              }
-          );
+              });
         }
       },
     );
