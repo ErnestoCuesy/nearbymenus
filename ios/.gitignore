@@ -30,3 +30,10 @@ Runner/GeneratedPluginRegistrant.*
 !default.mode2v3
 !default.pbxuser
 !default.perspectivev3
+
+# API keys and signing files
+android/key.properties
+android/app/google-services.json
+android/app/src/main/AndroidManifest.xml
+ios/Runner/GoogleService-Info.plist
+ios/Runner/AppDelegate.swift
